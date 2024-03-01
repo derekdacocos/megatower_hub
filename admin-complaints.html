@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Complaint Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
+        <div class="container">
+            <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
+                <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
+            </a>
+
+            <button class="navbar-toggler" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#navmenu" 
+            aria-controls="navmenu" 
+            aria-expanded="false" 
+            aria-label="Toggle navigation menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light">Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Request
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
+                            <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="roomsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Rooms
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="roomsDropdown">
+                            <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                            <a class="dropdown-item" href="admin-room-form.html">Room Form</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                    <a href="user-management.html" class="nav-link text-light">Users</a>
+                </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>   
+    </nav>
+
+    <div class="container mt-5">
+        <h2>Complaints</h2>
+        <div id="complaintList"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+            authDomain: "megatower-hub-ca285.firebaseapp.com",
+            databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+            projectId: "megatower-hub-ca285",
+            storageBucket: "megatower-hub-ca285.appspot.com",
+            messagingSenderId: "900973693171",
+            appId: "1:900973693171:web:9062bf9b49221596294f86"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        // Firebase Realtime Database
+        const database = firebase.database();
+
+        // Fetch and display complaints
+        function displayComplaints() {
+            const complaintList = document.getElementById('complaintList');
+
+            // Remove existing content
+            complaintList.innerHTML = "";
+
+            // Fetch complaints from Firebase, order by date and time
+            database.ref('complaints').orderByChild('dateTime').once('value')
+                .then(snapshot => {
+                    snapshot.forEach(childSnapshot => {
+                        const complaint = childSnapshot.val();
+                        const complaintKey = childSnapshot.key;
+
+                        // Create HTML elements for each complaint
+                        const complaintDiv = document.createElement('div');
+                        complaintDiv.className = 'border p-3 my-3';
+
+                        const name = complaint.name || "Anonymous";
+                        const complaintMessage = complaint.complaintMessage;
+                        const dateTime = complaint.dateTime;
+                        const resolved = complaint.resolved || false;
+
+                        // Determine button text based on resolved status
+                        const buttonText = resolved ? "Mark Unresolved" : "Set as Resolved";
+
+                        complaintDiv.innerHTML = `
+                            <strong>${name}</strong> (${dateTime})<br>
+                            ${complaintMessage}<br>
+                            Resolved: ${resolved ? 'Yes' : 'No'}<br>
+                            <button class="btn btn-success" onclick="toggleResolvedStatus('${complaintKey}', ${resolved})">${buttonText}</button>
+                            <hr>
+                        `;
+
+                        complaintList.appendChild(complaintDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error(error.message);
+                });
+        }
+
+        // Function to toggle the resolved status and send notification
+        function toggleResolvedStatus(complaintKey, currentStatus) {
+        const newStatus = !currentStatus;
+
+        // Fetch the user ID associated with the complaint
+        database.ref(`complaints/${complaintKey}/userID`).once('value')
+            .then(userSnapshot => {
+                const userID = userSnapshot.val();
+                const dateTime = new Date().toLocaleString(); // Convert dateTime to readable format
+                const notificationMessage = `The issue you submitted on ${dateTime} has been ${newStatus ? 'resolved' : 'marked unresolved'}.`;
+
+                // Update the resolved status and add notification to the user's collection
+                database.ref(`users/${userID}/notifications`).push({
+                    complaintID: complaintKey,
+                    notification: newStatus ? notificationMessage : null,
+                    dateTime: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // Update the resolved status in the complaints
+                return database.ref(`complaints/${complaintKey}`).update({
+                    resolved: newStatus
+                });
+            })
+            .then(() => {
+                // Display updated complaints
+                displayComplaints();
+
+                const statusText = newStatus ? 'resolved' : 'unresolved';
+                alert(`Complaint marked as ${statusText}. Notification sent to user.`);
+            })
+            .catch(error => {
+                console.error(error.message);
+                alert("Error marking complaint as resolved. Please try again.");
+            });
+    }
+
+        // Function to send notification to the user (replace with your actual notification method)
+        function sendNotificationToUser(complaintKey, message) {
+            // This is a placeholder; replace it with your actual notification method
+            // For example, you might send a push notification to the user's device
+            console.log(`Notification sent to user for complaint ${complaintKey}: ${message}`);
+        }
+
+            // Display complaints on page load
+            displayComplaints();
+        </script>
+</body>
+</html>

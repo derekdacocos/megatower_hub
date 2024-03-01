@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Condo Reservation</title>
+  <!-- Add Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Add Bootstrap Datepicker CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+  <!-- Add Custom CSS -->
+  <style>
+    /* Add your custom styles here */
+    body {
+      padding: 20px;
+    }
+
+    /* Additional styles for room types section */
+    .room-type {
+      margin-top: 20px;
+    }
+
+    .room-type img {
+      width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    /* Custom CSS for swiper */
+    .swiper-container {
+      height: 50vh; /* Set swiper height to 20% of viewport height */
+    }
+
+    .swiper-slide img {
+      width: 100%; /* Make images fill the entire width of the swiper */
+      height: 100%; /* Make images fill the entire height of the swiper */
+      object-fit: cover; /* Maintain aspect ratio and cover entire slide */
+    }
+
+    /* Custom CSS for search button */
+    .search-button {
+      position: absolute;
+      left: 50%;
+      bottom: calc(20vh + 1/3 * (100vh - 20vh));
+      transform: translateX(-50%);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Swiper -->
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+      <!-- Add your swiper slides here -->
+      <div class="swiper-slide">
+        <img src="https://static.wixstatic.com/media/1817fe_e325baa235fe43539115cc7041c673e4~mv2.jpg/v1/fill/w_525,h_613,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/MEGATOWER%20RESIDENCES%20III%20(1).jpg" alt="Slide 1">
+      </div>
+      <div class="swiper-slide">
+        <img src="https://static.wixstatic.com/media/ba324c_f2697c21035c436aa06e65852c7caaf1~mv2.jpg/v1/fill/w_380,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/megapines_tower-3-1.jpg" alt="Slide 2">
+      </div>
+      <!-- Add more slides as needed -->
+    </div>
+</div>
+
+<!-- Check availability form -->
+<div class="container availability-form">
+    <div class="row">
+        <div class="col-lg-12 bg-white shadow p-4 rounded">
+            <h5 class="col-lg-3">Condominium Reservation</h5>
+            <form>
+                <div class="row align-items-end">
+                    <!-- Type Dropdown -->
+                    <div class="col-lg-2 mb-3">
+                        <label class="form-label" style="font-weight: 500;">Type</label>
+                        <select class="form-select" aria-label="Type" id="typeDropdown">
+                            <option selected>Choose...</option>
+                            <option value="transient">Transient</option>
+                            <option value="buying">Buying</option>
+                            <option value="lease">Lease</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3 mb-3">
+                        <label class="form-label" style="font-weight: 500;">Check-in</label>
+                        <input type="date" class="form-control shadow-none datepicker" id="checkInDate">
+                    </div>
+                    <div class="col-lg-3 mb-3">
+                        <label class="form-label" style="font-weight: 500;">Check-out</label>
+                        <input type="date" class="form-control shadow-none datepicker" id="checkOutDate">
+                    </div>                    
+                    <div class="col-lg-2 mb-3">
+                        <label class="form-label" style="font-weight: 500;">Guests</label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#guestModal">
+                                Guests
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 mb-lg-3 mt-2">
+                        <button type="submit" class="btn text-white shadow-none bg-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Guest Modal -->
+<div class="modal fade" id="guestModal" tabindex="-1" role="dialog" aria-labelledby="guestModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="guestModalLabel">Select Guests</h5>
+                <!-- Replace the close button with a cancel button -->
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="adultsCount">Adults</label>
+                    <input type="number" class="form-control" id="adultsCount" min="1" value="1">
+                </div>
+                <div class="mb-3">
+                    <label for="childrenCount">Children</label>
+                    <input type="number" class="form-control" id="childrenCount" min="0" value="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- Update the "Apply Changes" button to close the modal -->
+                <button type="button" class="btn btn-primary" onclick="updateGuestCount()" data-dismiss="modal">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Our Rooms -->
+<h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">AVAILABLE ROOMS</h2>
+<div class="container">
+
+</div>
+
+<!-- Amenities section -->
+<div class="container amenities-section mt-4">
+    <div class="row">
+        <div class="col-lg-12 bg-white shadow p-4 rounded">
+            <h2 class="col-lg-12 text-center mb-4">Amenities and Facilities</h2>
+            <div class="row">
+                <!-- Column 1 -->
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <ul>
+                        <li><strong>Kitchen</strong></li>
+                            <ul>
+                                <li>Dishes and dining utensils</li>
+                                <li>Microwave</li>
+                                <li>Refrigerator</li>
+                            </ul>
+                        <li><strong>Bathroom</strong></li>
+                            <ul>
+                                <li>Body wash</li>
+                            </ul>
+                        <li><strong>Standard</strong></li>
+                            <ul>
+                                <li>Fans (ceiling or portable)</li>
+                                <li>Laundromat nearby</li>
+                            </ul>
+                    </ul>
+                </div>
+                <!-- Column 2 -->
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <ul>
+                        <li><strong>Outdoor</strong></li>
+                            <ul>
+                                <li>Garden or backyard</li>
+                            </ul>
+                        <li><strong>Entertainment</strong></li>
+                            <ul>
+                                <li>Internet</li>
+                                <li>TV</li>
+                                <li>Wi-Fi</li>
+                            </ul>
+                        <li><strong>Comforts</strong></li>
+                            <ul>
+                                <li>Linens</li>
+                            </ul>
+                    </ul>
+                </div>
+                <!-- Column 3 -->
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <ul>
+                        <li><strong>Dining, drinking, and snacking</strong></li>
+                            <ul>
+                                <li>Coffee or tea</li>
+                            </ul>
+                        <li><strong>Bathroom and toiletries</strong></li>
+                            <ul>
+                                <li>Hair dryer</li>
+                                <li>Toiletries</li>
+                            </ul>
+                        <li><strong>Services and conveniences</strong></li>
+                            <ul>
+                                <li>Doorman</li>
+                                <li>Elevator</li>
+                            </ul>
+                    </ul>
+                </div>
+                <!-- Column 4 -->
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <ul>
+                        <li><strong>Safety and security features</strong></li>
+                            <ul>
+                                <li>Fire extinguisher</li>
+                                <li>Smoke detector</li>
+                            </ul>
+                        <li><strong>Access</strong></li>
+                            <ul>
+                                <li>Security [24-hour]</li>
+                            </ul>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Add Bootstrap Datepicker JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+<!-- Initialize Bootstrap Datepicker -->
+<script>
+    $(document).ready(function(){
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);  // Set hours to 0 to include the entire day
+
+      $('#checkInDate').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd',
+        startDate: today,
+        todayHighlight: true
+      });
+
+      $('#checkOutDate').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd',
+        startDate: today,
+        todayHighlight: true
+      });
+
+      // Optionally, you can set the start date of the second datepicker to the selected date in the first datepicker.
+      $('#checkInDate').on('changeDate', function(selected){
+        var startDate = new Date(selected.date.valueOf());
+        $('#checkOutDate').datepicker('setStartDate', startDate);
+      });
+    });
+</script>
+
+<!-- Add Swiper JS -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script>
+  // Initialize Swiper
+  var swiper = new Swiper('.swiper-container', {
+    // Add your swiper options here
+    loop: true, // Loop through slides
+    autoplay: {
+      delay: 3000, // Time between slides (in milliseconds)
+    },
+  });
+</script>
+
+<script>
+    // Function to update the guest count
+    function updateGuestCount() {
+        var adultsCount = document.getElementById('adultsCount').value;
+        var childrenCount = document.getElementById('childrenCount').value;
+
+        // Set the placeholder of the "Guests" button
+        document.querySelector('.input-group button').textContent = 'Guests: ' + (parseInt(adultsCount) + parseInt(childrenCount));
+
+        // Update the guest count display if needed
+        // For example, you can display it in an alert
+        alert('Guest count updated: Adults - ' + adultsCount + ', Children - ' + childrenCount);
+        
+        // You can also perform any other action you need here
+    }
+</script>
+
+<script>
+    // Function to handle form submission
+    function handleSubmit(event) {
+      event.preventDefault(); // Prevent default form submission
+  
+      // Fetch form inputs
+      var type = document.getElementById('typeDropdown').value;
+      var checkInDate = document.getElementById('checkInDate').value;
+      var checkOutDate = document.getElementById('checkOutDate').value;
+      var adultsCount = document.getElementById('adultsCount').value;
+      var childrenCount = document.getElementById('childrenCount').value;
+  
+      // Construct query string with form data
+      var queryString = '?type=' + encodeURIComponent(type) +
+                        '&checkInDate=' + encodeURIComponent(checkInDate) +
+                        '&checkOutDate=' + encodeURIComponent(checkOutDate) +
+                        '&adultsCount=' + encodeURIComponent(adultsCount) +
+                        '&childrenCount=' + encodeURIComponent(childrenCount);
+  
+      // Redirect to reservation-form.html with query string
+      window.location.href = 'reservation-form.html' + queryString;
+    }
+  
+    // Add event listener to form submit button
+    document.querySelector('form').addEventListener('submit', handleSubmit);
+</script>
+
+</body>
+</html>

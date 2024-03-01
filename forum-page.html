@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Forum</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+
+  <!--Navbar-->
+  <nav class="navbar navbar-expand-lg bg-success navbar-dark fixed-top">
+    <div class="container">
+        <a href="home-page.html" class="navbar-brand">MegaTower Hub</a>
+
+        <button class="navbar-toggler" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#navmenu" 
+            aria-controls="navmenu" 
+            aria-expanded="false" 
+            aria-label="Toggle navigation menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navmenu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <button type="button" class="nav-link text-light btn" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+                        Notifications
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <a href="complain-page.html" class="nav-link text-light">Complaints</a>
+                </li>
+                <li class="nav-item">
+                    <a href="request-page.html" class="nav-link text-light">Request</a>
+                </li>
+                <li class="nav-item">
+                    <a href="payment-page.html" class="nav-link text-light">Payment</a>
+                </li>
+                <li class="nav-item">
+                    <a href="forum-page.html" class="nav-link text-light">Forum</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#questions" class="nav-link text-light">FAQs</a>
+                </li>
+                <li class="nav-item">
+                    <a href="tenant-profile.html" class="nav-link text-light">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0);" onclick="logout()" class="nav-link text-light">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>   
+  </nav>
+
+  <div class="container mt-5">
+    <h1>Community Forum</h1>
+    <!-- Button to toggle discussion form -->
+    <button type="button" class="btn btn-primary mt-4" id="toggleDiscussionForm">Create Discussion</button>
+
+    <!-- Form for creating discussions -->
+    <form id="discussionForm" class="mt-4" style="display: none;">
+      <div class="mb-3">
+        <label for="discussionTitle" class="form-label">Discussion Title</label>
+        <input type="text" class="form-control" id="discussionTitle" required>
+      </div>
+      <div class="mb-3">
+        <label for="discussionContent" class="form-label">Discussion Content</label>
+        <textarea class="form-control" id="discussionContent" rows="3" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="discussionTags" class="form-label">Tags/Keywords</label>
+        <input type="text" class="form-control" id="discussionTags" placeholder="Separate tags with commas">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <!-- Recent discussions section -->
+    <div class="mt-5">
+      <h2>Recent Discussions</h2>
+      <div id="recentDiscussions"></div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+  <!-- Firebase JavaScript SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-messaging.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+      authDomain: "megatower-hub-ca285.firebaseapp.com",
+      databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+      projectId: "megatower-hub-ca285",
+      storageBucket: "megatower-hub-ca285.appspot.com",
+      messagingSenderId: "900973693171",
+      appId: "1:900973693171:web:9062bf9b49221596294f86"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Reference to the Firebase Realtime Database
+    var database = firebase.database();
+
+    // Function to fetch recent discussions
+    function fetchRecentDiscussions() {
+      database.ref('discussions').orderByChild('timestamp').limitToLast(10).on('value', function(snapshot) {
+        var recentDiscussionsDiv = document.getElementById('recentDiscussions');
+        recentDiscussionsDiv.innerHTML = ''; // Clear previous discussions
+        snapshot.forEach(function(childSnapshot) {
+          var postData = childSnapshot.val();
+          var postKey = childSnapshot.key; // Get discussion key
+          var postTitle = postData.title;
+          var postContent = postData.content;
+          var postAuthorUID = postData.authorUID; // Retrieve author's UID
+          var postTimestamp = new Date(postData.timestamp); // Get discussion timestamp
+
+          // Fetch author's full name from the database
+          database.ref('users/' + postAuthorUID + '/fullName').once('value').then(function(snapshot) {
+            var postAuthorName = snapshot.val(); // Retrieve author's full name
+
+            // Append discussion post to the recentDiscussions div
+            var discussionHTML = `
+            <div class="card mt-3">
+              <div class="card-body">
+                <h5 class="card-title">${postTitle}</h5>
+                <p class="card-text">${postContent}</p>
+                <small class="text-muted">Posted by ${postAuthorUID === firebase.auth().currentUser.uid ? 'You' : postAuthorName} on ${postTimestamp.toLocaleString()}</small>
+                
+                <!-- Tags section -->
+                <div class="mt-3">
+                  ${postData.tags.map(tag => `<span class="badge bg-secondary rounded-pill">${tag}</span>`).join(' ')}
+                </div>
+                
+                <!-- Upvote and downvote buttons with vote counts -->
+                <div class="mt-3">
+                  <button class="btn btn-link" onclick="upvote('${postKey}')"><i class="bi bi-arrow-up"></i></button>
+                  <span id="upvoteCount-${postKey}">${postData.upvotes || 0}</span>
+                  <button class="btn btn-link" onclick="downvote('${postKey}')"><i class="bi bi-arrow-down"></i></button>
+                  <span id="downvoteCount-${postKey}">${postData.downvotes || 0}</span>
+                  <button class="btn btn-link" onclick="toggleCommentInput('${postKey}')">Comment</button>
+                </div>
+                
+                <!-- Comment section -->
+                <div id="commentSection-${postKey}" class="mt-3" style="display: none;">
+                  <input type="text" class="form-control" id="commentInput-${postKey}" placeholder="Write a comment">
+                  <button class="btn btn-primary mt-2" onclick="postComment('${postKey}')">Post Comment</button>
+                </div>
+                
+                <!-- Comments -->
+                <div id="comments-${postKey}" class="mt-3">
+                  <!-- Comments will be displayed here -->
+                </div>
+              </div>
+            </div>`;
+            recentDiscussionsDiv.innerHTML += discussionHTML;
+            // Fetch and display comments for this discussion
+            fetchComments(postKey);
+          }).catch(function(error) {
+            console.error('Error fetching user data:', error.message);
+          });
+        });
+      });
+    }
+
+    // Function to handle discussion form submission
+    document.getElementById('discussionForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      // Get form values
+      var title = document.getElementById('discussionTitle').value;
+      var content = document.getElementById('discussionContent').value;
+      var tags = document.getElementById('discussionTags').value.split(',').map(tag => tag.trim());
+      var authorUID = firebase.auth().currentUser.uid; // Get current user's UID
+
+      // Add current timestamp to discussion data
+      var timestamp = new Date().toISOString();
+
+      // Add discussion to Firebase
+      var newDiscussionRef = database.ref('discussions').push();
+      var discussionKey = newDiscussionRef.key; // Get the key of the newly added discussion
+      newDiscussionRef.set({
+        title: title,
+        content: content,
+        tags: tags,
+        authorUID: authorUID,
+        timestamp: timestamp
+      });
+
+      // Reset form
+      document.getElementById('discussionForm').reset();
+    });
+
+    // Function to handle toggling the discussion form visibility
+    document.getElementById('toggleDiscussionForm').addEventListener('click', function() {
+      var discussionForm = document.getElementById('discussionForm');
+      var toggleButton = document.getElementById('toggleDiscussionForm');
+      // Toggle the display of the discussion form
+      if (discussionForm.style.display === 'none') {
+        discussionForm.style.display = 'block';
+        toggleButton.innerText = 'Cancel';
+      } else {
+        discussionForm.style.display = 'none';
+        toggleButton.innerText = 'Create Discussion';
+      }
+    });
+
+    // Function to toggle comment input visibility
+    function toggleCommentInput(postKey) {
+      var commentSection = document.getElementById('commentSection-' + postKey);
+      if (commentSection.style.display === 'none') {
+        commentSection.style.display = 'block';
+      } else {
+        commentSection.style.display = 'none';
+      }
+    }
+
+    // Function to post a comment
+    function postComment(postKey) {
+      var commentInput = document.getElementById('commentInput-' + postKey);
+      var commentText = commentInput.value.trim();
+      if (commentText !== '') {
+        var authorUID = firebase.auth().currentUser.uid; // Get current user's UID
+
+        // Fetch author's full name from the database
+        database.ref('users/' + authorUID + '/fullName').once('value').then(function(snapshot) {
+          var authorName = snapshot.val(); // Retrieve author's full name
+
+          var commentRef = database.ref('comments/' + postKey).push();
+          commentRef.set({
+            authorUID: authorUID,
+            authorName: authorName,
+            text: commentText
+          });
+          // Clear comment input after posting
+          commentInput.value = '';
+        }).catch(function(error) {
+          console.error('Error fetching user data:', error.message);
+        });
+      }
+    }
+
+    // Function to fetch and display comments for a given discussion post
+    function fetchComments(postKey) {
+      var commentsDiv = document.getElementById('comments-' + postKey);
+      commentsDiv.innerHTML = ''; // Clear previous comments
+
+      // Reference to the comments for the given discussion post
+      var commentsRef = database.ref('comments/' + postKey);
+      
+      // Fetch comments from the database
+      commentsRef.on('child_added', function(snapshot) {
+        var commentData = snapshot.val();
+        var commentAuthorName = commentData.authorName;
+        var commentText = commentData.text;
+
+        // Create HTML for the comment
+        var commentHTML = `
+          <div class="card mt-3">
+            <div class="card-body">
+              <p class="card-text">${commentText}</p>
+              <small class="text-muted">Comment by ${commentAuthorName}</small>
+            </div>
+          </div>`;
+
+        // Append the comment HTML to the commentsDiv
+        commentsDiv.innerHTML += commentHTML;
+      });
+    }
+
+    // Function to handle upvoting a post
+    function upvote(postKey) {
+      var user = firebase.auth().currentUser;
+      if (user) {
+        var userId = user.uid;
+        var postRef = database.ref('discussions/' + postKey);
+
+        postRef.once('value').then(function(snapshot) {
+          var post = snapshot.val();
+          if (!post.upvoters) {
+            post.upvoters = {};
+          }
+          if (post.upvoters[userId]) {
+            // Remove upvote
+            post.upvotes -= 1;
+            delete post.upvoters[userId];
+          } else {
+            // Add upvote
+            post.upvotes = (post.upvotes || 0) + 1;
+            post.upvoters[userId] = true;
+
+            // Check if user has already downvoted, remove downvote if yes
+            if (post.downvoters && post.downvoters[userId]) {
+              post.downvotes -= 1;
+              delete post.downvoters[userId];
+            }
+          }
+          postRef.update(post);
+        });
+      } else {
+        console.log("You need to be logged in to upvote.");
+      }
+    }
+
+    // Function to handle downvoting a post
+    function downvote(postKey) {
+      var user = firebase.auth().currentUser;
+      if (user) {
+        var userId = user.uid;
+        var postRef = database.ref('discussions/' + postKey);
+
+        postRef.once('value').then(function(snapshot) {
+          var post = snapshot.val();
+          if (!post.downvoters) {
+            post.downvoters = {};
+          }
+          if (post.downvoters[userId]) {
+            // Remove downvote
+            post.downvotes -= 1;
+            delete post.downvoters[userId];
+          } else {
+            // Add downvote
+            post.downvotes = (post.downvotes || 0) + 1;
+            post.downvoters[userId] = true;
+
+            // Check if user has already upvoted, remove upvote if yes
+            if (post.upvoters && post.upvoters[userId]) {
+              post.upvotes -= 1;
+              delete post.upvoters[userId];
+            }
+          }
+          postRef.update(post);
+        });
+      } else {
+        console.log("You need to be logged in to downvote.");
+      }
+    }
+
+    // Function to handle Firebase Authentication state changes
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in
+        // Display username or any other information if needed
+        console.log('User is signed in:', user.displayName);
+      } else {
+        // User is signed out
+        // Redirect or handle accordingly
+        console.log('User is signed out');
+      }
+    });
+
+    // Call fetchRecentDiscussions when the page loads
+    window.onload = function() {
+      fetchRecentDiscussions();
+    };
+  </script>
+</body>
+</html>

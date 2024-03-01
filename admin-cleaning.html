@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Cleaning Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
+        <div class="container">
+            <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
+                <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu" aria-controls="navmenu" aria-expanded="false" aria-label="Toggle navigation menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light">Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Request
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
+                            <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="roomsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Rooms
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="roomsDropdown">
+                            <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                            <a class="dropdown-item" href="admin-room-form.html">Room Form</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="user-management.html" class="nav-link text-light">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>   
+    </nav>
+
+    <!-- Content -->
+    <div class="container mt-5">
+        <h2 class="mb-4">Cleaning Queue</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Description</th>
+                    <th scope="col">Schedule</th>
+                    <th scope="col">Media</th>
+                    <th scope="col">Submitted At</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="cleaningQueue">
+                <!-- Cleaning requests will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal for displaying media -->
+    <div class="modal fade" id="mediaModal" tabindex="-1" aria-labelledby="mediaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mediaModalLabel">Media Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="" id="mediaPreview" class="img-fluid" alt="Media Preview">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for remarks -->
+    <div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="remarksModalLabel">Add Remarks</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" id="remarksInput" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submitRemarksBtn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Firebase JS -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+
+    <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+            authDomain: "megatower-hub-ca285.firebaseapp.com",
+            databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+            projectId: "megatower-hub-ca285",
+            storageBucket: "megatower-hub-ca285.appspot.com",
+            messagingSenderId: "900973693171",
+            appId: "1:900973693171:web:9062bf9b49221596294f86"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Function to format timestamp
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        // Function to open modal and display media
+        function openMediaModal(mediaURL) {
+            const mediaPreview = document.getElementById('mediaPreview');
+            mediaPreview.src = mediaURL;
+            $('#mediaModal').modal('show');
+        }
+
+        // Firebase listener for cleaning requests
+        const cleaningRef = firebase.database().ref('cleaningRequests');
+        cleaningRef.on('value', (snapshot) => {
+            const cleaningQueue = document.getElementById('cleaningQueue');
+            cleaningQueue.innerHTML = ''; // Clear the existing table
+            const requests = snapshot.val();
+
+            if (requests) {
+                const requestArray = Object.keys(requests).map((key) => ({
+                    id: key,
+                    ...requests[key]
+                }));
+
+                const sortedRequests = requestArray.sort((a, b) => {
+                    const dateA = new Date(`${a.scheduleDate} ${a.scheduleTime}`);
+                    const dateB = new Date(`${b.scheduleDate} ${b.scheduleTime}`);
+                    return dateA - dateB;
+                });
+
+                sortedRequests.forEach((request) => {
+                    const row = cleaningQueue.insertRow();
+                    row.innerHTML = `<td>${request.description}</td>
+                                    <td>${request.scheduleDate} ${request.scheduleTime}</td>
+                                    <td>
+                                        ${request.mediaURL ? `<button class="btn btn-primary" onclick="openMediaModal('${request.mediaURL}')">View Media</button>` : 'No Media'}
+                                    </td>
+                                    <td>${formatTimestamp(request.submittedAt)}</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="assignDropdown${request.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Assign to
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="assignDropdown${request.id}">
+                                                <!-- Modify staff names as needed -->
+                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Susan Victo')">Susan Victo</a>
+                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Pefonia Sanchez')">Pefonia Sanchez</a>
+                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Albert Ginez')">Albert Ginez</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary" onclick="openRemarksModal('${request.id}')">Remarks</button>
+                                    </td>
+                                    `;
+
+                    // Button to mark cleaning as done
+                    const cell = row.insertCell();
+                    const doneButton = document.createElement('button');
+                    doneButton.className = 'btn btn-success';
+                    doneButton.innerText = 'Mark as Done';
+                    doneButton.addEventListener('click', () => markAsDone(request));
+                    cell.appendChild(doneButton);
+                });
+            }
+        });
+
+        // Function to mark cleaning as done
+        function markAsDone(request) {
+            const requestRef = firebase.database().ref(`cleaningRequests/${request.id}`);
+            requestRef.remove();
+
+            const finishedRef = firebase.database().ref('finishedCleaning');
+            finishedRef.push(request);
+
+            const dateTime = new Date().toLocaleString();
+            const message = `The cleaning request you submitted on ${dateTime} has been resolved.`;
+            const userID = request.userID;
+
+            // Add the message to requestNotifs
+            firebase.database().ref(`users/${userID}/requestsNotif`).push({
+                cleaningRequestID: request.id,
+                message: message,
+                dateTime: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            // Show a confirmation message (you can customize this part)
+            alert(`Cleaning request marked as done. Notification sent to user.`);
+        }
+
+        function assignTo(requestId, assignedTo) {
+            // Get the user ID from the cleaning request
+            const requestUserRef = firebase.database().ref(`cleaningRequests/${requestId}/userID`);
+            requestUserRef.once('value').then((snapshot) => {
+                const userID = snapshot.val();
+
+                // Add the assignedTo information to the Firebase database
+                const requestRef = firebase.database().ref(`cleaningRequests/${requestId}`);
+                requestRef.update({ assignedTo });
+
+                // Send a message to the user
+                const dateTime = new Date().toLocaleString();
+                const message = `The cleaning request you submitted on ${dateTime} has been assigned to ${assignedTo}.`;
+                firebase.database().ref(`users/${userID}/requestsNotif`).push({
+                    cleaningRequestID: requestId,
+                    message: message,
+                    dateTime: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // Show a confirmation message (you can customize this part)
+                alert(`Cleaning request assigned to ${assignedTo}. Notification sent to user.`);
+
+                // Update the dropdown button text
+                updateDropdownButtonText(requestId, assignedTo);
+            });
+        }
+
+
+
+        function updateDropdownButtonText(requestId, assignedTo) {
+            const dropdownButton = document.getElementById(`assignDropdown${requestId}`);
+            dropdownButton.innerText = `Assigned to: ${assignedTo}`;
+        }
+
+
+
+        // Get the logout button element
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Add a click event listener to the logout button
+        logoutBtn.addEventListener('click', () => {
+            // Sign out the user
+            firebase.auth().signOut()
+                .then(() => {
+                    // Redirect to the landing page after logout
+                    window.location.replace('index.html');
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                });
+        });
+
+        // Function to open remarks modal
+        function openRemarksModal(requestId) {
+            // Your code to open remarks modal goes here
+            // For example:
+            $('#remarksModal').modal('show');
+            // Pass the requestId to the submitRemarks function
+            document.getElementById('submitRemarksBtn').onclick = function() {
+                submitRemarks(requestId);
+            };
+        }
+
+        // Function to submit remarks
+        function submitRemarks(requestId) {
+            // Your code to submit remarks goes here
+            // For example:
+            const remarks = document.getElementById('remarksInput').value;
+            const userID = firebase.auth().currentUser.uid;
+
+            if (remarks.trim() !== '') {
+                // Add the remarks to requestNotifs
+                const dateTime = new Date().toLocaleString();
+                const message = `New remarks added: ${remarks}`;
+                firebase.database().ref(`users/${userID}/requestsNotif`).push({
+                    cleaningRequestID: requestId,
+                    message: message,
+                    dateTime: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // Show a confirmation message (you can customize this part)
+                alert(`Remarks submitted successfully. Notification sent to user.`);
+            } else {
+                // Handle case when remarks are empty
+                alert('Please enter remarks before submitting.');
+            }
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Reservation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
+      <div class="container">
+          <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
+              <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
+          </a>
+
+          <button class="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navmenu" 
+          aria-controls="navmenu" 
+          aria-expanded="false" 
+          aria-label="Toggle navigation menu">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navmenu">
+              <ul class="navbar-nav ms-auto">
+                  <li class="nav-item">
+                      <a href="#" class="nav-link text-light">Notifications</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Request
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                          <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
+                          <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+                      </div>
+                  </li>
+                  <li class="nav-item">
+                    <a href="user-management.html" class="nav-link text-light">Users</a>
+                </li>
+                  <li class="nav-item">
+                      <a href="#" class="nav-link text-light">Profile</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
+                  </li>
+              </ul>
+          </div>
+      </div>   
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Reservation Data</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Room Number</th>
+                    <th>Reservation Type</th>
+                    <th>Phone Number</th>
+                    <th>Email</th>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="reservationTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+            authDomain: "megatower-hub-ca285.firebaseapp.com",
+            databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+            projectId: "megatower-hub-ca285",
+            storageBucket: "megatower-hub-ca285.appspot.com",
+            messagingSenderId: "900973693171",
+            appId: "1:900973693171:web:9062bf9b49221596294f86"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Function to retrieve and display reservations
+        function displayReservations() {
+            const reservationTableBody = document.getElementById('reservationTableBody');
+            reservationTableBody.innerHTML = ''; // Clear previous content
+
+            // Retrieve data from Firebase Realtime Database
+            database.ref('reservations').orderByChild('timestamp').once('value')
+                .then((snapshot) => {
+                    snapshot.forEach((childSnapshot) => {
+                        const reservation = childSnapshot.val();
+                        const tableRow = document.createElement('tr');
+                        tableRow.innerHTML = `
+                            <td>${reservation.name}</td>
+                            <td>${reservation.roomNumber}</td>
+                            <td>${reservation.reservationType}</td>
+                            <td>${reservation.phoneNumber}</td>
+                            <td>${reservation.email}</td>
+                            <td>${new Date(reservation.timestamp).toLocaleString()}</td>
+                            <td>
+                                <button class="btn btn-success" onclick="toggleReservationStatus('${childSnapshot.key}', ${reservation.reserved})">
+                                    ${reservation.reserved ? 'Unconfirm' : 'Confirm'}
+                                </button>
+                            </td>
+                        `;
+                        reservationTableBody.appendChild(tableRow);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error retrieving reservations:', error);
+                    alert('Error retrieving reservations. Please try again.');
+                });
+        }
+
+        // Function to toggle reservation status
+        function toggleReservationStatus(reservationKey, currentStatus) {
+            const reservationsRef = database.ref('reservations');
+            reservationsRef.child(reservationKey).update({
+                reserved: !currentStatus
+            })
+            .then(() => {
+                // Success message
+                alert(`Reservation status successfully ${currentStatus ? 'unconfirmed' : 'confirmed'}.`);
+                // Refresh the table
+                displayReservations();
+            })
+            .catch((error) => {
+                // Error message
+                console.error('Error toggling reservation status:', error);
+                alert('Error toggling reservation status. Please try again.');
+            });
+        }
+
+        // Call the displayReservations function to show existing reservations
+        displayReservations();
+    </script>
+
+    
+</body>
+</html>

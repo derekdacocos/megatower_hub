@@ -1,0 +1,81 @@
+body::before {
+  display: block;
+  content: '';
+  height: 60px;
+}
+
+/* Style for the floating chat icon */
+.chat-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Chat icon hover effect */
+.chat-icon:hover {
+  background-color: #0056b3;
+}
+
+/* Style for the chat overlay */
+.chat-overlay {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  width: 300px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+/* Style for chat header, body, and footer */
+.chat-header, .chat-footer {
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+}
+
+.chat-footer {
+  display: flex;
+  align-items: center;
+}
+
+.chat-body {
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Close button style */
+.chat-close-btn {
+  cursor: pointer;
+}
+
+/* Complaint */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.col-md-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+/* Adjust the width of the columns in request */
+.request-column {
+  width: 80%;
+}
+
+.feedback-column {
+  width: 20%;
+}

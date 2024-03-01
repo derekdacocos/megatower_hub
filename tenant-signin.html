@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container mt-5">
+        <div class="col-md-6 offset-md-3 border p-4">
+            <h2 class="mb-4">Tenant Login</h2>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+          authDomain: "megatower-hub-ca285.firebaseapp.com",
+          databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+          projectId: "megatower-hub-ca285",
+          storageBucket: "megatower-hub-ca285.appspot.com",
+          messagingSenderId: "900973693171",
+          appId: "1:900973693171:web:9062bf9b49221596294f86"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const loginForm = document.getElementById('loginForm');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Sign in with email and password
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    // Check if the user has a 'tenant' role in the 'users' collection
+                    checkTenantRole(email);
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                    alert("Login failed. Please check your email and password.");
+                });
+        });
+
+        function checkTenantRole(email) {
+            // Retrieve user information from Firebase Realtime Database
+            firebase.database().ref('users').orderByChild('email').equalTo(email).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const userId = Object.keys(userData)[0];
+
+                        // Check if the user has a 'tenant' role
+                        if (userData[userId].role === 'tenant') {
+                            // Check if 'lastLogin' exists
+                            if ('lastLogin' in userData[userId]) {
+                                alert("Login successful! You are a tenant.");
+                                // Redirect to the tenant dashboard
+                                window.location.href = 'home-page.html';
+                            } else {
+                                alert("Your account hasn't been registered. Please proceed to the Registration Page.");
+                                // Redirect to the tenant signup page
+                                window.location.href = 'tenant-signup.html';
+                            }
+                        } else {
+                            alert("Access denied. You are not a tenant.");
+                            // Sign out the user
+                            firebase.auth().signOut();
+                        }
+                    } else {
+                        console.error("User data not found.");
+                    }
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                });
+        }
+    </script>
+</body>
+</html>

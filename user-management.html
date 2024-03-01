@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
+        <div class="container">
+            <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
+                <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
+            </a>
+
+            <button class="navbar-toggler" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#navmenu" 
+            aria-controls="navmenu" 
+            aria-expanded="false" 
+            aria-label="Toggle navigation menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light">Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Request
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
+                            <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="roomsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Rooms
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="roomsDropdown">
+                            <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                            <a class="dropdown-item" href="admin-room-form.html">Room Form</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                    <a href="user-management.html" class="nav-link text-light">Users</a>
+                </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>   
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">User List</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Date of Birth</th>
+                    <th>Role</th>
+                    <th>Last Login</th>
+                    <th>Unit Number</th>
+                    <th>Actions</th> <!-- New column for edit and delete buttons -->
+                </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for editing user -->
+                    <form id="editUserForm">
+                        <div class="mb-3">
+                            <label for="editFullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editFullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPhoneNumber" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="editPhoneNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDateOfBirth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="editDateOfBirth" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUnitNumber" class="form-label">Unit Number</label>
+                            <input type="text" class="form-control" id="editUnitNumber" required>
+                        </div>
+                        <input type="hidden" id="editUserId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEditedUser()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+            authDomain: "megatower-hub-ca285.firebaseapp.com",
+            databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+            projectId: "megatower-hub-ca285",
+            storageBucket: "megatower-hub-ca285.appspot.com",
+            messagingSenderId: "900973693171",
+            appId: "1:900973693171:web:9062bf9b49221596294f86"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Function to retrieve and display users
+        function displayUsers() {
+            const userTableBody = document.getElementById('userTableBody');
+            userTableBody.innerHTML = ''; // Clear previous content
+
+            // Retrieve data from Firebase Realtime Database
+            database.ref('users').once('value')
+                .then((snapshot) => {
+                    // Convert snapshot to array
+                    const users = [];
+                    snapshot.forEach((childSnapshot) => {
+                        const userId = childSnapshot.key;
+                        const user = childSnapshot.val();
+                        users.push({ userId, ...user });
+                    });
+
+                    // Sort users based on lastLogin timestamp in descending order
+                    users.sort((a, b) => b.lastLogin - a.lastLogin);
+
+                    // Render users in the table
+                    users.forEach((user) => {
+                        const tableRow = document.createElement('tr');
+                        tableRow.innerHTML = `
+                            <td>${user.fullName}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phoneNumber}</td>
+                            <td>${user.dateOfBirth}</td>
+                            <td>${user.role}</td>
+                            <td>${new Date(user.lastLogin).toLocaleString()}</td>
+                            <td>${user.unitNumber}</td>
+                            <td><button class="btn btn-primary btn-sm" onclick="editUser('${user.userId}')">Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userId}')">Delete</button></td>
+                        `;
+                        tableRow.dataset.userId = user.userId;
+                        userTableBody.appendChild(tableRow);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error retrieving users:', error);
+                    alert('Error retrieving users. Please try again.');
+                });
+        }
+
+        // Function to edit user
+        function editUser(userId) {
+            const userRef = database.ref('users').child(userId);
+            userRef.once('value')
+                .then((snapshot) => {
+                    const user = snapshot.val();
+                    document.getElementById('editUserId').value = userId;
+                    document.getElementById('editFullName').value = user.fullName;
+                    document.getElementById('editEmail').value = user.email;
+                    document.getElementById('editPhoneNumber').value = user.phoneNumber;
+                    document.getElementById('editDateOfBirth').value = user.dateOfBirth;
+                    document.getElementById('editUnitNumber').value = user.unitNumber;
+                    $('#editUserModal').modal('show'); // Show edit user modal
+                })
+                .catch((error) => {
+                    console.error('Error editing user:', error);
+                    alert('Error editing user. Please try again.');
+                });
+        }
+
+        // Function to save edited user
+        function saveEditedUser() {
+            const userId = document.getElementById('editUserId').value;
+            const fullName = document.getElementById('editFullName').value;
+            const email = document.getElementById('editEmail').value;
+            const phoneNumber = document.getElementById('editPhoneNumber').value;
+            const dateOfBirth = document.getElementById('editDateOfBirth').value;
+            const unitNumber = document.getElementById('editUnitNumber').value;
+
+            const userRef = database.ref('users').child(userId);
+            userRef.update({
+                fullName,
+                email,
+                phoneNumber,
+                dateOfBirth,
+                unitNumber
+            })
+            .then(() => {
+                $('#editUserModal').modal('hide'); // Hide edit user modal
+                displayUsers(); // Refresh user list
+            })
+            .catch((error) => {
+                console.error('Error saving edited user:', error);
+                alert('Error saving edited user. Please try again.');
+            });
+        }
+
+        // Function to delete user
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                const userRef = database.ref('users').child(userId);
+                userRef.remove()
+                    .then(() => {
+                        displayUsers(); // Refresh user list
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting user:', error);
+                        alert('Error deleting user. Please try again.');
+                    });
+            }
+        }
+
+        // Call the displayUsers function to show existing users
+        displayUsers();
+    </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container mt-5">
+        <div class="col-md-6 offset-md-3 border p-4">
+            <h2 class="mb-4">Admin Login</h2>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+          authDomain: "megatower-hub-ca285.firebaseapp.com",
+          databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+          projectId: "megatower-hub-ca285",
+          storageBucket: "megatower-hub-ca285.appspot.com",
+          messagingSenderId: "900973693171",
+          appId: "1:900973693171:web:9062bf9b49221596294f86"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const loginForm = document.getElementById('loginForm');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Sign in with email and password
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    // Update lastLogin in the 'admins' collection with the current date and time
+                    updateLastLogin(user.uid);
+                    // Check if the user is an admin
+                    checkAdminRole(email);
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                    alert("Login failed. Please check your email and password.");
+                });
+        });
+
+        function updateLastLogin(uid) {
+            // Update lastLogin in the 'admins' collection with the current date and time
+            firebase.database().ref(`admins/${uid}`).update({
+                lastLogin: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+
+        function checkAdminRole(email) {
+            // Retrieve admin information from Firebase Realtime Database
+            firebase.database().ref('admins').orderByChild('email').equalTo(email).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const adminData = snapshot.val();
+                        const adminId = Object.keys(adminData)[0];
+
+                        // Check if the user has an 'admin' role
+                        if (adminData[adminId].role === 'admin') {
+                            alert("Login successful! You are an admin.");
+                            // Redirect to the admin dashboard
+                            window.location.href = 'admin-dashboard.html';
+                        } else {
+                            alert("Access denied. You are not an admin.");
+                            // Sign out the user
+                            firebase.auth().signOut();
+                        }
+                    } else {
+                        console.error("Admin data not found.");
+                    }
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                });
+        }
+    </script>
+</

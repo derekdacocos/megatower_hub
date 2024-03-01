@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Condo Reservation</title>
+  <!-- Add Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Add Custom CSS -->
+  <style>
+    /* Add your custom styles here */
+    .container {
+      margin-top: 20px;
+    }
+    .reservation-form {
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
+    .available-rooms {
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="row">
+    <!-- Reservation Form -->
+    <div class="col-md-4">
+      <div class="reservation-form">
+        <h4>Reservation Details</h4>
+        <form id="reservationForm">
+          <div class="form-group">
+            <label for="typeDropdown">Type</label>
+            <select class="form-control" id="typeDropdown">
+              <option value="transient">Transient</option>
+              <option value="buying">Buying</option>
+              <option value="lease">Lease</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="checkInDate">Check-in Date</label>
+            <input type="date" class="form-control" id="checkInDate">
+          </div>
+          <div class="form-group">
+            <label for="checkOutDate">Check-out Date</label>
+            <input type="date" class="form-control" id="checkOutDate">
+          </div>
+          <div class="form-group">
+            <label for="adultsCount">Adults</label>
+            <input type="number" class="form-control" id="adultsCount" min="1" value="1">
+          </div>
+          <div class="form-group">
+            <label for="childrenCount">Children</label>
+            <input type="number" class="form-control" id="childrenCount" min="0" value="0">
+          </div>
+          <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+      </div>
+    </div>
+    <!-- Available Rooms -->
+    <div class="col-md-8">
+      <div class="available-rooms">
+        <h4>Available Rooms</h4>
+        <div id="availableRooms"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Firebase SDK if needed -->
+<script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js"></script>
+
+<script>
+  // Your Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+    authDomain: "megatower-hub-ca285.firebaseapp.com",
+    databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+    projectId: "megatower-hub-ca285",
+    storageBucket: "megatower-hub-ca285.appspot.com",
+    messagingSenderId: "900973693171",
+    appId: "1:900973693171:web:9062bf9b49221596294f86"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  // Initialize Firestore
+  var db = firebase.firestore();
+
+  // Function to set form values
+  function setFormValues(type, checkInDate, checkOutDate, adultsCount, childrenCount) {
+    document.getElementById('typeDropdown').value = type;
+    document.getElementById('checkInDate').value = checkInDate;
+    document.getElementById('checkOutDate').value = checkOutDate;
+    document.getElementById('adultsCount').value = adultsCount;
+    document.getElementById('childrenCount').value = childrenCount;
+  }
+
+  // Call setFormValues when the page loads
+  window.onload = function() {
+    // You can set default values here or fetch values from another source
+    setFormValues('transient', '', '', '1', '0');
+  };
+
+  // Function to handle form submission
+  document.getElementById('reservationForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Get form values
+    var type = document.getElementById('typeDropdown').value;
+    var checkInDate = document.getElementById('checkInDate').value;
+    var checkOutDate = document.getElementById('checkOutDate').value;
+    var adultsCount = document.getElementById('adultsCount').value;
+    var childrenCount = document.getElementById('childrenCount').value;
+
+    db.collection('rooms').where('type', '==', type)
+                           .where('available', '==', true)
+                           .where('capacity', '>=', parseInt(adultsCount) + parseInt(childrenCount))
+                           .where('checkInDate', '<=', checkInDate)
+                           .where('checkOutDate', '>=', checkOutDate)
+                           .get()
+                           .then(function(querySnapshot) {
+                             querySnapshot.forEach(function(doc) {
+                               // Process each available room
+                               var roomData = doc.data();
+                               // Display the room data in the availableRooms element
+                               var roomElement = document.createElement('div');
+                               roomElement.textContent = 'Room Number: ' + roomData.roomNumber + ', Type: ' + roomData.type + ', Price: ' + roomData.price;
+                               document.getElementById('availableRooms').appendChild(roomElement);
+                             });
+                           })
+                           .catch(function(error) {
+                             console.error('Error getting available rooms: ', error);
+                           });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,328 @@
+/*google font*/
+
+
+
+.navbar{
+	position: fixed;
+	top: 0;
+	z-index: 99999;
+	padding: 25px 0;
+}
+.navbar .logo{
+	font-size: 1.5em;
+	text-transform: uppercase;
+	font-weight: 750;
+	letter-spacing: 2px;
+  margin-left: 8%;
+}
+.navbar ul.nav{
+	margin-right: 8%;
+}
+.navbar ul.nav li.active,
+.navbar ul.nav li:hover{
+	background:rgba(255, 255, 255, 0.5);
+	color: #000;
+
+}
+.navbar ul.nav li a{
+	color: #fff;
+	font-size: 1em;
+	font-weight: 500;
+}
+.navbar ul.nav li.active a,
+.navbar ul.nav li:hover a{
+	color: #000;
+}
+
+/*slider*/
+#carouselExampleIndicators{
+	position: relative;
+	height: 100vh;
+	width: 100%;
+}
+#carouselExampleIndicators .carousel-inner{
+	position: relative;
+	height: 100%;
+	width: 100%;
+	background: #000;
+}
+#carouselExampleIndicators .carousel-inner:before{
+	position: absolute;
+	content: '';
+	background: rgba(0, 0, 0, 0.45);
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	z-index: 1;
+}
+#carouselExampleIndicators .carousel-inner .carousel-item{
+	position: relative;
+	height: 100%;
+	width:100%;
+	background: url('https://static.wixstatic.com/media/1817fe_e325baa235fe43539115cc7041c673e4~mv2.jpg/v1/fill/w_525,h_613,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/MEGATOWER%20RESIDENCES%20III%20(1).jpg');
+	background-size: 95% 100%;
+	background-position: center;
+	background-attachment: fixed;
+}
+#carouselExampleIndicators .carousel-inner .carousel-item:nth-child(2){
+	background: url('https://static.wixstatic.com/media/ba324c_f2697c21035c436aa06e65852c7caaf1~mv2.jpg/v1/fill/w_380,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/megapines_tower-3-1.jpg');
+	background-size: 95% 100%;
+	background-position: center;
+	background-attachment: fixed;
+}
+#carouselExampleIndicators .carousel-inner .carousel-item:nth-child(3){
+	background: url('https://static.wixstatic.com/media/ba324c_15a8784533624b8aa243c440fd7e741c~mv2.jpg/v1/fill/w_373,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/megapines_tower-3-2.jpg');
+	background-size: 90% 100%;
+	background-position: center;
+	background-attachment: fixed;
+}
+
+#carouselExampleIndicators .carousel-inner .carousel-item .info{
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	height: auto;
+	width: 100%;
+	z-index: 1;
+	text-align: center;
+}
+#carouselExampleIndicators .carousel-inner .carousel-item h1{
+	height: auto;
+	color: #fff;
+	width: 100%;
+	z-index: 1;
+	text-align: center;
+	font-size: 5.5em;
+	font-weight: 750;
+}
+#carouselExampleIndicators .carousel-inner .carousel-item p{
+	height: auto;
+	color: #ccc;
+	width: 100%;
+	z-index: 1;
+	text-align: center;
+	font-size: 1.2em;
+	font-weight: 500;
+}
+
+/* complaint-page */
+
+.container {
+  width: 80%;
+  margin: auto;
+  overflow: hidden;
+}
+
+#message {
+	resize: none;
+}
+
+
+section {
+  float: left;
+  width: 68%;
+  padding: 20px 0 0 0;
+}
+
+.complaint-form {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.complaint-form h2 {
+  text-align: center;
+  color: #333;
+}
+
+.complaint-form label {
+  display: block;
+  margin: 15px 0 5px;
+  color: #333;
+}
+
+.complaint-form input,
+.complaint-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.complaint-form textarea {
+  resize: vertical;
+}
+
+.complaint-form button {
+  background-color: #e8491d;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.complaint-form button:hover {
+  background-color: #333;
+}
+
+/*HOME*/
+
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #f4f4f4;
+}
+
+.container {
+	width: 80%;
+	margin: auto;
+	overflow: hidden;
+}
+
+header {
+	background: #333;
+	color: #ffffff;
+	padding-top: 20px;
+	min-height: 70px;
+	border-bottom: #e8491d 4px solid;
+}
+
+header #branding {
+	float: left;
+}
+
+header #branding h1 {
+	margin: 0;
+}
+
+header #branding h1 a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+nav {
+	float: right;
+	margin-top: 20px;
+}
+
+nav ul {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+nav li {
+	display: inline;
+	margin-left: 15px;
+}
+
+nav a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+nav a:hover {
+	color: #e8491d;
+}
+
+.content {
+	padding: 50px 0;
+}
+
+.box {
+	width: 30%;
+	padding: 30px;
+	background: #ffffff;
+	border-radius: 5px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	margin: 0 2% 2% 0;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.box h2 {
+	color: #333;
+	text-align: center;
+	margin: 0;
+}
+
+@media (max-width: 768px) {
+	.box {
+			width: 100%;
+			margin-right: 0;
+	}
+}
+
+
+/*log-in page */
+
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #f4f4f4;
+}
+
+.login-border {
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.login-container,
+.change-password-container {
+	background: #ffffff;
+	padding: 20px;
+	border-radius: 5px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.change-password-container {
+	display: none;
+}
+
+label {
+	display: block;
+	margin: 10px 0;
+}
+
+input {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+}
+
+button {
+	background-color: #e8491d;
+	color: #fff;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #333;
+}
+
+#error-message,
+#change-password-message {
+	color: #e8491d;
+	margin-top: 10px;
+}
+
+
