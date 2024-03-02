@@ -1,316 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Condo Reservation</title>
-  <!-- Add Bootstrap CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Add Bootstrap Datepicker CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-  <!-- Add Custom CSS -->
-  <style>
-    /* Add your custom styles here */
-    body {
-      padding: 20px;
-    }
-
-    /* Additional styles for room types section */
-    .room-type {
-      margin-top: 20px;
-    }
-
-    .room-type img {
-      width: 100%;
-      height: auto;
-      margin-bottom: 10px;
-    }
-
-    /* Custom CSS for swiper */
-    .swiper-container {
-      height: 50vh; /* Set swiper height to 20% of viewport height */
-    }
-
-    .swiper-slide img {
-      width: 100%; /* Make images fill the entire width of the swiper */
-      height: 100%; /* Make images fill the entire height of the swiper */
-      object-fit: cover; /* Maintain aspect ratio and cover entire slide */
-    }
-
-    /* Custom CSS for search button */
-    .search-button {
-      position: absolute;
-      left: 50%;
-      bottom: calc(20vh + 1/3 * (100vh - 20vh));
-      transform: translateX(-50%);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.19.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- Swiper -->
-<div class="swiper-container">
-    <div class="swiper-wrapper">
-      <!-- Add your swiper slides here -->
-      <div class="swiper-slide">
-        <img src="https://static.wixstatic.com/media/1817fe_e325baa235fe43539115cc7041c673e4~mv2.jpg/v1/fill/w_525,h_613,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/MEGATOWER%20RESIDENCES%20III%20(1).jpg" alt="Slide 1">
+  <!--Navbar-->
+  <nav class="navbar navbar-expand-lg bg-success navbar-dark fixed-top">
+    <div class="container">
+      <a href="home-page.html" class="navbar-brand">MegaTower Hub</a>
+
+      <button class="navbar-toggler" 
+      type="button" 
+      data-bs-toggle="collapse" 
+      data-bs-target="#navmenu" 
+      aria-controls="navmenu" 
+      aria-expanded="false" 
+      aria-label="Toggle navigation menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navmenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-light" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Notifications
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="notificationsDropdown" id="notificationDropdownMenu">
+              <!-- Notifications will be displayed here -->
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="complain-page.html" class="nav-link text-light">Complaints</a>
+          </li>
+          <li class="nav-item">
+            <a href="request-page.html" class="nav-link text-light">Request</a>
+          </li>
+          <li class="nav-item">
+            <a href="payment-page.html" class="nav-link text-light">Payment</a>
+          </li>
+          <li class="nav-item">
+            <a href="forum-page.html" class="nav-link text-light">Forum</a>
+          </li>
+          <li class="nav-item">
+            <a href="#questions" class="nav-link text-light">FAQs</a>
+          </li>
+          <li class="nav-item">
+            <a href="tenant-profile.html" class="nav-link text-light">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a href="javascript:void(0);" onclick="logout()" class="nav-link text-light">Logout</a>
+          </li>
+        </ul>
       </div>
-      <div class="swiper-slide">
-        <img src="https://static.wixstatic.com/media/ba324c_f2697c21035c436aa06e65852c7caaf1~mv2.jpg/v1/fill/w_380,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/megapines_tower-3-1.jpg" alt="Slide 2">
+    </div>   
+  </nav>
+
+
+  <div class="container mt-5">
+    <div class="row">
+      <!-- Request Form Column (80%) -->
+      <div class="col-md-8 request-column">
+        <div class="border p-4">
+          <h2 class="mb-4">Submit Request</h2>
+          <form id="requestForm">
+            <div class="mb-3">
+                <label for="requestType" class="form-label">Request Type</label>
+                <select class="form-select" id="requestType" required>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="cleaning">Cleaning</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="scheduleDate" class="form-label">Schedule Date</label>
+                <input type="date" class="form-control" id="scheduleDate" required>
+            </div>
+            <div class="mb-3">
+                <label for="scheduleTime" class="form-label">Schedule Time</label>
+                <input type="time" class="form-control" id="scheduleTime" required>
+            </div>
+            <!-- Optional Media Upload Button with Icon -->
+            <div class="mb-3">
+                <label for="mediaUpload" class="form-label">Media Upload (Optional)</label>
+                <div class="input-group">
+                    <input type="file" class="form-control" id="mediaUpload">
+                    <label class="input-group-text" for="mediaUpload">
+                        <i class="bi bi-cloud-upload"></i>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+            
+            <!-- Emergency Maintenance Request Button -->
+            <button type="button" class="btn btn-danger" id="emergencyBtn">Emergency Maintenance Request</button>
+          </form>
+        </div>
       </div>
-      <!-- Add more slides as needed -->
-    </div>
-</div>
 
-<!-- Check availability form -->
-<div class="container availability-form">
-    <div class="row">
-        <div class="col-lg-12 bg-white shadow p-4 rounded">
-            <h5 class="col-lg-3">Condominium Reservation</h5>
-            <form>
-                <div class="row align-items-end">
-                    <!-- Type Dropdown -->
-                    <div class="col-lg-2 mb-3">
-                        <label class="form-label" style="font-weight: 500;">Type</label>
-                        <select class="form-select" aria-label="Type" id="typeDropdown">
-                            <option selected>Choose...</option>
-                            <option value="transient">Transient</option>
-                            <option value="buying">Buying</option>
-                            <option value="lease">Lease</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-3 mb-3">
-                        <label class="form-label" style="font-weight: 500;">Check-in</label>
-                        <input type="date" class="form-control shadow-none datepicker" id="checkInDate">
-                    </div>
-                    <div class="col-lg-3 mb-3">
-                        <label class="form-label" style="font-weight: 500;">Check-out</label>
-                        <input type="date" class="form-control shadow-none datepicker" id="checkOutDate">
-                    </div>                    
-                    <div class="col-lg-2 mb-3">
-                        <label class="form-label" style="font-weight: 500;">Guests</label>
-                        <div class="input-group">
-                            <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#guestModal">
-                                Guests
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-lg-1 mb-lg-3 mt-2">
-                        <button type="submit" class="btn text-white shadow-none bg-primary">Submit</button>
-                    </div>
-                </div>
-            </form>
+      <!-- Feedback Form Column (20%) -->
+      <div class="col-md-4 feedback-column" style="height: 100vh;">
+        <div class="border p-4" style="height: 100%;">
+          <h2 class="mb-4">Feedback</h2>
+          <div id="feedbackBox" style="max-height: 100%; overflow-y: auto;">
+            <!-- Feedback form elements here -->
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- Guest Modal -->
-<div class="modal fade" id="guestModal" tabindex="-1" role="dialog" aria-labelledby="guestModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="guestModalLabel">Select Guests</h5>
-                <!-- Replace the close button with a cancel button -->
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="adultsCount">Adults</label>
-                    <input type="number" class="form-control" id="adultsCount" min="1" value="1">
-                </div>
-                <div class="mb-3">
-                    <label for="childrenCount">Children</label>
-                    <input type="number" class="form-control" id="childrenCount" min="0" value="0">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <!-- Update the "Apply Changes" button to close the modal -->
-                <button type="button" class="btn btn-primary" onclick="updateGuestCount()" data-dismiss="modal">Apply Changes</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Our Rooms -->
-<h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">AVAILABLE ROOMS</h2>
-<div class="container">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.19.0/dist/js/bootstrap-icons.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
 
-</div>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+          authDomain: "megatower-hub-ca285.firebaseapp.com",
+          databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+          projectId: "megatower-hub-ca285",
+          storageBucket: "megatower-hub-ca285.appspot.com",
+          messagingSenderId: "900973693171",
+          appId: "1:900973693171:web:9062bf9b49221596294f86"
+        };
 
-<!-- Amenities section -->
-<div class="container amenities-section mt-4">
-    <div class="row">
-        <div class="col-lg-12 bg-white shadow p-4 rounded">
-            <h2 class="col-lg-12 text-center mb-4">Amenities and Facilities</h2>
-            <div class="row">
-                <!-- Column 1 -->
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <ul>
-                        <li><strong>Kitchen</strong></li>
-                            <ul>
-                                <li>Dishes and dining utensils</li>
-                                <li>Microwave</li>
-                                <li>Refrigerator</li>
-                            </ul>
-                        <li><strong>Bathroom</strong></li>
-                            <ul>
-                                <li>Body wash</li>
-                            </ul>
-                        <li><strong>Standard</strong></li>
-                            <ul>
-                                <li>Fans (ceiling or portable)</li>
-                                <li>Laundromat nearby</li>
-                            </ul>
-                    </ul>
-                </div>
-                <!-- Column 2 -->
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <ul>
-                        <li><strong>Outdoor</strong></li>
-                            <ul>
-                                <li>Garden or backyard</li>
-                            </ul>
-                        <li><strong>Entertainment</strong></li>
-                            <ul>
-                                <li>Internet</li>
-                                <li>TV</li>
-                                <li>Wi-Fi</li>
-                            </ul>
-                        <li><strong>Comforts</strong></li>
-                            <ul>
-                                <li>Linens</li>
-                            </ul>
-                    </ul>
-                </div>
-                <!-- Column 3 -->
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <ul>
-                        <li><strong>Dining, drinking, and snacking</strong></li>
-                            <ul>
-                                <li>Coffee or tea</li>
-                            </ul>
-                        <li><strong>Bathroom and toiletries</strong></li>
-                            <ul>
-                                <li>Hair dryer</li>
-                                <li>Toiletries</li>
-                            </ul>
-                        <li><strong>Services and conveniences</strong></li>
-                            <ul>
-                                <li>Doorman</li>
-                                <li>Elevator</li>
-                            </ul>
-                    </ul>
-                </div>
-                <!-- Column 4 -->
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <ul>
-                        <li><strong>Safety and security features</strong></li>
-                            <ul>
-                                <li>Fire extinguisher</li>
-                                <li>Smoke detector</li>
-                            </ul>
-                        <li><strong>Access</strong></li>
-                            <ul>
-                                <li>Security [24-hour]</li>
-                            </ul>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+        firebase.initializeApp(firebaseConfig);
 
-<!-- Add Bootstrap JS and Popper.js -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- Add Bootstrap Datepicker JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    const requestForm = document.getElementById('requestForm');
+    const emergencyBtn = document.getElementById('emergencyBtn');
+    const feedbackBox = document.getElementById('feedbackBox');
 
-<!-- Initialize Bootstrap Datepicker -->
-<script>
-    $(document).ready(function(){
-      var today = new Date();
-      today.setHours(0, 0, 0, 0);  // Set hours to 0 to include the entire day
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        const userUID = user.uid;
 
-      $('#checkInDate').datepicker({
-        autoclose: true,
-        format: 'yyyy-mm-dd',
-        startDate: today,
-        todayHighlight: true
-      });
+        // Fetch and display notifications for the authenticated user from requestsNotif
+        const notificationsRef = firebase.database().ref(`users/${userUID}/requestsNotif`);
 
-      $('#checkOutDate').datepicker({
-        autoclose: true,
-        format: 'yyyy-mm-dd',
-        startDate: today,
-        todayHighlight: true
-      });
+        notificationsRef.on('child_added', (snapshot) => {
+          const notification = snapshot.val();
+          const notificationItem = document.createElement('div');
+          notificationItem.className = 'border p-3 my-3';
 
-      // Optionally, you can set the start date of the second datepicker to the selected date in the first datepicker.
-      $('#checkInDate').on('changeDate', function(selected){
-        var startDate = new Date(selected.date.valueOf());
-        $('#checkOutDate').datepicker('setStartDate', startDate);
-      });
+          const notificationMessage = notification.message;
+
+          notificationItem.innerHTML = `
+            ${notificationMessage}<br>
+            <hr>
+          `;
+
+          feedbackBox.appendChild(notificationItem);
+        });
+
+        requestForm.addEventListener('change', () => {
+          const requestType = document.getElementById('requestType').value;
+          // Show or hide the emergency button based on the selected request type
+          emergencyBtn.style.display = (requestType === 'maintenance') ? 'block' : 'none';
+        });
+
+            // Emergency Maintenance Request Button Click Event
+            emergencyBtn.addEventListener('click', () => {
+                // Show a confirmation prompt with a warning about the seriousness of the request
+                const isEmergency = confirm("This is an emergency maintenance request. Are you sure?");
+                
+                if (isEmergency) {
+                    alert("Emergency request submitted! Please wait for assistance.");
+                    
+                    // TODO: Add logic to handle emergency request
+                    // For example, you can set a flag in the database to mark it as an emergency
+                } else {
+                    alert("Emergency request cancelled. Thank you for your cooperation.");
+                }
+            });
+        }
+
+        requestForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        const requestType = document.getElementById('requestType').value;
+        const description = document.getElementById('description').value;
+        const scheduleDate = document.getElementById('scheduleDate').value;
+        const scheduleTime = document.getElementById('scheduleTime').value;
+
+        const mediaUpload = document.getElementById('mediaUpload');
+        const mediaFile = mediaUpload.files[0];
+
+        const requestData = {
+            description,
+            scheduleDate,
+            scheduleTime,
+            // Add any other data you want to include
+        };
+
+        // Check the selected request type and submit to the corresponding collection
+        if (requestType === 'maintenance') {
+            submitRequest('maintenanceRequests', requestData, mediaFile);
+        } else if (requestType === 'cleaning') {
+            submitRequest('cleaningRequests', requestData, mediaFile);
+        }
     });
-</script>
 
-<!-- Add Swiper JS -->
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-<script>
-  // Initialize Swiper
-  var swiper = new Swiper('.swiper-container', {
-    // Add your swiper options here
-    loop: true, // Loop through slides
-    autoplay: {
-      delay: 3000, // Time between slides (in milliseconds)
-    },
-  });
-</script>
+    // Function to submit request data to the specified collection
+    function submitRequest(collection, requestData, mediaFile) {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            const userUID = user.uid;
 
-<script>
-    // Function to update the guest count
-    function updateGuestCount() {
-        var adultsCount = document.getElementById('adultsCount').value;
-        var childrenCount = document.getElementById('childrenCount').value;
+            // Add user-specific information to the request data
+            requestData.userID = userUID;
+            requestData.submittedAt = firebase.database.ServerValue.TIMESTAMP;
 
-        // Set the placeholder of the "Guests" button
-        document.querySelector('.input-group button').textContent = 'Guests: ' + (parseInt(adultsCount) + parseInt(childrenCount));
+            // Check if a file is selected for upload
+            if (mediaFile) {
+                const storageRef = firebase.storage().ref();
+                // Define the folder based on the request type
+                const folder = collection === 'maintenanceRequests' ? 'maintenance' : 'cleaning';
+                const fileName = new Date().getTime() + '_' + mediaFile.name; // Unique file name
+                const fileRef = storageRef.child(`${folder}/${fileName}`);
 
-        // Update the guest count display if needed
-        // For example, you can display it in an alert
-        alert('Guest count updated: Adults - ' + adultsCount + ', Children - ' + childrenCount);
-        
-        // You can also perform any other action you need here
+                fileRef.put(mediaFile)
+                    .then((snapshot) => {
+                        // File uploaded successfully, get download URL
+                        return snapshot.ref.getDownloadURL();
+                    })
+                    .then((downloadURL) => {
+                        // Add the download URL to the request data
+                        requestData.mediaURL = downloadURL;
+
+                        // Add the request data to the specified collection
+                        firebase.database().ref(collection).push(requestData)
+                            .then(() => {
+                                alert('Request submitted successfully!');
+                                // You can add additional logic or UI updates as needed
+                                requestForm.reset();
+                            })
+                            .catch((error) => {
+                                console.error('Error submitting request:', error);
+                                alert('Error submitting request. Please try again.');
+                            });
+                    })
+                    .catch((error) => {
+                        console.error('Error uploading file:', error);
+                        alert('Error uploading file. Please try again.');
+                    });
+            } else {
+                // No file selected, submit request without media URL
+                firebase.database().ref(collection).push(requestData)
+                    .then(() => {
+                        alert('Request submitted successfully!');
+                        // You can add additional logic or UI updates as needed
+                        requestForm.reset();
+                    })
+                    .catch((error) => {
+                        console.error('Error submitting request:', error);
+                        alert('Error submitting request. Please try again.');
+                    });
+            }
+        }
     }
-</script>
+    });
 
-<script>
-    // Function to handle form submission
-    function handleSubmit(event) {
-      event.preventDefault(); // Prevent default form submission
-  
-      // Fetch form inputs
-      var type = document.getElementById('typeDropdown').value;
-      var checkInDate = document.getElementById('checkInDate').value;
-      var checkOutDate = document.getElementById('checkOutDate').value;
-      var adultsCount = document.getElementById('adultsCount').value;
-      var childrenCount = document.getElementById('childrenCount').value;
-  
-      // Construct query string with form data
-      var queryString = '?type=' + encodeURIComponent(type) +
-                        '&checkInDate=' + encodeURIComponent(checkInDate) +
-                        '&checkOutDate=' + encodeURIComponent(checkOutDate) +
-                        '&adultsCount=' + encodeURIComponent(adultsCount) +
-                        '&childrenCount=' + encodeURIComponent(childrenCount);
-  
-      // Redirect to reservation-form.html with query string
-      window.location.href = 'reservation-form.html' + queryString;
+    // Function to display feedback
+    function displayFeedback(feedback) {
+        const feedbackBox = document.getElementById('feedbackBox');
+        feedbackBox.innerHTML = ''; // Clear the existing content
+
+        // Sort feedback based on timestamp in ascending order
+        const sortedFeedback = feedback.sort((a, b) => a.timestamp - b.timestamp);
+
+        // Reverse the order to display from bottom to top
+        sortedFeedback.reverse();
+
+        sortedFeedback.forEach(item => {
+            const feedbackItem = document.createElement('div');
+            feedbackItem.className = 'mb-3';
+            feedbackItem.innerHTML = `
+                <p>${item.message} - ${formatTimestamp(item.timestamp)}</p>
+                <hr>
+            `;
+            feedbackBox.appendChild(feedbackItem);
+        });
     }
-  
-    // Add event listener to form submit button
-    document.querySelector('form').addEventListener('submit', handleSubmit);
-</script>
 
+    // Firebase listener for feedback
+    const feedbackRef = firebase.database().ref('feedback');
+    feedbackRef.on('value', (snapshot) => {
+        const feedbackData = snapshot.val() || [];
+        displayFeedback(Object.values(feedbackData));
+    });
+
+    </script>
 </body>
 </html>
