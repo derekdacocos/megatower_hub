@@ -147,44 +147,43 @@
             sendNotificationToUser(request.userID, `The maintenance request you submitted on ${formatTimestamp(request.submittedAt)} has been resolved.`);
         }
 
-        // Function to assign cleaning request to a staff
         function assignTo(requestId, assignedTo) {
-            // Get the user ID from the cleaning request
-            const requestUserRef = firebase.database().ref(`cleaningRequests/${requestId}/userID`);
-            requestUserRef.once('value').then((snapshot) => {
-                const userID = snapshot.val();
+            // Get the user ID from the maintenance request
+            const requestRef = firebase.database().ref(`maintenanceRequests/${requestId}`);
+            requestRef.once('value').then((snapshot) => {
+                const request = snapshot.val();
+                const userID = request.userID;
 
                 // Check if the request has been previously assigned
-                firebase.database().ref(`cleaningRequests/${requestId}/assignedTo`).once('value').then((snapshot) => {
-                    const previousAssignedTo = snapshot.val();
+                const previousAssignedTo = request.assignedTo;
 
-                    // Update the assignedTo information in the Firebase database
-                    const requestRef = firebase.database().ref(`cleaningRequests/${requestId}`);
-                    requestRef.update({ assignedTo });
+                // Update the assignedTo information in the Firebase database
+                requestRef.update({ assignedTo });
 
-                    // Send a message to the user
-                    const dateTime = new Date().toLocaleString();
-                    let message;
-                    if (previousAssignedTo) {
-                        message = `The cleaning request you submitted on ${dateTime} has been reassigned to ${assignedTo}.`;
-                    } else {
-                        message = `The cleaning request you submitted on ${dateTime} has been assigned to ${assignedTo}.`;
-                    }
-                    firebase.database().ref(`users/${userID}/requestsNotif`).push({
-                        cleaningRequestID: requestId,
-                        message: message,
-                        dateTime: firebase.database.ServerValue.TIMESTAMP
-                    });
-
-                    // Show a confirmation message (you can customize this part)
-                    alert(`Cleaning request ${previousAssignedTo ? 'reassigned' : 'assigned'} to ${assignedTo}. Notification sent to user.`);
-
-                    // Update the dropdown button text
-                    const dropdownButton = document.getElementById(`assignDropdown${requestId}`);
-                    dropdownButton.innerText = `Assigned to: ${assignedTo}`;
+                // Send a message to the user
+                const dateTime = new Date().toLocaleString();
+                let message;
+                if (previousAssignedTo) {
+                    message = `The maintenance request you submitted on ${dateTime} has been reassigned to ${assignedTo}.`;
+                } else {
+                    message = `The maintenance request you submitted on ${dateTime} has been assigned to ${assignedTo}.`;
+                }
+                
+                // Add the message to the user's notifications
+                firebase.database().ref(`users/${userID}/requestsNotif`).push({
+                    message: message,
+                    dateTime: firebase.database.ServerValue.TIMESTAMP
                 });
+
+                // Show a confirmation message (you can customize this part)
+                alert(`Maintenance request ${previousAssignedTo ? 'reassigned' : 'assigned'} to ${assignedTo}. Notification sent to user.`);
+
+                // Update the dropdown button text
+                const dropdownButton = document.getElementById(`assignDropdown${requestId}`);
+                dropdownButton.innerText = `Assigned to: ${assignedTo}`;
             });
         }
+
 
         // Firebase listener for maintenance requests
         const maintenanceRef = firebase.database().ref('maintenanceRequests');
