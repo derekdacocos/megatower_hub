@@ -60,7 +60,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="roomsDropdown">
                             <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
-                            <a class="dropdown-item" href="admin-room-form.html">Room Form</a>
+                            <a class="dropdown-item" href="admin-addRoom.html">Room Form</a>
                         </div>
                     </li>
                     <li class="nav-item">
@@ -91,6 +91,22 @@
                         <select class="form-select" id="category" required>
                             <!-- Category options will be dynamically populated here -->
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="floor" class="form-label">Floor</label>
+                        <input type="number" class="form-control" id="floor" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select class="form-select" id="type" required>
+                            <option value="transient">Transient</option>
+                            <option value="buy">Buy</option>
+                            <option value="lease">Lease</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input type="number" class="form-control" id="price" required>
                     </div>
                     <div class="mb-3">
                         <label for="availability" class="form-label">Availability</label>
@@ -144,6 +160,22 @@
                             </select>
                         </div>
                         <div class="mb-3">
+                            <label for="editFloor" class="form-label">Floor</label>
+                            <input type="number" class="form-control" id="editFloor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editType" class="form-label">Type</label>
+                            <select class="form-select" id="editType" required>
+                                <option value="transient">Transient</option>
+                                <option value="buy">Buy</option>
+                                <option value="lease">Lease</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPrice" class="form-label">Price</label>
+                            <input type="number" class="form-control" id="editPrice" required>
+                        </div>
+                        <div class="mb-3">
                             <label for="editAvailability" class="form-label">Availability</label>
                             <select class="form-select" id="editAvailability" required>
                                 <option value="available">Available</option>
@@ -191,7 +223,7 @@
         // Populate category dropdown with room categories
         const categoryDropdown = document.getElementById('category');
         const editCategoryDropdown = document.getElementById('editCategory');
-        database.ref('room_categories').on('value', function(snapshot) {
+        database.ref('room_category').on('value', function(snapshot) {
             categoryDropdown.innerHTML = '';
             editCategoryDropdown.innerHTML = '';
             snapshot.forEach(function(childSnapshot) {
@@ -216,15 +248,34 @@
             // Get form values
             const room = document.getElementById('room').value;
             const category = document.getElementById('category').value;
+            const floor = document.getElementById('floor').value;
+            const type = document.getElementById('type').value;
+            const price = document.getElementById('price').value;
             const availability = document.getElementById('availability').value;
 
-            // Add room data to Firebase Realtime Database
-            const roomData = {
-                room: room,
-                category: category,
-                availability: availability
-            };
-            database.ref('rooms').push(roomData);
+            // Fetch category details from room_category node
+            database.ref('room_category').orderByChild('name').equalTo(category).once('value', function(snapshot) {
+                snapshot.forEach(function(childSnapshot) {
+                    const categoryData = childSnapshot.val();
+                    const image = categoryData.image;
+                    const amenities = categoryData.amenities;
+                    const maxGuests = categoryData.maxGuests;
+
+                    // Add room data to Firebase Realtime Database
+                    const roomData = {
+                        room: room,
+                        category: category,
+                        floor: floor,
+                        type: type,
+                        price: price,
+                        availability: availability,
+                        image: image,
+                        amenities: amenities,
+                        maxGuests: maxGuests
+                    };
+                    database.ref('rooms').push(roomData);
+                });
+            });
 
             roomForm.reset();
         });
@@ -242,10 +293,10 @@
                 tr.innerHTML = `
                     <td>${count++}</td>
                     <td>${data.category}</td>
-                    <td>${data.room}</td>
+                    <td>Room: ${data.room}<br>Type: ${data.type}<br>Floor: ${data.floor}<br>Price: ${data.price}</td>
                     <td><span class="badge ${data.availability === 'available' ? 'bg-success' : 'bg-danger'}">${data.availability}</span></td>
                     <td>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="editRoom('${key}', '${data.room}', '${data.category}', '${data.availability}')">Edit</button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="editRoom('${key}', '${data.room}', '${data.category}', '${data.floor}', '${data.type}', '${data.price}', '${data.availability}')">Edit</button>
                         <button type="button" class="btn btn-danger btn-sm" onclick="deleteRoom('${key}')">Delete</button>
                     </td>
                 `;
@@ -254,9 +305,12 @@
         });
 
         // Function to edit room
-        function editRoom(id, room, category, availability) {
+        function editRoom(id, room, category, floor, type, price, availability) {
             document.getElementById('editRoom').value = room;
             document.getElementById('editCategory').value = category;
+            document.getElementById('editFloor').value = floor;
+            document.getElementById('editType').value = type;
+            document.getElementById('editPrice').value = price;
             document.getElementById('editAvailability').value = availability;
             document.getElementById('editRoomId').value = id;
             // Open the Bootstrap modal using jQuery
@@ -268,11 +322,17 @@
             const id = document.getElementById('editRoomId').value;
             const room = document.getElementById('editRoom').value;
             const category = document.getElementById('editCategory').value;
+            const floor = document.getElementById('editFloor').value;
+            const type = document.getElementById('editType').value;
+            const price = document.getElementById('editPrice').value;
             const availability = document.getElementById('editAvailability').value;
 
             database.ref('rooms').child(id).update({
                 room: room,
                 category: category,
+                floor: floor,
+                type: type,
+                price: price,
                 availability: availability
             }).then(() => {
                 $('#editRoomModal').modal('hide');

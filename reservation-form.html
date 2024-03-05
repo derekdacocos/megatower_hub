@@ -3,79 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Condo Reservation</title>
-  <!-- Add Bootstrap CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Add Custom CSS -->
-  <style>
-    /* Add your custom styles here */
-    .container {
-      margin-top: 20px;
-    }
-    .reservation-form {
-      border: 1px solid #ccc;
-      padding: 20px;
-    }
-    .available-rooms {
-      border: 1px solid #ccc;
-      padding: 20px;
-    }
-  </style>
+  <title>Reservation Form</title>
+  <!-- Add Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
+<!-- Reservation Form -->
 <div class="container">
-  <div class="row">
-    <!-- Reservation Form -->
-    <div class="col-md-4">
-      <div class="reservation-form">
-        <h4>Reservation Details</h4>
-        <form id="reservationForm">
-          <div class="form-group">
-            <label for="typeDropdown">Type</label>
-            <select class="form-control" id="typeDropdown">
-              <option value="transient">Transient</option>
-              <option value="buying">Buying</option>
-              <option value="lease">Lease</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="checkInDate">Check-in Date</label>
-            <input type="date" class="form-control" id="checkInDate">
-          </div>
-          <div class="form-group">
-            <label for="checkOutDate">Check-out Date</label>
-            <input type="date" class="form-control" id="checkOutDate">
-          </div>
-          <div class="form-group">
-            <label for="adultsCount">Adults</label>
-            <input type="number" class="form-control" id="adultsCount" min="1" value="1">
-          </div>
-          <div class="form-group">
-            <label for="childrenCount">Children</label>
-            <input type="number" class="form-control" id="childrenCount" min="0" value="0">
-          </div>
-          <button type="submit" class="btn btn-primary">Update</button>
-        </form>
-      </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <h2 class="text-center mb-4">Reservation Form</h2>
+            <form id="reservationForm">
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="fullName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <!-- Additional fields for chosen room data -->
+                <input type="hidden" id="roomId">
+                <input type="hidden" id="roomName">
+                <input type="hidden" id="roomPrice">
+                <!-- Check-in and Check-out date fields -->
+                <div class="mb-3">
+                    <label for="checkInDate" class="form-label">Check-in Date</label>
+                    <input type="date" class="form-control" id="checkInDate" required>
+                </div>
+                <div class="mb-3">
+                    <label for="checkOutDate" class="form-label">Check-out Date</label>
+                    <input type="date" class="form-control" id="checkOutDate" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Book Now</button>
+            </form>
+        </div>
     </div>
-    <!-- Available Rooms -->
-    <div class="col-md-8">
-      <div class="available-rooms">
-        <h4>Available Rooms</h4>
-        <div id="availableRooms"></div>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- Add Firebase SDK if needed -->
-<script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js"></script>
-
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
 <script>
-  // Your Firebase configuration
-  var firebaseConfig = {
+  // Firebase configuration
+  const firebaseConfig = {
     apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
     authDomain: "megatower-hub-ca285.firebaseapp.com",
     databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
@@ -84,59 +56,66 @@
     messagingSenderId: "900973693171",
     appId: "1:900973693171:web:9062bf9b49221596294f86"
   };
+
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
 
-  // Initialize Firestore
-  var db = firebase.firestore();
+  // Fetch data for the chosen room
+  const roomId = 'YOUR_CHOSEN_ROOM_ID'; // Replace with the actual room ID
+  const roomRef = firebase.database().ref('rooms/' + roomId);
+  roomRef.once('value', function(snapshot) {
+    const roomData = snapshot.val();
+    if (roomData) {
+      // Populate fields with room data
+      document.getElementById('roomId').value = roomId;
+      document.getElementById('roomName').value = roomData.name;
+      document.getElementById('roomPrice').value = roomData.price;
+    } else {
+      console.log("Room data not found");
+    }
+  });
 
-  // Function to set form values
-  function setFormValues(type, checkInDate, checkOutDate, adultsCount, childrenCount) {
-    document.getElementById('typeDropdown').value = type;
-    document.getElementById('checkInDate').value = checkInDate;
-    document.getElementById('checkOutDate').value = checkOutDate;
-    document.getElementById('adultsCount').value = adultsCount;
-    document.getElementById('childrenCount').value = childrenCount;
-  }
-
-  // Call setFormValues when the page loads
-  window.onload = function() {
-    // You can set default values here or fetch values from another source
-    setFormValues('transient', '', '', '1', '0');
-  };
-
-  // Function to handle form submission
+  // Handle form submission
   document.getElementById('reservationForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission
 
-    // Get form values
-    var type = document.getElementById('typeDropdown').value;
-    var checkInDate = document.getElementById('checkInDate').value;
-    var checkOutDate = document.getElementById('checkOutDate').value;
-    var adultsCount = document.getElementById('adultsCount').value;
-    var childrenCount = document.getElementById('childrenCount').value;
+    // Fetch form inputs
+    const fullName = document.getElementById('fullName').value;
+    const email = document.getElementById('email').value;
+    const checkInDate = document.getElementById('checkInDate').value;
+    const checkOutDate = document.getElementById('checkOutDate').value;
+    const roomId = document.getElementById('roomId').value;
+    const roomName = document.getElementById('roomName').value;
+    const roomPrice = document.getElementById('roomPrice').value;
 
-    db.collection('rooms').where('type', '==', type)
-                           .where('available', '==', true)
-                           .where('capacity', '>=', parseInt(adultsCount) + parseInt(childrenCount))
-                           .where('checkInDate', '<=', checkInDate)
-                           .where('checkOutDate', '>=', checkOutDate)
-                           .get()
-                           .then(function(querySnapshot) {
-                             querySnapshot.forEach(function(doc) {
-                               // Process each available room
-                               var roomData = doc.data();
-                               // Display the room data in the availableRooms element
-                               var roomElement = document.createElement('div');
-                               roomElement.textContent = 'Room Number: ' + roomData.roomNumber + ', Type: ' + roomData.type + ', Price: ' + roomData.price;
-                               document.getElementById('availableRooms').appendChild(roomElement);
-                             });
-                           })
-                           .catch(function(error) {
-                             console.error('Error getting available rooms: ', error);
-                           });
+    // Construct reservation object
+    const reservation = {
+      fullName: fullName,
+      email: email,
+      checkInDate: checkInDate,
+      checkOutDate: checkOutDate,
+      roomId: roomId,
+      roomName: roomName,
+      roomPrice: roomPrice
+      // Add additional fields as needed
+    };
+
+    // You can now proceed to handle the reservation data, such as storing it in Firebase or processing it further
+    console.log(reservation);
+    // Example: Store reservation data in Firebase
+    const reservationsRef = firebase.database().ref('reservations');
+    reservationsRef.push(reservation)
+      .then(() => {
+        // Reservation successful
+        console.log("Reservation successful");
+        // Redirect to confirmation page or display a success message
+      })
+      .catch(error => {
+        // Reservation failed
+        console.error("Error storing reservation:", error);
+        // Display an error message to the user
+      });
   });
 </script>
-
 </body>
 </html>

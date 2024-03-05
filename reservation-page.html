@@ -104,9 +104,13 @@
         </div>
     </div>
 </div>
-<!-- Our Rooms -->
+<!-- Available Rooms -->
 <h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">AVAILABLE ROOMS</h2>
-<div class="container" id="availableRooms">
+<div class="container">
+    <div class="row" id="availableRooms">
+        <!-- Room cards will be dynamically added here -->
+    </div>
+</div>
 
 </div>
 <!-- Amenities section -->
@@ -236,8 +240,8 @@
     // You can also perform any other action you need here
   }
 
-  // Function to handle form submission
-  document.getElementById('availabilityForm').addEventListener('submit', function(event) {
+    // Function to handle form submission
+    document.getElementById('availabilityForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission behavior
 
     // Fetch form inputs
@@ -278,25 +282,29 @@
         // Display filtered rooms
         var availableRoomHtml = '';
         if (filteredRooms.length > 0) {
-          filteredRooms.forEach(function(room) {
-            // Generate HTML for each room
-            availableRoomHtml += '<div class="card mb-3">';
+        filteredRooms.forEach(function(room) {
+            // Generate HTML for each room card
+            availableRoomHtml += '<div class="col-lg-3 mb-3">';
+            availableRoomHtml += '<div class="card">';
+            availableRoomHtml += '<img src="' + room.image + '" class="card-img-top" alt="' + room.category + '">';
             availableRoomHtml += '<div class="card-body">';
-            availableRoomHtml += '<h5 class="card-title">' + room.name + '</h5>';
-            availableRoomHtml += '<p class="card-text">Type: ' + room.type + '</p>';
+            availableRoomHtml += '<h5 class="card-title">' + room.category + '</h5>';
+            availableRoomHtml += '<p class="card-text">Capacity: ' + room.maxGuests + '</p>';
             availableRoomHtml += '<p class="card-text">Price: ' + room.price + '</p>';
+            availableRoomHtml += '<a href="reservation-form.html" class="btn btn-primary">Book Now</a>'; // Link to reservation form
             availableRoomHtml += '</div>';
             availableRoomHtml += '</div>';
-          });
+            availableRoomHtml += '</div>';
+        });
         } else {
-          // No rooms available for the selected criteria
-          availableRoomHtml = '<p>No rooms available for the selected criteria.</p>';
+        // No rooms available for the selected criteria
+        availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
         }
         // Display available rooms
         document.getElementById('availableRooms').innerHTML = availableRoomHtml;
       } else {
         // No rooms available
-        document.getElementById('availableRooms').innerHTML = '<p>No rooms available.</p>';
+        document.getElementById('availableRooms').innerHTML = '<div class="col-lg-12"><p class="text-center">No rooms available.</p></div>';
       }
     });
   });
