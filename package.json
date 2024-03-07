@@ -3,18 +3,10 @@
   "version": "1.0.0",
   "main": "index.html",
   "scripts": {
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "derekdacocos",
+  "author": "TEAMBA",
   "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/derekdacocos/MegaTower_Hub.git"
-  },
-  "bugs": {
-    "url": "https://github.com/derekdacocos/MegaTower_Hub/issues"
-  },
-  "homepage": "https://github.com/derekdacocos/MegaTower_Hub#readme",
   "description": ""
 }

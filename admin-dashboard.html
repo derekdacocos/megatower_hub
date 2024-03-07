@@ -1,393 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
-    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
-    crossorigin="anonymous">
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Dashboard - MT Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
-<body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
-        <div class="container">
-            <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
-                <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
-            </a>
-
-            <button class="navbar-toggler" 
-            type="button" 
-            data-bs-toggle="collapse" 
-            data-bs-target="#navmenu" 
-            aria-controls="navmenu" 
-            aria-expanded="false" 
-            aria-label="Toggle navigation menu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navmenu">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-light">Notifications</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Request
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
-                            <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+<body class="sb-nav-fixed">        
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">Dashboard</h1>
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+                <div class="row">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title" id="complaintsCount">Loading...</h5>
+                                <p class="card-text">Complaints</p>
+                            </div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <a class="small text-white stretched-link" href="admin-complaints.html">View Details</a>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
                         </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light" href="#" id="roomsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Rooms
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="roomsDropdown">
-                            <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
-                            <a class="dropdown-item" href="admin-addRoom.html">Room Form</a>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card bg-warning text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title" id="maintenanceCount">Loading...</h5>
+                                <p class="card-text">Maintenance Requests</p>
+                            </div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <a class="small text-white stretched-link" href="admin-maintenance.html">View Details</a>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
                         </div>
-                    </li>
-                    <li class="nav-item">
-                    <a href="user-management.html" class="nav-link text-light">Users</a>
-                </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-light">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
-                    </li>
-                </ul>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card bg-success text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title" id="cleaningCount">Loading...</h5>
+                                <p class="card-text">Cleaning Requests</p>
+                            </div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <a class="small text-white stretched-link" href="admin-cleaning.html">View Details</a>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card bg-danger text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title" id="reservationCount">Loading...</h5>
+                                <p class="card-text">Reservation Requests</p>
+                            </div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <a class="small text-white stretched-link" href="admin-reservations.html">View Details</a>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                Recent Requests
+                            </div>
+                            <div class="card-body">
+                                <table id="recentRequestsTable" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Description</th>
+                                            <th>Type</th>
+                                            <th>Time</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Table body will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>   
-    </nav>
-
-    <!-- Active Complaints and Maintenance Requests Boxes -->
-    <div class="container mt-5">
-      <div class="row">
-          <!-- Active Complaints Box -->
-          <div class="col-md-6">
-              <a href="admin-complaints.html" style="text-decoration: none; color: inherit;">
-                  <div class="card text-white bg-danger">
-                      <div class="card-body">
-                          <h5 class="card-title">Active Complaints</h5>
-                          <p class="card-text" id="activeComplaintsCount">Loading...</p>
-                      </div>
-                  </div>
-              </a>
-          </div>
-
-          <!-- Active Maintenance Requests Box -->
-          <div class="col-md-6">
-              <a href="admin-maintenance.html" style="text-decoration: none; color: inherit;">
-                  <div class="card text-white bg-warning">
-                      <div class="card-body">
-                          <h5 class="card-title">Active Maintenance Requests</h5>
-                          <p class="card-text" id="activeMaintenanceCount">Loading...</p>
-                      </div>
-                  </div>
-              </a>
-          </div>
-      </div>
+        </main>
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid px-4">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                    <div>
+                        <a href="#">Privacy Policy</a>
+                        &middot;
+                        <a href="#">Terms &amp; Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
-    <!-- Active Cleaning Requests and Reservations Boxes -->
-    <div class="container mt-5">
-      <div class="row">
-          <!-- Active Cleaning Requests Box -->
-          <div class="col-md-6">
-              <a href="admin-cleaning.html" style="text-decoration: none; color: inherit;">
-                  <div class="card text-white bg-success">
-                      <div class="card-body">
-                          <h5 class="card-title">Active Cleaning Requests</h5>
-                          <p class="card-text" id="activeCleaningCount">Loading...</p>
-                      </div>
-                  </div>
-              </a>
-          </div>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+        authDomain: "megatower-hub-ca285.firebaseapp.com",
+        databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+        projectId: "megatower-hub-ca285",
+        storageBucket: "megatower-hub-ca285.appspot.com",
+        messagingSenderId: "900973693171",
+        appId: "1:900973693171:web:9062bf9b49221596294f86"
+    };
 
-          <!-- Active Reservations Box -->
-          <div class="col-md-6">
-              <a href="admin-reservations.html" style="text-decoration: none; color: inherit;">
-                  <div class="card text-white bg-primary">
-                      <div class="card-body">
-                          <h5 class="card-title">Active Reservations</h5>
-                          <p class="card-text" id="activeReservationsCount">Loading...</p>
-                      </div>
-                  </div>
-              </a>
-          </div>
-      </div>
-    </div>
+    firebase.initializeApp(firebaseConfig);
 
-    <!-- New Section for Listing Recent Requests in a Table -->
-    <div class="container mt-5">
-        <h2>Recent Requests</h2>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="recentRequestsTableBody">
-                    <!-- Table body will be populated by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-    </div>
+    const complaintsRef = firebase.database().ref('complaints');
+    const maintenanceRef = firebase.database().ref('maintenanceRequests');
+    const cleaningRef = firebase.database().ref('cleaningRequests');
+    const reservationsRef = firebase.database().ref('reservations');
 
+    const complaintsCountElement = document.getElementById('complaintsCount');
+    const maintenanceCountElement = document.getElementById('maintenanceCount');
+    const cleaningCountElement = document.getElementById('cleaningCount');
+    const reservationCountElement = document.getElementById('reservationCount');
 
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-
-    <!-- Firebase JS -->
-    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
-            authDomain: "megatower-hub-ca285.firebaseapp.com",
-            databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
-            projectId: "megatower-hub-ca285",
-            storageBucket: "megatower-hub-ca285.appspot.com",
-            messagingSenderId: "900973693171",
-            appId: "1:900973693171:web:9062bf9b49221596294f86"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-
-        // Get the elements where you want to display the counts
-        const activeComplaintsCountElement = document.getElementById('activeComplaintsCount');
-        const activeMaintenanceCountElement = document.getElementById('activeMaintenanceCount');
-        const activeCleaningCountElement = document.getElementById('activeCleaningCount');
-        const activeReservationsCountElement = document.getElementById('activeReservationsCount');
-
-        // Get the logout button element
-        const logoutBtn = document.getElementById('logoutBtn');
-
-        // Add a click event listener to the logout button
-        logoutBtn.addEventListener('click', () => {
-            // Sign out the user
-            firebase.auth().signOut()
-                .then(() => {
-                    // Redirect to the landing page after logout
-                    window.location.replace('index.html');
-                })
-                .catch((error) => {
-                    console.error(error.message);
-                });
+    function displayCounts() {
+        complaintsRef.once('value', snapshot => {
+            const complaintsCount = snapshot.exists() ? Object.values(snapshot.val()).filter(complaint => !complaint.resolved).length : 0;
+            complaintsCountElement.textContent = complaintsCount;
         });
 
-        // Function to display active complaints count
-        function displayActiveComplaintsCount() {
-            const complaintsRef = firebase.database().ref('complaints');
+        maintenanceRef.once('value', snapshot => {
+            const maintenanceCount = snapshot.exists() ? Object.values(snapshot.val()).filter(request => !request.resolved).length : 0;
+            maintenanceCountElement.textContent = maintenanceCount;
+        });
 
-            // Listen for changes in the "complaints" node
-            complaintsRef.on('value', (snapshot) => {
-                const complaintsData = snapshot.val();
+        cleaningRef.once('value', snapshot => {
+            const cleaningCount = snapshot.exists() ? Object.values(snapshot.val()).filter(request => !request.resolved).length : 0;
+            cleaningCountElement.textContent = cleaningCount;
+        });
 
-                if (complaintsData) {
-                    // Filter active complaints (where resolved is false)
-                    const activeComplaints = Object.values(complaintsData).filter(complaint => !complaint.resolved);
+        reservationsRef.once('value', snapshot => {
+            const reservationCount = snapshot.exists() ? Object.values(snapshot.val()).filter(reservation => !reservation.reserved).length : 0;
+            reservationCountElement.textContent = reservationCount;
+        });
+    }
 
-                    // Update the count in the HTML
-                    activeComplaintsCountElement.textContent = activeComplaints.length;
-                } else {
-                    // If there are no complaints, set count to 0
-                    activeComplaintsCountElement.textContent = '0';
-                }
+    displayCounts();
+
+    const recentRequestsTableBody = document.querySelector('#recentRequestsTable tbody');
+
+    function displayRecentRequests() {
+        const allRequests = [];
+
+        complaintsRef.once('value', snapshot => {
+            snapshot.forEach(childSnapshot => {
+                const complaint = childSnapshot.val();
+                complaint.type = 'Complaint';
+                allRequests.push(complaint);
             });
+        });
+
+        maintenanceRef.once('value', snapshot => {
+            snapshot.forEach(childSnapshot => {
+                const maintenance = childSnapshot.val();
+                maintenance.type = 'Maintenance';
+                allRequests.push(maintenance);
+            });
+        });
+
+        cleaningRef.once('value', snapshot => {
+            snapshot.forEach(childSnapshot => {
+                const cleaning = childSnapshot.val();
+                cleaning.type = 'Cleaning';
+                allRequests.push(cleaning);
+            });
+        });
+
+        reservationsRef.once('value', snapshot => {
+            snapshot.forEach(childSnapshot => {
+                const reservation = childSnapshot.val();
+                reservation.type = 'Reservation';
+                allRequests.push(reservation);
+            });
+        });
+
+        allRequests.sort((a, b) => b.timestamp - a.timestamp);
+
+        allRequests.slice(0, 10).forEach((request, index) => {
+            const row = recentRequestsTableBody.insertRow();
+            const typeClass = getRequestTypeClass(request.type);
+            const statusClass = request.resolved ? 'bg-success' : 'bg-warning';
+
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${request.description}</td>
+                <td class="${typeClass}">${request.type}</td>
+                <td>${formatDate(request.timestamp)}</td>
+                <td class="${statusClass}">${request.resolved ? 'Resolved' : 'Pending'}</td>
+            `;
+        });
+    }
+
+    function formatDate(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleString();
+    }
+
+    function getRequestTypeClass(type) {
+        switch (type) {
+            case 'Complaint':
+                return 'bg-danger';
+            case 'Maintenance':
+                return 'bg-warning';
+            case 'Cleaning':
+                return 'bg-success';
+            case 'Reservation':
+                return 'bg-primary';
+            default:
+                return '';
         }
+    }
 
-        // Function to display active maintenance requests count
-        function displayActiveMaintenanceCount() {
-            const maintenanceRef = firebase.database().ref('maintenanceRequests');
+    displayRecentRequests();
+</script>
 
-            // Listen for changes in the "maintenanceRequests" node
-            maintenanceRef.on('value', (snapshot) => {
-                const maintenanceData = snapshot.val();
-
-                if (maintenanceData) {
-                    // Filter active maintenance requests (where resolved is false)
-                    const activeMaintenanceRequests = Object.values(maintenanceData).filter(request => !request.resolved);
-
-                    // Update the count in the HTML
-                    activeMaintenanceCountElement.textContent = activeMaintenanceRequests.length;
-                } else {
-                    // If there are no maintenance requests, set count to 0
-                    activeMaintenanceCountElement.textContent = '0';
-                }
-            });
-        }
-
-        // Function to display active cleaning requests count
-        function displayActiveCleaningCount() {
-            const cleaningRef = firebase.database().ref('cleaningRequests');
-
-            // Listen for changes in the "cleaningRequests" node
-            cleaningRef.on('value', (snapshot) => {
-                const cleaningData = snapshot.val();
-
-                if (cleaningData) {
-                    // Filter active cleaning requests (where resolved is false)
-                    const activeCleaningRequests = Object.values(cleaningData).filter(request => !request.resolved);
-
-                    // Update the count in the HTML
-                    activeCleaningCountElement.textContent = activeCleaningRequests.length;
-                } else {
-                    // If there are no cleaning requests, set count to 0
-                    activeCleaningCountElement.textContent = '0';
-                }
-            });
-        }
-
-        // Function to display active reservations count
-        function displayActiveReservationsCount() {
-            const reservationsRef = firebase.database().ref('reservations');
-
-            // Listen for changes in the "reservations" node
-            reservationsRef.on('value', (snapshot) => {
-                const reservationsData = snapshot.val();
-
-                if (reservationsData) {
-                    // Filter active reservations (where reserved is false)
-                    const activeReservations = Object.values(reservationsData).filter(reservation => !reservation.reserved);
-
-                    // Update the count in the HTML
-                    activeReservationsCountElement.textContent = activeReservations.length;
-                } else {
-                    // If there are no reservations, set count to 0
-                    activeReservationsCountElement.textContent = '0';
-                }
-            });
-        }
-
-        // Call the functions to display counts
-        displayActiveComplaintsCount();
-        displayActiveMaintenanceCount();
-        displayActiveCleaningCount();
-        displayActiveReservationsCount();
-        
-// Function to display recent requests in a table
-function displayRecentRequests() {
-            const recentRequests = [];
-
-            // Get all requests from Firebase
-            const complaintsRef = firebase.database().ref('complaints');
-            const maintenanceRef = firebase.database().ref('maintenanceRequests');
-            const cleaningRef = firebase.database().ref('cleaningRequests');
-            const reservationsRef = firebase.database().ref('reservations');
-
-            // Fetch complaints
-            complaintsRef.once('value', (complaintsSnapshot) => {
-                complaintsSnapshot.forEach((complaintSnapshot) => {
-                    const complaint = complaintSnapshot.val();
-                    complaint.type = 'Complaint';
-                    recentRequests.push(complaint);
-                });
-                checkRequestsCount();
-            });
-
-            // Fetch maintenance requests
-            maintenanceRef.once('value', (maintenanceSnapshot) => {
-                maintenanceSnapshot.forEach((maintenanceSnapshot) => {
-                    const maintenance = maintenanceSnapshot.val();
-                    maintenance.type = 'Maintenance';
-                    recentRequests.push(maintenance);
-                });
-                checkRequestsCount();
-            });
-
-            // Fetch cleaning requests
-            cleaningRef.once('value', (cleaningSnapshot) => {
-                cleaningSnapshot.forEach((cleaningSnapshot) => {
-                    const cleaning = cleaningSnapshot.val();
-                    cleaning.type = 'Cleaning';
-                    recentRequests.push(cleaning);
-                });
-                checkRequestsCount();
-            });
-
-            // Fetch reservations
-            reservationsRef.once('value', (reservationsSnapshot) => {
-                reservationsSnapshot.forEach((reservationSnapshot) => {
-                    const reservation = reservationSnapshot.val();
-                    reservation.type = 'Reservation';
-                    recentRequests.push(reservation);
-                });
-                checkRequestsCount();
-            });
-
-            function checkRequestsCount() {
-                const totalCount = recentRequests.length;
-                if (totalCount === recentRequests.length) {
-                    // Sort recent requests by timestamp
-                    recentRequests.sort((a, b) => (a.timestamp > b.timestamp) ? -1 : 1);
-
-                    // Display recent requests in the table
-                    const tableBody = document.getElementById('recentRequestsTableBody');
-                    tableBody.innerHTML = '';
-
-                    recentRequests.slice(0, 10).forEach((request, index) => {
-                        const row = tableBody.insertRow();
-                        const typeClass = getRequestTypeClass(request.type);
-                        const statusClass = getRequestStatusClass(request.resolved);
-                        row.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${request.description}</td>
-                            <td class="${typeClass}">${request.type}</td>
-                            <td>${formatDate(request.timestamp)}</td>
-                            <td class="${statusClass}">${request.resolved ? 'Resolved' : 'Pending'}</td>
-                        `;
-                    });
-                }
-            }
-
-            // Function to format date
-            function formatDate(timestamp) {
-                const date = new Date(timestamp);
-                return date.toLocaleString();
-            }
-
-            // Function to get request type class
-            function getRequestTypeClass(type) {
-                switch (type) {
-                    case 'Complaint':
-                        return 'bg-danger';
-                    case 'Maintenance':
-                        return 'bg-warning';
-                    case 'Cleaning':
-                        return 'bg-success';
-                    case 'Reservation':
-                        return 'bg-primary';
-                    default:
-                        return '';
-                }
-            }
-
-            // Function to get request status class
-            function getRequestStatusClass(resolved) {
-                return resolved ? 'bg-success' : 'bg-warning';
-            }
-        }
-
-        // Call the function to display recent requests
-        displayRecentRequests();
-
-    </script>
 </body>
 </html>
