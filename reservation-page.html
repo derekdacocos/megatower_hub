@@ -1,349 +1,458 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Condo Reservation</title>
-  <!-- Add Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Add Bootstrap Datepicker CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-  <!-- Add Swiper CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-  <style>
-    /* Custom CSS for swiper */
-    .swiper-container {
-      height: 50vh; /* Set swiper height to 20% of viewport height */
-    }
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Condo Reservation</title>
+    <!-- Add Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Add Bootstrap Datepicker CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <!-- Add Swiper CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <style>
+        /* Custom CSS for swiper */
+        .swiper-container {
+        height: 50vh; /* Set swiper height to 20% of viewport height */
+        }
 
-    .swiper-slide img {
-      width: 100%; /* Make images fill the entire width of the swiper */
-      height: 100%; /* Make images fill the entire height of the swiper */
-      object-fit: cover; /* Maintain aspect ratio and cover entire slide */
-    }
-  </style>
-</head>
-<body>
-<!-- Swiper -->
-<div class="swiper-container">
-    <div class="swiper-wrapper">
-      <!-- Add your swiper slides here -->
-      <div class="swiper-slide">
-        <img src="https://static.wixstatic.com/media/1817fe_e325baa235fe43539115cc7041c673e4~mv2.jpg/v1/fill/w_525,h_613,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/MEGATOWER%20RESIDENCES%20III%20(1).jpg" alt="Slide 1">
-      </div>
-      <div class="swiper-slide">
-        <img src="https://static.wixstatic.com/media/ba324c_f2697c21035c436aa06e65852c7caaf1~mv2.jpg/v1/fill/w_380,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/megapines_tower-3-1.jpg" alt="Slide 2">
-      </div>
-      <!-- Add more slides as needed -->
+        .swiper-slide img {
+        width: 100%; /* Make images fill the entire width of the swiper */
+        height: 100%; /* Make images fill the entire height of the swiper */
+        object-fit: cover; /* Maintain aspect ratio and cover entire slide */
+        }
+    </style>
+    </head>
+    <body>
+    <!-- Swiper -->
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+        <!-- Add your swiper slides here -->
+        <div class="swiper-slide">
+            <img src="https://static.wixstatic.com/media/1817fe_e325baa235fe43539115cc7041c673e4~mv2.jpg/v1/fill/w_525,h_613,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/MEGATOWER%20RESIDENCES%20III%20(1).jpg" alt="Slide 1">
+        </div>
+        <div class="swiper-slide">
+            <img src="https://static.wixstatic.com/media/ba324c_f2697c21035c436aa06e65852c7caaf1~mv2.jpg/v1/fill/w_380,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/megapines_tower-3-1.jpg" alt="Slide 2">
+        </div>
+        <!-- Add more slides as needed -->
+        </div>
     </div>
-</div>
-<!-- Check availability form -->
-<div class="container availability-form">
-    <div class="row">
-        <div class="col-lg-12 bg-white shadow p-4 rounded">
-            <h5 class="col-lg-3">Condominium Reservation</h5>
-            <form id="availabilityForm">
-                <div class="row align-items-end">
-                    <!-- Type Dropdown -->
-                    <div class="col-lg-2 mb-3">
-                        <label class="form-label" style="font-weight: 500;">Type</label>
-                        <select class="form-select" aria-label="Type" id="typeDropdown">
-                            <option selected>Choose...</option>
-                            <option value="transient">Transient</option>
-                            <option value="buying">Buying</option>
-                            <option value="lease">Lease</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-3 mb-3">
-                        <label class="form-label" style="font-weight: 500;">Check-in</label>
-                        <input type="date" class="form-control shadow-none datepicker" id="checkInDate">
-                    </div>
-                    <div class="col-lg-3 mb-3">
-                        <label class="form-label" style="font-weight: 500;">Check-out</label>
-                        <input type="date" class="form-control shadow-none datepicker" id="checkOutDate">
-                    </div>                    
-                    <div class="col-lg-2 mb-3">
-                        <label class="form-label" style="font-weight: 500;">Guests</label>
-                        <div class="input-group">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#guestModal">
-                                Guests
-                            </button>
+    <!-- Check availability form -->
+    <div class="container availability-form">
+        <div class="row">
+            <div class="col-lg-12 bg-white shadow p-4 rounded">
+                <h5 class="col-lg-3">Condominium Reservation</h5>
+                <form id="availabilityForm">
+                    <div class="row align-items-end">
+                        <!-- Type Dropdown -->
+                        <div class="col-lg-2 mb-3">
+                            <label class="form-label" style="font-weight: 500;">Type</label>
+                            <select class="form-select" aria-label="Type" id="typeDropdown">
+                                <option selected>Choose...</option>
+                                <option value="transient">Transient</option>
+                                <option value="buying">Buying</option>
+                                <option value="lease">Lease</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 mb-3">
+                            <label class="form-label" style="font-weight: 500;">Check-in</label>
+                            <input type="date" class="form-control shadow-none datepicker" id="checkInDate">
+                        </div>
+                        <div class="col-lg-3 mb-3">
+                            <label class="form-label" style="font-weight: 500;">Check-out</label>
+                            <input type="date" class="form-control shadow-none datepicker" id="checkOutDate">
+                        </div>                    
+                        <div class="col-lg-2 mb-3">
+                            <label class="form-label" style="font-weight: 500;">Guests</label>
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#guestModal">
+                                    Guests
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 mb-lg-3 mt-2">
+                            <button type="submit" class="btn text-white shadow-none bg-primary">Submit</button>
                         </div>
                     </div>
-                    <div class="col-lg-1 mb-lg-3 mt-2">
-                        <button type="submit" class="btn text-white shadow-none bg-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Guest Modal -->
+    <div class="modal fade" id="guestModal" tabindex="-1" aria-labelledby="guestModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="guestModalLabel">Select Guests</h5>
+                    <!-- Replace the close button with a cancel button -->
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="adultsCount">Adults</label>
+                        <input type="number" class="form-control" id="adultsCount" min="1" value="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="childrenCount">Children</label>
+                        <input type="number" class="form-control" id="childrenCount" min="0" value="0">
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
-<!-- Guest Modal -->
-<div class="modal fade" id="guestModal" tabindex="-1" aria-labelledby="guestModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="guestModalLabel">Select Guests</h5>
-                <!-- Replace the close button with a cancel button -->
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="adultsCount">Adults</label>
-                    <input type="number" class="form-control" id="adultsCount" min="1" value="1">
-                </div>
-                <div class="mb-3">
-                    <label for="childrenCount">Children</label>
-                    <input type="number" class="form-control" id="childrenCount" min="0" value="0">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <!-- Update the "Apply Changes" button to close the modal -->
-                <button type="button" class="btn btn-primary" onclick="updateGuestCount()" data-bs-dismiss="modal">Apply Changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Available Rooms -->
-<h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">AVAILABLE ROOMS</h2>
-<div class="container">
-    <div class="row" id="availableRooms">
-        <!-- Room cards will be dynamically added here -->
-    </div>
-</div>
-
-</div>
-<!-- Amenities section -->
-<div class="container amenities-section mt-4">
-    <div class="row">
-        <div class="col-lg-12 bg-white shadow p-4 rounded">
-            <h2 class="col-lg-12 text-center mb-4">Amenities and Facilities</h2>
-            <div class="row">
-                <!-- Column 1 -->
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <ul>
-                        <li><strong>Kitchen</strong></li>
-                            <ul>
-                                <li>Dishes and dining utensils</li>
-                                <li>Microwave</li>
-                                <li>Refrigerator</li>
-                            </ul>
-                        <li><strong>Bathroom</strong></li>
-                            <ul>
-                                <li>Body wash</li>
-                            </ul>
-                        <li><strong>Standard</strong></li>
-                            <ul>
-                                <li>Fans (ceiling or portable)</li>
-                                <li>Laundromat nearby</li>
-                            </ul>
-                    </ul>
-                </div>
-                <!-- Column 2 -->
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <ul>
-                        <li><strong>Outdoor</strong></li>
-                            <ul>
-                                <li>Garden or backyard</li>
-                            </ul>
-                        <li><strong>Entertainment</strong></li>
-                            <ul>
-                                <li>Internet</li>
-                                <li>TV</li>
-                                <li>Wi-Fi</li>
-                            </ul>
-                        <li><strong>Comforts</strong></li>
-                            <ul>
-                                <li>Linens</li>
-                            </ul>
-                    </ul>
-                </div>
-                <!-- Column 3 -->
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <ul>
-                        <li><strong>Dining, drinking, and snacking</strong></li>
-                            <ul>
-                                <li>Coffee or tea</li>
-                            </ul>
-                        <li><strong>Bathroom and toiletries</strong></li>
-                            <ul>
-                                <li>Hair dryer</li>
-                                <li>Toiletries</li>
-                            </ul>
-                        <li><strong>Services and conveniences</strong></li>
-                            <ul>
-                                <li>Doorman</li>
-                                <li>Elevator</li>
-                            </ul>
-                    </ul>
-                </div>
-                <!-- Column 4 -->
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <ul>
-                        <li><strong>Safety and security features</strong></li>
-                            <ul>
-                                <li>Fire extinguisher</li>
-                                <li>Smoke detector</li>
-                            </ul>
-                        <li><strong>Access</strong></li>
-                            <ul>
-                                <li>Security [24-hour]</li>
-                            </ul>
-                    </ul>
+                <div class="modal-footer">
+                    <!-- Update the "Apply Changes" button to close the modal -->
+                    <button type="button" class="btn btn-primary" onclick="updateGuestCount()" data-bs-dismiss="modal">Apply Changes</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Add Bootstrap 5 JS and Popper.js -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Add jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Add Bootstrap Datepicker JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-<!-- Add Swiper JS -->
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
-<script>
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
-    authDomain: "megatower-hub-ca285.firebaseapp.com",
-    databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
-    projectId: "megatower-hub-ca285",
-    storageBucket: "megatower-hub-ca285.appspot.com",
-    messagingSenderId: "900973693171",
-    appId: "1:900973693171:web:9062bf9b49221596294f86"
-  };
+    <!-- Available Rooms -->
+    <h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">AVAILABLE ROOMS</h2>
+    <!-- Filter box -->
+    <div class="container mb-4 rounded border" id="filterBox">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="dishes" id="filterDishes">
+                    <label class="form-check-label" for="filterDishes">Dishes and dining utensils</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="microwave" id="filterMicrowave">
+                    <label class="form-check-label" for="filterMicrowave">Microwave</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="refrigerator" id="filterRefrigerator">
+                    <label class="form-check-label" for="filterRefrigerator">Refrigerator</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="bodywash" id="filterBodywash">
+                    <label class="form-check-label" for="filterBodywash">Body wash</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="fans" id="filterFans">
+                    <label class="form-check-label" for="filterFans">Fans (ceiling or portable)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="laundry" id="filterLaundry">
+                    <label class="form-check-label" for="filterLaundry">Laundromat nearby</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="garden" id="filterGarden">
+                    <label class="form-check-label" for="filterGarden">Garden or backyard</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="internet" id="filterInternet">
+                    <label class="form-check-label" for="filterInternet">Internet</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="tv" id="filterTV">
+                    <label class="form-check-label" for="filterTV">TV</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="wifi" id="filterWifi">
+                    <label class="form-check-label" for="filterWifi">Wi-Fi</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="linens" id="filterLinens">
+                    <label class="form-check-label" for="filterLinens">Linens</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="coffee" id="filterCoffee">
+                    <label class="form-check-label" for="filterCoffee">Coffee or tea</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="hairdryer" id="filterHairdryer">
+                    <label class="form-check-label" for="filterHairdryer">Hair dryer</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="toiletries" id="filterToiletries">
+                    <label class="form-check-label" for="filterToiletries">Toiletries</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="doorman" id="filterDoorman">
+                    <label class="form-check-label" for="filterDoorman">Doorman</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="elevator" id="filterElevator">
+                    <label class="form-check-label" for="filterElevator">Elevator</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="fireextinguisher" id="filterFireExtinguisher">
+                    <label class="form-check-label" for="filterFireExtinguisher">Fire extinguisher</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="smokedetector" id="filterSmokeDetector">
+                    <label class="form-check-label" for="filterSmokeDetector">Smoke detector</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="security24" id="filterSecurity24">
+                    <label class="form-check-label" for="filterSecurity24">Security (24-hour)</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-primary" onclick="filterRooms()">Apply Filters</button>
+            </div>            
+        </div>
+    </div>
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
+    <!-- Available Rooms -->
+    <div class="container">
+        <div class="row" id="availableRooms">
+            <!-- Room cards will be dynamically added here -->
+        </div>
+    </div>
 
-  // Get a reference to the database service
-  const database = firebase.database();
+    <!-- Amenities section -->
+    <div class="container amenities-section mt-4">
+        <div class="row">
+            <div class="col-lg-12 bg-white shadow p-4 rounded">
+                <h2 class="col-lg-12 text-center mb-4">Amenities and Facilities</h2>
+                <div class="row">
+                    <!-- Column 1 -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <ul>
+                            <li><strong>Kitchen</strong></li>
+                                <ul>
+                                    <li>Dishes and dining utensils</li>
+                                    <li>Microwave</li>
+                                    <li>Refrigerator</li>
+                                </ul>
+                            <li><strong>Bathroom</strong></li>
+                                <ul>
+                                    <li>Body wash</li>
+                                </ul>
+                            <li><strong>Standard</strong></li>
+                                <ul>
+                                    <li>Fans (ceiling or portable)</li>
+                                    <li>Laundromat nearby</li>
+                                </ul>
+                        </ul>
+                    </div>
+                    <!-- Column 2 -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <ul>
+                            <li><strong>Outdoor</strong></li>
+                                <ul>
+                                    <li>Garden or backyard</li>
+                                </ul>
+                            <li><strong>Entertainment</strong></li>
+                                <ul>
+                                    <li>Internet</li>
+                                    <li>TV</li>
+                                    <li>Wi-Fi</li>
+                                </ul>
+                            <li><strong>Comforts</strong></li>
+                                <ul>
+                                    <li>Linens</li>
+                                </ul>
+                        </ul>
+                    </div>
+                    <!-- Column 3 -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <ul>
+                            <li><strong>Dining, drinking, and snacking</strong></li>
+                                <ul>
+                                    <li>Coffee or tea</li>
+                                </ul>
+                            <li><strong>Bathroom and toiletries</strong></li>
+                                <ul>
+                                    <li>Hair dryer</li>
+                                    <li>Toiletries</li>
+                                </ul>
+                            <li><strong>Services and conveniences</strong></li>
+                                <ul>
+                                    <li>Doorman</li>
+                                    <li>Elevator</li>
+                                </ul>
+                        </ul>
+                    </div>
+                    <!-- Column 4 -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <ul>
+                            <li><strong>Safety and security features</strong></li>
+                                <ul>
+                                    <li>Fire extinguisher</li>
+                                    <li>Smoke detector</li>
+                                </ul>
+                            <li><strong>Access</strong></li>
+                                <ul>
+                                    <li>Security [24-hour]</li>
+                                </ul>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add Bootstrap 5 JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Add jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Add Bootstrap Datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <!-- Add Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+    <script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+        authDomain: "megatower-hub-ca285.firebaseapp.com",
+        databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+        projectId: "megatower-hub-ca285",
+        storageBucket: "megatower-hub-ca285.appspot.com",
+        messagingSenderId: "900973693171",
+        appId: "1:900973693171:web:9062bf9b49221596294f86"
+    };
 
-  // Function to update the guest count
-  function updateGuestCount() {
-    var adultsCount = document.getElementById('adultsCount').value;
-    var childrenCount = document.getElementById('childrenCount').value;
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
 
-    // Set the placeholder of the "Guests" button
-    document.querySelector('.input-group button').textContent = 'Guests: ' + (parseInt(adultsCount) + parseInt(childrenCount));
+    // Get a reference to the database service
+    const database = firebase.database();
 
-    // Update the guest count display if needed
-    // For example, you can display it in an alert
-    alert('Guest count updated: Adults - ' + adultsCount + ', Children - ' + childrenCount);
-    
-    // You can also perform any other action you need here
-  }
+    // Function to update the guest count
+    function updateGuestCount() {
+        var adultsCount = document.getElementById('adultsCount').value;
+        var childrenCount = document.getElementById('childrenCount').value;
 
-    // Function to handle form submission
+        // Set the placeholder of the "Guests" button
+        document.querySelector('.input-group button').textContent = 'Guests: ' + (parseInt(adultsCount) + parseInt(childrenCount));
+
+        // Update the guest count display if needed
+        // For example, you can display it in an alert
+        alert('Guest count updated: Adults - ' + adultsCount + ', Children - ' + childrenCount);
+        
+        // You can also perform any other action you need here
+    }
+
+    // Function to handle form submission and filter rooms
     document.getElementById('availabilityForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent default form submission behavior
+        event.preventDefault(); // Prevent default form submission behavior
 
-    // Fetch form inputs
-    var type = document.getElementById('typeDropdown').value;
-    var checkInDate = new Date(document.getElementById('checkInDate').value);
-    var checkOutDate = new Date(document.getElementById('checkOutDate').value);
-    var adultsCount = parseInt(document.getElementById('adultsCount').value);
-    var childrenCount = parseInt(document.getElementById('childrenCount').value);
-    var maxGuests = adultsCount + childrenCount;
+        // Fetch form inputs
+        var type = document.getElementById('typeDropdown').value;
+        var checkInDate = new Date(document.getElementById('checkInDate').value);
+        var checkOutDate = new Date(document.getElementById('checkOutDate').value);
+        var adultsCount = parseInt(document.getElementById('adultsCount').value);
+        var childrenCount = parseInt(document.getElementById('childrenCount').value);
+        var capacity = adultsCount + childrenCount;
 
-    // Query available rooms in Firebase
-    database.ref('rooms').once('value', function(snapshot) {
-      var availableRooms = snapshot.val();
-      if (availableRooms) {
-        // Filter available rooms based on criteria
-        var filteredRooms = [];
-        Object.keys(availableRooms).forEach(function(roomKey) {
-          var room = availableRooms[roomKey];
-          // Check if room type matches
-          if (room.type === type) {
-            // Check if there are no booked dates or if the selected dates are available
-            var bookedDates = room.bookedDates || {};
-            var isAvailable = true;
-            for (var bookedDate in bookedDates) {
-              var startDate = new Date(bookedDate);
-              var endDate = new Date(bookedDates[bookedDate]);
-              if ((checkInDate >= startDate && checkInDate <= endDate) || (checkOutDate >= startDate && checkOutDate <= endDate)) {
-                isAvailable = false;
-                break;
-              }
-            }
-            // Check if the number of guests is within the room's capacity
-            if (isAvailable && maxGuests <= room.maxGuests) {
-              filteredRooms.push(room);
-            }
-          }
+        // Get selected amenities
+        var selectedAmenities = [];
+        document.querySelectorAll('#filterBox input[type="checkbox"]:checked').forEach(function(checkbox) {
+            selectedAmenities.push(checkbox.value);
         });
-        // Display filtered rooms
-        var availableRoomHtml = '';
-        if (filteredRooms.length > 0) {
-        filteredRooms.forEach(function(room) {
-            // Generate HTML for each room card
-            availableRoomHtml += '<div class="col-lg-3 mb-3">';
-            availableRoomHtml += '<div class="card">';
-            availableRoomHtml += '<img src="' + room.image + '" class="card-img-top" alt="' + room.category + '">';
-            availableRoomHtml += '<div class="card-body">';
-            availableRoomHtml += '<h5 class="card-title">' + room.category + '</h5>';
-            availableRoomHtml += '<p class="card-text">Capacity: ' + room.maxGuests + '</p>';
-            availableRoomHtml += '<p class="card-text">Price: ' + room.price + '</p>';
-            availableRoomHtml += '<a href="reservation-form.html" class="btn btn-primary">Book Now</a>'; // Link to reservation form
-            availableRoomHtml += '</div>';
-            availableRoomHtml += '</div>';
-            availableRoomHtml += '</div>';
+
+        // Query available rooms in Firebase
+        database.ref('rooms').once('value', function(snapshot) {
+            var availableRooms = snapshot.val();
+            if (availableRooms) {
+                // Filter available rooms based on criteria
+                var filteredRooms = [];
+                Object.keys(availableRooms).forEach(function(roomKey) {
+                    var room = availableRooms[roomKey];
+                    // Check if room type matches
+                    if (room.type === type && room.availability === 'available' && room.capacity >= capacity) {
+                        // Check if there are no booked dates or if the selected dates are available
+                        var bookedDates = room.bookedDates || {};
+                        var isAvailable = true;
+                        for (var bookedDate in bookedDates) {
+                            var startDate = new Date(bookedDate);
+                            var endDate = new Date(bookedDates[bookedDate]);
+                            if ((checkInDate >= startDate && checkInDate <= endDate) || (checkOutDate >= startDate && checkOutDate <= endDate)) {
+                                isAvailable = false;
+                                break;
+                            }
+                        }
+                        // Check if the room has all selected amenities
+                        if (isAvailable && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
+                            filteredRooms.push(room);
+                        }
+                    }
+                });
+                // Display filtered rooms
+                var availableRoomHtml = '';
+                if (filteredRooms.length > 0) {
+                    filteredRooms.forEach(function(room) {
+                        // Generate HTML for each room card
+                        availableRoomHtml += '<div class="col-lg-4 mb-3">';
+                        availableRoomHtml += '<div class="card">';
+                        availableRoomHtml += '<img src="' + room.image + '" class="card-img-top" alt="' + room.category + '">';
+                        availableRoomHtml += '<div class="card-body">';
+                        availableRoomHtml += '<h5 class="card-title">' + room.category + '</h5>';
+                        availableRoomHtml += '<p class="card-text">Capacity: ' + room.capacity + '</p>';
+                        availableRoomHtml += '<p class="card-text">Floor: ' + room.floor + '</p>';
+                        availableRoomHtml += '<p class="card-text">Status: ' + room.availability + '</p>';
+                        availableRoomHtml += '<p class="card-text">Amenities: ' + room.amenities.join(', ') + '</p>';
+                        availableRoomHtml += '<p class="card-text">Price: ₱' + room.price + '</p>';
+                        availableRoomHtml += '<a href="reservation-form.html" class="btn btn-primary">Book Now</a>'; // Link to reservation form
+                        availableRoomHtml += '</div>';
+                        availableRoomHtml += '</div>';
+                        availableRoomHtml += '</div>';
+                    });
+                } else {
+                    // No rooms available for the selected criteria
+                    availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
+                }
+                // Display available rooms
+                document.getElementById('availableRooms').innerHTML = availableRoomHtml;
+            } else {
+                // No rooms available
+                document.getElementById('availableRooms').innerHTML = '<div class="col-lg-12"><p class="text-center">No rooms available.</p></div>';
+            }
         });
-        } else {
-        // No rooms available for the selected criteria
-        availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
-        }
-        // Display available rooms
-        document.getElementById('availableRooms').innerHTML = availableRoomHtml;
-      } else {
-        // No rooms available
-        document.getElementById('availableRooms').innerHTML = '<div class="col-lg-12"><p class="text-center">No rooms available.</p></div>';
-      }
-    });
-  });
-
-  // Initialize Swiper
-  var swiper = new Swiper('.swiper-container', {
-    // Add your swiper options here
-    loop: true, // Loop through slides
-    autoplay: {
-      delay: 3000, // Time between slides (in milliseconds)
-    },
-  });
-</script>
-<script>
-  // Initialize Datepicker
-  $(document).ready(function(){
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);  // Set hours to 0 to include the entire day
-
-    $('#checkInDate').datepicker({
-      autoclose: true,
-      format: 'yyyy-mm-dd',
-      startDate: today,
-      todayHighlight: true
     });
 
-    $('#checkOutDate').datepicker({
-      autoclose: true,
-      format: 'yyyy-mm-dd',
-      startDate: today,
-      todayHighlight: true
-    });
+    // Function to filter rooms based on amenities
+    function filterRooms() {
+        // Trigger form submission to apply filters
+        document.getElementById('availabilityForm').submit();
+    }
 
-    // Optionally, you can set the start date of the second datepicker to the selected date in the first datepicker.
-    $('#checkInDate').on('changeDate', function(selected){
-      var startDate = new Date(selected.date.valueOf());
-      $('#checkOutDate').datepicker('setStartDate', startDate);
+
+    // Initialize Swiper
+    var swiper = new Swiper('.swiper-container', {
+        // Add your swiper options here
+        loop: true, // Loop through slides
+        autoplay: {
+        delay: 3000, // Time between slides (in milliseconds)
+        },
     });
-  });
-</script>
-</body>
-</html>
+    </script>
+    <script>
+    // Initialize Datepicker
+    $(document).ready(function(){
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);  // Set hours to 0 to include the entire day
+
+        $('#checkInDate').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd',
+        startDate: today,
+        todayHighlight: true
+        });
+
+        $('#checkOutDate').datepicker({
+        autoclose: true,
+        format: 'yyyy-mm-dd',
+        startDate: today,
+        todayHighlight: true
+        });
+
+        // Optionally, you can set the start date of the second datepicker to the selected date in the first datepicker.
+        $('#checkInDate').on('changeDate', function(selected){
+        var startDate = new Date(selected.date.valueOf());
+        $('#checkOutDate').datepicker('setStartDate', startDate);
+        });
+    });
+    </script>
+    </body>
+    </html>

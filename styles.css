@@ -71,6 +71,25 @@ body::before {
   max-width: 50%;
 }
 
+/*ADMIN ROOMS CSS*/
+
+.category-form, .room-form {
+  max-width: 300px; /* Adjust as needed */
+}
+
+.category-form, .room-form input, .category-form select, .room-form select {
+  padding: 6px; /* Adjust as needed */
+}
+
+.room-table {
+  border: 1px solid #dee2e6;
+}
+
+.room-table th, .room-table td {
+  border: 1px solid #dee2e6;
+  padding: 8px;
+}
+
 /* Adjust the width of the columns in request */
 .request-column {
   width: 80%;

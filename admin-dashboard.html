@@ -12,12 +12,68 @@
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 <body class="sb-nav-fixed">        
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
+        <div class="container">
+            <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
+                <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
+            </a>
+
+            <button class="navbar-toggler" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#navmenu" 
+            aria-controls="navmenu" 
+            aria-expanded="false" 
+            aria-label="Toggle navigation menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light">Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Request
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
+                            <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="roomsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Rooms
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="roomsDropdown">
+                            <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                    <a href="user-management.html" class="nav-link text-light">Users</a>
+                </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>   
+    </nav>
+
     <div id="layoutSidenav_content">
         <main>
             <div class="container-fluid px-4">
                 <h1 class="mt-4">Dashboard</h1>
                 <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item active">Dashboard</li>
+                    <li class="breadcrumb-item active">MegaTower Hub Dashboard</li>
                 </ol>
                 <div class="row">
                     <div class="col-xl-3 col-md-6">
@@ -111,6 +167,11 @@
         </footer>
     </div>
 
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
@@ -137,68 +198,62 @@
     const cleaningCountElement = document.getElementById('cleaningCount');
     const reservationCountElement = document.getElementById('reservationCount');
 
-    function displayCounts() {
-        complaintsRef.once('value', snapshot => {
-            const complaintsCount = snapshot.exists() ? Object.values(snapshot.val()).filter(complaint => !complaint.resolved).length : 0;
-            complaintsCountElement.textContent = complaintsCount;
-        });
+    async function displayCounts() {
+        const complaintsSnapshot = await complaintsRef.once('value');
+        const maintenanceSnapshot = await maintenanceRef.once('value');
+        const cleaningSnapshot = await cleaningRef.once('value');
+        const reservationsSnapshot = await reservationsRef.once('value');
 
-        maintenanceRef.once('value', snapshot => {
-            const maintenanceCount = snapshot.exists() ? Object.values(snapshot.val()).filter(request => !request.resolved).length : 0;
-            maintenanceCountElement.textContent = maintenanceCount;
-        });
+        const complaintsCount = complaintsSnapshot.exists() ? Object.values(complaintsSnapshot.val()).filter(complaint => !complaint.resolved).length : 0;
+        const maintenanceCount = maintenanceSnapshot.exists() ? Object.values(maintenanceSnapshot.val()).filter(request => !request.resolved).length : 0;
+        const cleaningCount = cleaningSnapshot.exists() ? Object.values(cleaningSnapshot.val()).filter(request => !request.resolved).length : 0;
+        const reservationCount = reservationsSnapshot.exists() ? Object.values(reservationsSnapshot.val()).filter(reservation => !reservation.reserved).length : 0;
 
-        cleaningRef.once('value', snapshot => {
-            const cleaningCount = snapshot.exists() ? Object.values(snapshot.val()).filter(request => !request.resolved).length : 0;
-            cleaningCountElement.textContent = cleaningCount;
-        });
-
-        reservationsRef.once('value', snapshot => {
-            const reservationCount = snapshot.exists() ? Object.values(snapshot.val()).filter(reservation => !reservation.reserved).length : 0;
-            reservationCountElement.textContent = reservationCount;
-        });
+        complaintsCountElement.textContent = complaintsCount;
+        maintenanceCountElement.textContent = maintenanceCount;
+        cleaningCountElement.textContent = cleaningCount;
+        reservationCountElement.textContent = reservationCount;
     }
 
-    displayCounts();
-
-    const recentRequestsTableBody = document.querySelector('#recentRequestsTable tbody');
-
-    function displayRecentRequests() {
+    async function displayRecentRequests() {
         const allRequests = [];
 
-        complaintsRef.once('value', snapshot => {
-            snapshot.forEach(childSnapshot => {
-                const complaint = childSnapshot.val();
-                complaint.type = 'Complaint';
-                allRequests.push(complaint);
-            });
-        });
+        await Promise.all([
+            complaintsRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const complaint = childSnapshot.val();
+                    complaint.type = 'Complaint';
+                    allRequests.push(complaint);
+                });
+            }),
+            maintenanceRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const maintenance = childSnapshot.val();
+                    maintenance.type = 'Maintenance';
+                    allRequests.push(maintenance);
+                });
+            }),
+            cleaningRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const cleaning = childSnapshot.val();
+                    cleaning.type = 'Cleaning';
+                    allRequests.push(cleaning);
+                });
+            }),
+            reservationsRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const reservation = childSnapshot.val();
+                    reservation.type = 'Reservation';
+                    allRequests.push(reservation);
+                });
+            })
+        ]);
 
-        maintenanceRef.once('value', snapshot => {
-            snapshot.forEach(childSnapshot => {
-                const maintenance = childSnapshot.val();
-                maintenance.type = 'Maintenance';
-                allRequests.push(maintenance);
-            });
-        });
+        // Sort allRequests based on the submittedAt timestamp
+        allRequests.sort((a, b) => b.submittedAt - a.submittedAt);
 
-        cleaningRef.once('value', snapshot => {
-            snapshot.forEach(childSnapshot => {
-                const cleaning = childSnapshot.val();
-                cleaning.type = 'Cleaning';
-                allRequests.push(cleaning);
-            });
-        });
-
-        reservationsRef.once('value', snapshot => {
-            snapshot.forEach(childSnapshot => {
-                const reservation = childSnapshot.val();
-                reservation.type = 'Reservation';
-                allRequests.push(reservation);
-            });
-        });
-
-        allRequests.sort((a, b) => b.timestamp - a.timestamp);
+        const recentRequestsTableBody = document.querySelector('#recentRequestsTable tbody');
+        recentRequestsTableBody.innerHTML = ''; // Clear table body before populating
 
         allRequests.slice(0, 10).forEach((request, index) => {
             const row = recentRequestsTableBody.insertRow();
@@ -209,7 +264,7 @@
                 <td>${index + 1}</td>
                 <td>${request.description}</td>
                 <td class="${typeClass}">${request.type}</td>
-                <td>${formatDate(request.timestamp)}</td>
+                <td>${formatDate(request.submittedAt)}</td>
                 <td class="${statusClass}">${request.resolved ? 'Resolved' : 'Pending'}</td>
             `;
         });
@@ -223,19 +278,45 @@
     function getRequestTypeClass(type) {
         switch (type) {
             case 'Complaint':
-                return 'bg-danger';
+                return 'bg-primary';
             case 'Maintenance':
                 return 'bg-warning';
             case 'Cleaning':
                 return 'bg-success';
             case 'Reservation':
-                return 'bg-primary';
+                return 'bg-danger';
             default:
                 return '';
         }
     }
 
-    displayRecentRequests();
+    async function initializeDashboard() {
+        await displayCounts();
+        await displayRecentRequests();
+    }
+
+    initializeDashboard();
+
+    // Update counts and recent requests in real-time
+    complaintsRef.on('value', () => {
+        displayCounts();
+        displayRecentRequests();
+    });
+
+    maintenanceRef.on('value', () => {
+        displayCounts();
+        displayRecentRequests();
+    });
+
+    cleaningRef.on('value', () => {
+        displayCounts();
+        displayRecentRequests();
+    });
+
+    reservationsRef.on('value', () => {
+        displayCounts();
+        displayRecentRequests();
+    });
 </script>
 
 </body>

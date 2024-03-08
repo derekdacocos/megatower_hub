@@ -138,18 +138,18 @@
       }
 
       const name = document.getElementById('name').value;
-      const complaintMessage = document.getElementById('complaintMessage').value;
+      const description = document.getElementById('complaintMessage').value; // Changed to description
 
       // Get the current date and time
       const currentDate = new Date();
-      const dateTime = currentDate.toISOString();
+      const submittedAt = currentDate.toISOString(); // Change dateTime to submittedAt
 
       // Push data to Firebase Realtime Database
       database.ref('complaints').push({
           userID: userID,
           name: name,
-          complaintMessage: complaintMessage,
-          dateTime: dateTime,
+          description: description, // Changed to description
+          submittedAt: submittedAt, // Change dateTime to submittedAt
           resolved: false // Initially, the complaint is not resolved
         })
         .then(() => {
