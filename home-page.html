@@ -304,6 +304,71 @@
   <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+  <script>
+    // Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+      authDomain: "megatower-hub-ca285.firebaseapp.com",
+      databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+      projectId: "megatower-hub-ca285",
+      storageBucket: "megatower-hub-ca285.appspot.com",
+      messagingSenderId: "900973693171",
+      appId: "1:900973693171:web:9062bf9b49221596294f86"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Check for authentication state changes
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in, fetch notifications
+        fetchNotifications();
+      } else {
+        // No user is signed in.
+        console.log('User not signed in.');
+      }
+    });
+
+    // Function to fetch notifications
+    function fetchNotifications() {
+      var userId = firebase.auth().currentUser.uid; // Get current user's UID
+      var notificationsRef = firebase.database().ref('users/' + userId + '/notifications');
+
+      notificationsRef.once('value', function(snapshot) {
+        var notifications = snapshot.val();
+        displayNotifications(notifications);
+      });
+    }
+
+    // Function to display notifications
+    function displayNotifications(notifications) {
+      const notificationsContainer = document.querySelector('.modal-body'); // Adjust selector as needed
+      notificationsContainer.innerHTML = ''; // Clear existing notifications
+
+      for (let key in notifications) {
+        if (notifications.hasOwnProperty(key)) {
+          const notification = notifications[key];
+          const notificationElement = document.createElement('div');
+          notificationElement.classList.add('notification', 'mb-4', 'p-3', 'border', 'rounded');
+          notificationElement.innerHTML = `
+            <h6 class="text-warning">Notification</h6>
+            <p class="mb-0">${notification.notification}</p>
+          `;
+          notificationsContainer.appendChild(notificationElement);
+        }
+      }
+    }
+
+    // Optional: Adjust to open the modal and fetch notifications based on your UI triggers
+    $('#notificationsModal').on('show.bs.modal', function (e) {
+      fetchNotifications();
+    });
+  </script>
 
     <script>
       // Function to open the chat overlay
@@ -332,7 +397,6 @@
       }
     </script>
 
-
     <script>
       function logout() {
         // Clear any user session or data if needed
@@ -343,6 +407,8 @@
         history.replaceState(null, null, location.href);
       }
     </script>
+
+
 
 
 </body>
