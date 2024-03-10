@@ -270,31 +270,9 @@
                         <input class="form-check-input" type="checkbox" value="Security [24-hour]" id="amenitySecurity24">
                         <label class="form-check-label" for="amenitySecurity24">Security [24-hour]</label>
                     </div>
-
-                    <h6>Additional</h6>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Parking" id="amenityParking">
-                        <label class="form-check-label" for="amenityParking">Parking</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Gym" id="amenityGym">
-                        <label class="form-check-label" for="amenityGym">Gym</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Pool" id="amenityPool">
-                        <label class="form-check-label" for="amenityPool">Pool</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Pet-friendly" id="amenityPetFriendly">
-                        <label class="form-check-label" for="amenityPetFriendly">Pet-friendly</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Wheelchair accessible" id="amenityWheelchairAccessible">
-                        <label class="form-check-label" for="amenityWheelchairAccessible">Wheelchair accessible</label>
-                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="addAmenities()">Add Amenities</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAmenities()">Save Amenities</button>
                 </div>
             </div>
         </div>
@@ -371,6 +349,9 @@
                                 <option value="available">Available</option>
                                 <option value="not-available">Not Available</option>
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-info" onclick="prepareAndShowEditAmenitiesModal(); $('#editRoomModal').modal('hide');">Edit Amenities</button>
                         </div>
                         <input type="hidden" id="editRoomId">
                     </form>
@@ -477,32 +458,60 @@
             });
         }
 
-        // Function to delete room category
+        // Function to delete room category and its associated rooms
         function deleteRoomCategory(key) {
             if (confirm('Are you sure you want to delete this room category?')) {
-                database.ref('room_category').child(key).remove()
-                    .then(() => {
-                        console.log('Room category deleted successfully');
-                    })
-                    .catch(error => {
-                        console.error('Error deleting room category: ', error);
-                    });
+                // First, get the category name to match against room categories
+                database.ref('room_category/' + key).once('value', snapshot => {
+                    const categoryToDelete = snapshot.val().category;
+
+                    // Then, delete the category
+                    database.ref('room_category').child(key).remove()
+                        .then(() => {
+                            console.log('Room category deleted successfully');
+
+                            // Now, iterate over all rooms to find and delete those with the matching category
+                            database.ref('rooms').once('value', roomsSnapshot => {
+                                roomsSnapshot.forEach(roomSnapshot => {
+                                    const roomData = roomSnapshot.val();
+                                    if(roomData.category === categoryToDelete) {
+                                        // If room's category matches the deleted category, remove it
+                                        database.ref('rooms').child(roomSnapshot.key).remove();
+                                    }
+                                });
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error deleting room category: ', error);
+                        });
+                });
             }
         }
 
-        function addAmenities() {
-        // Get selected amenities
-        const selectedAmenities = [];
-        document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(checkbox) {
-            selectedAmenities.push(checkbox.value);
-        });
+        function saveAmenities() {
+            // Example for editing context; adapt as needed based on how you track context
+            const roomId = document.getElementById('editRoomId').value; // or another way you choose to track the editing room ID
+            const selectedAmenities = [];
 
-        // Perform any desired action with the selected amenities, such as adding them to a database or displaying them
-        console.log('Selected Amenities:', selectedAmenities);
+            document.querySelectorAll('#amenitiesModal .form-check-input:checked').forEach(checkbox => {
+                selectedAmenities.push(checkbox.value);
+            });
 
-        // Close the modal
-        $('#amenitiesModal').modal('hide');
-    }
+            if (roomId) {
+                // Editing existing room's amenities
+                database.ref('rooms/' + roomId).update({
+                    amenities: selectedAmenities
+                }).then(() => {
+                    console.log('Amenities updated successfully');
+                    $('#amenitiesModal').modal('hide');
+                }).catch(error => {
+                    console.error('Error updating amenities: ', error);
+                });
+            } else {
+                // Handle adding new room logic if needed
+            }
+        }
+
 
         // Function to add a room
         roomForm.addEventListener('submit', function(event) {
@@ -525,9 +534,9 @@
                 selectedAmenities.push(checkbox.value);
             });
 
-            // Define the addAmenities function here
-            function addAmenities() {
-                // Your addAmenities function implementation here
+            // Define the saveAmenities function here
+            function saveAmenities() {
+                // Your saveAmenities function implementation here
                 console.log("Adding amenities...");
                 // You can access selectedAmenities here
                 console.log("Selected amenities:", selectedAmenities);
@@ -697,7 +706,6 @@
             });
         }
 
-
         // Function to delete room
         function deleteRoom(key) {
             if (confirm('Are you sure you want to delete this room?')) {
@@ -710,6 +718,35 @@
                     });
             }
         }
+
+        function prepareAndShowEditAmenitiesModal() {
+            const roomId = document.getElementById('editRoomId').value;
+            // Assume roomId is correctly set when opening the edit room modal
+            
+            // Load current amenities and mark them as checked in the amenitiesModal
+            database.ref('rooms/' + roomId + '/amenities').once('value', snapshot => {
+                const currentAmenities = snapshot.val() || [];
+                // Reset checkboxes
+                document.querySelectorAll('#amenitiesModal .form-check-input').forEach(checkbox => {
+                    checkbox.checked = currentAmenities.includes(checkbox.value);
+                });
+
+                // Show the modal
+                $('#amenitiesModal').modal('show');
+            });
+
+            // Store roomId or context if needed to differentiate between add and edit
+            // This could be storing in a hidden input inside the modal, setting a global variable, etc.
+        }
+
+        $('#amenitiesModal').on('hidden.bs.modal', function () {
+            // Check if we're coming from the edit room context
+            const roomId = document.getElementById('editRoomId').value;
+            if (roomId) {
+                $('#editRoomModal').modal('show');
+            }
+        });
+
     </script>
 
 </body>

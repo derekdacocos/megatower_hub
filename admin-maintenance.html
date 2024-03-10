@@ -143,7 +143,7 @@
                 const confirmationMessages = document.getElementById('confirmationMessages');
                 const li = document.createElement('li');
                 li.className = "list-group-item";
-                li.innerHTML = `<strong>Message sent to ${messageData.fullName}:</strong> ${messageData.message} (${new Date(messageData.dateTime).toLocaleString()})`;
+                li.innerHTML = `<strong>Message sent to ${messageData.fullName}:</strong> ${messageData.notification} (${new Date(messageData.dateTime).toLocaleString()})`;
                 // Prepend the new message to the list
                 confirmationMessages.insertBefore(li, confirmationMessages.firstChild);
             });
@@ -153,35 +153,35 @@
         displayConfirmationMessages();
 
         // Function to display confirmation message and push it to Firebase
-        function displayConfirmation(message, fullName) {
+        function displayConfirmation(notification, fullName) {
             // Push confirmation message to Firebase
             const confirmationRef = firebase.database().ref('confirmationMessages');
             confirmationRef.push({
-                message: message,
+                notification: notification,
                 fullName: fullName,
                 dateTime: firebase.database.ServerValue.TIMESTAMP
             });
         }
 
         // Function to send notification to the user
-        function sendNotificationToUser(userID, message) {
+        function sendNotificationToUser(userID, notification) {
             // Display confirmation message
             firebase.database().ref(`users/${userID}`).once('value').then(snapshot => {
                 const user = snapshot.val();
                 const fullName = user.fullName; // Assuming user has a 'fullName' property
-                displayConfirmation(message, fullName);
+                displayConfirmation(notification, fullName);
             });
 
-            // Add notification to the 'requestsNotif' node
-            const notifRef = firebase.database().ref(`users/${userID}/requestsNotif`);
+            // Add notification to the 'notifications' node
+            const notifRef = firebase.database().ref(`users/${userID}/notifications`);
             notifRef.push({
-                message: message,
+                notification: notification,
                 dateTime: firebase.database.ServerValue.TIMESTAMP
             });
 
             // This is a placeholder; replace it with your actual notification method
             // For example, you might send a push notification to the user's device
-            console.log(`Notification sent to user: ${message}`);
+            console.log(`Notification sent to user: ${notification}`);
         }
 
         // Function to mark maintenance as done
@@ -212,15 +212,12 @@
                 requestRef.update({ assignedTo });
 
                 // Send a message to the user
-                const message = previousAssignedTo ?
-                    `The maintenance request you submitted has been reassigned to ${assignedTo}.` :
-                    `The maintenance request you submitted has been assigned to ${assignedTo}.`;
-
-                // Add the message to the user's notifications
-                firebase.database().ref(`users/${userID}/requestsNotif`).push({
-                    message: message,
-                    dateTime: firebase.database.ServerValue.TIMESTAMP
-                });
+                let message = '';
+                if (previousAssignedTo) {
+                    message = `The maintenance request you submitted has been reassigned to ${assignedTo}.`;
+                } else {
+                    message = `The maintenance request you submitted has been assigned to ${assignedTo}.`;
+                }
 
                 // Display confirmation message
                 sendNotificationToUser(userID, message);
