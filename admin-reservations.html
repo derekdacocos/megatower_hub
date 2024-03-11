@@ -55,11 +55,12 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="roomsDropdown">
                             <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                            <a class="dropdown-item" href="admin-reservations.html">Reservations</a> <!-- Added link to reservations -->
                         </div>
                     </li>
                     <li class="nav-item">
-                    <a href="user-management.html" class="nav-link text-light">Users</a>
-                </li>
+                        <a href="user-management.html" class="nav-link text-light">Users</a>
+                    </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link text-light">Profile</a>
                     </li>
@@ -76,18 +77,18 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Room Number</th>
-                    <th>Reservation Type</th>
-                    <th>Phone Number</th>
+                    <th>Full Name</th>
+                    <th>Room ID</th>
+                    <th>Status</th>
+                    <th>Check-In Date</th>
+                    <th>Check-Out Date</th>
                     <th>Email</th>
-                    <th>Timestamp</th>
-                    <th>Action</th>
+                    <th>Action</th> <!-- Added Action column -->
                 </tr>
             </thead>
             <tbody id="reservationTableBody"></tbody>
         </table>
-    </div>
+    </div>    
 
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -114,22 +115,22 @@
             reservationTableBody.innerHTML = ''; // Clear previous content
 
             // Retrieve data from Firebase Realtime Database
-            database.ref('reservations').orderByChild('timestamp').once('value')
+            database.ref('reservations').once('value')
                 .then((snapshot) => {
                     snapshot.forEach((childSnapshot) => {
                         const reservation = childSnapshot.val();
                         const tableRow = document.createElement('tr');
                         tableRow.innerHTML = `
-                            <td>${reservation.name}</td>
-                            <td>${reservation.roomNumber}</td>
-                            <td>${reservation.reservationType}</td>
-                            <td>${reservation.phoneNumber}</td>
+                            <td>${reservation.fullName}</td>
+                            <td>${reservation.roomId}</td>
+                            <td>${reservation.status}</td>
+                            <td>${reservation.checkInDate}</td>
+                            <td>${reservation.checkOutDate}</td>
                             <td>${reservation.email}</td>
-                            <td>${new Date(reservation.timestamp).toLocaleString()}</td>
                             <td>
-                                <button class="btn btn-success" onclick="toggleReservationStatus('${childSnapshot.key}', ${reservation.reserved})">
-                                    ${reservation.reserved ? 'Unconfirm' : 'Confirm'}
-                                </button>
+                                <button class="btn btn-success" onclick="confirmReservation('${childSnapshot.key}')">Confirm</button>
+                                <button class="btn btn-warning" onclick="cancelReservation('${childSnapshot.key}', '${reservation.roomId}', '${reservation.checkInDate}', '${reservation.checkOutDate}')">Cancel</button>
+                                <button class="btn btn-danger" onclick="rejectReservation('${childSnapshot.key}')">Reject</button>
                             </td>
                         `;
                         reservationTableBody.appendChild(tableRow);
@@ -141,23 +142,111 @@
                 });
         }
 
-        // Function to toggle reservation status
-        function toggleReservationStatus(reservationKey, currentStatus) {
+        // Function to confirm reservation
+        function confirmReservation(reservationKey) {
+            const reservationRef = database.ref('reservations').child(reservationKey);
+            reservationRef.once('value')
+                .then((snapshot) => {
+                    const reservation = snapshot.val();
+                    const roomId = reservation.roomId;
+                    const checkInDate = reservation.checkInDate;
+                    const checkOutDate = reservation.checkOutDate;
+
+                    // Update reservation status to 'confirmed'
+                    reservationRef.update({
+                        status: 'confirmed'
+                    })
+                    .then(() => {
+                        // Update booked dates for the room
+                        const bookedDatesRef = database.ref('rooms').child(roomId).child('bookedDates');
+                        for (let date = checkInDate; date <= checkOutDate; date = getNextDate(date)) {
+                            bookedDatesRef.child(date).set(true);
+                        }
+
+                        // Success message
+                        alert('Reservation confirmed successfully.');
+                        // Refresh the table
+                        displayReservations();
+                    })
+                    .catch((error) => {
+                        // Error message
+                        console.error('Error confirming reservation:', error);
+                        alert('Error confirming reservation. Please try again.');
+                    });
+                })
+                .catch((error) => {
+                    // Error message
+                    console.error('Error retrieving reservation data:', error);
+                    alert('Error retrieving reservation data. Please try again.');
+                });
+        }
+
+        // Function to reject reservation
+        function rejectReservation(reservationKey) {
+            updateReservationStatus(reservationKey, 'rejected');
+        }
+
+        // Function to update reservation status and room check-in/check-out dates
+        function updateReservationStatus(reservationKey, status) {
             const reservationsRef = database.ref('reservations');
-            reservationsRef.child(reservationKey).update({
-                reserved: !currentStatus
-            })
+            reservationsRef.child(reservationKey).once('value')
+                .then((snapshot) => {
+                    const reservation = snapshot.val();
+                    const roomId = reservation.roomId;
+
+                    // Update reservation status
+                    reservationsRef.child(reservationKey).update({
+                        status: status
+                    })
+                    .then(() => {
+                        // Success message
+                        alert(`Reservation status successfully updated to ${status}.`);
+                        // Refresh the table
+                        displayReservations();
+                    })
+                    .catch((error) => {
+                        // Error message
+                        console.error('Error updating reservation status:', error);
+                        alert('Error updating reservation status. Please try again.');
+                    });
+                })
+                .catch((error) => {
+                    // Error message
+                    console.error('Error retrieving reservation data:', error);
+                    alert('Error retrieving reservation data. Please try again.');
+                });
+        }
+
+        function cancelReservation(reservationKey, roomId, checkInDate, checkOutDate) {
+            // Step 1: Update the reservation status to 'cancelled'
+            const reservationRef = database.ref('reservations').child(reservationKey);
+            reservationRef.update({ status: 'cancelled' })
             .then(() => {
-                // Success message
-                alert(`Reservation status successfully ${currentStatus ? 'unconfirmed' : 'confirmed'}.`);
-                // Refresh the table
+                // Step 2: Remove the booked dates for the room
+                const bookedDatesRef = database.ref('rooms').child(roomId).child('bookedDates');
+                let currentDate = new Date(checkInDate);
+                const endDate = new Date(checkOutDate);
+
+                while (currentDate <= endDate) {
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    bookedDatesRef.child(dateString).remove(); // Remove the booked date
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                alert('Reservation cancelled successfully.');
                 displayReservations();
             })
             .catch((error) => {
-                // Error message
-                console.error('Error toggling reservation status:', error);
-                alert('Error toggling reservation status. Please try again.');
+                console.error('Error cancelling reservation:', error);
+                alert('Error cancelling reservation. Please try again.');
             });
+        }
+
+        // Function to get the next date
+        function getNextDate(date) {
+            const currentDate = new Date(date);
+            currentDate.setDate(currentDate.getDate() + 1);
+            return currentDate.toISOString().split('T')[0];
         }
 
         // Call the displayReservations function to show existing reservations

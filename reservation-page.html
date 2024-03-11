@@ -288,6 +288,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Complete Your Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookingForm">
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <input type="hidden" id="roomId">
+                        <input type="hidden" id="bookingCheckInDate">
+                        <input type="hidden" id="bookingCheckOutDate">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" form="bookingForm">Submit Booking</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Bootstrap 5 JS and Popper.js -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -333,83 +365,62 @@
         // You can also perform any other action you need here
     }
 
-    // Function to handle form submission and filter rooms
     document.getElementById('availabilityForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission behavior
+        event.preventDefault(); // Prevent the form from submitting in the traditional way
 
-        // Fetch form inputs
-        var type = document.getElementById('typeDropdown').value;
         var checkInDate = new Date(document.getElementById('checkInDate').value);
         var checkOutDate = new Date(document.getElementById('checkOutDate').value);
-        var adultsCount = parseInt(document.getElementById('adultsCount').value);
-        var childrenCount = parseInt(document.getElementById('childrenCount').value);
-        var capacity = adultsCount + childrenCount;
-
-        // Get selected amenities
-        var selectedAmenities = [];
-        document.querySelectorAll('#filterBox input[type="checkbox"]:checked').forEach(function(checkbox) {
-            selectedAmenities.push(checkbox.value);
+        var selectedAmenities = Array.from(document.querySelectorAll('#filterBox input[type="checkbox"]:checked')).map(function(checkbox) {
+            return checkbox.value;
         });
 
-        // Query available rooms in Firebase
         database.ref('rooms').once('value', function(snapshot) {
-            var availableRooms = snapshot.val();
-            if (availableRooms) {
-                // Filter available rooms based on criteria
-                var filteredRooms = [];
-                Object.keys(availableRooms).forEach(function(roomKey) {
-                    var room = availableRooms[roomKey];
-                    // Check if room type matches
-                    if (room.type === type && room.availability === 'available' && room.capacity >= capacity) {
-                        // Check if there are no booked dates or if the selected dates are available
-                        var bookedDates = room.bookedDates || {};
-                        var isAvailable = true;
-                        for (var bookedDate in bookedDates) {
-                            var startDate = new Date(bookedDate);
-                            var endDate = new Date(bookedDates[bookedDate]);
-                            if ((checkInDate >= startDate && checkInDate <= endDate) || (checkOutDate >= startDate && checkOutDate <= endDate)) {
-                                isAvailable = false;
-                                break;
-                            }
-                        }
-                        // Check if the room has all selected amenities
-                        if (isAvailable && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
-                            filteredRooms.push(room);
-                        }
-                    }
-                });
-                // Display filtered rooms
-                var availableRoomHtml = '';
-                if (filteredRooms.length > 0) {
-                    filteredRooms.forEach(function(room) {
-                        // Generate HTML for each room card
-                        availableRoomHtml += '<div class="col-lg-4 mb-3">';
-                        availableRoomHtml += '<div class="card">';
-                        availableRoomHtml += '<img src="' + room.image + '" class="card-img-top" alt="' + room.category + '">';
-                        availableRoomHtml += '<div class="card-body">';
-                        availableRoomHtml += '<h5 class="card-title">' + room.category + '</h5>';
-                        availableRoomHtml += '<p class="card-text">Capacity: ' + room.capacity + '</p>';
-                        availableRoomHtml += '<p class="card-text">Floor: ' + room.floor + '</p>';
-                        availableRoomHtml += '<p class="card-text">Status: ' + room.availability + '</p>';
-                        availableRoomHtml += '<p class="card-text">Amenities: ' + room.amenities.join(', ') + '</p>';
-                        availableRoomHtml += '<p class="card-text">Price: ₱' + room.price + '</p>';
-                        availableRoomHtml += '<a href="reservation-form.html" class="btn btn-primary">Book Now</a>'; // Link to reservation form
-                        availableRoomHtml += '</div>';
-                        availableRoomHtml += '</div>';
-                        availableRoomHtml += '</div>';
+            var rooms = snapshot.val();
+            var availableRoomHtml = '';
+
+            Object.keys(rooms).forEach(function(roomId) {
+                var room = rooms[roomId];
+                if (room.availability === 'available' && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
+                    // Assuming the room is available if there are no bookedDates overlapping the requested period
+                    var isOverlapping = Object.keys(room.bookedDates || {}).some(function(date) {
+                        var bookedDate = new Date(date);
+                        return bookedDate >= checkInDate && bookedDate <= checkOutDate;
                     });
-                } else {
-                    // No rooms available for the selected criteria
-                    availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
+
+                    if (!isOverlapping) {
+                        availableRoomHtml += `
+                            <div class="col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <img src="${room.image}" class="card-img-top" alt="Room Image">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${roomId}</h5>
+                                        <p class="card-text">Price: ${room.price}</p>
+                                        <p class="card-text">Amenities: ${room.amenities.join(', ')}</p>
+                                        <button class="btn btn-primary" onclick="openBookingModal('${roomId}')">Book Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
                 }
-                // Display available rooms
-                document.getElementById('availableRooms').innerHTML = availableRoomHtml;
-            } else {
-                // No rooms available
-                document.getElementById('availableRooms').innerHTML = '<div class="col-lg-12"><p class="text-center">No rooms available.</p></div>';
+            });
+
+            if (availableRoomHtml === '') {
+                availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
             }
+
+            document.getElementById('availableRooms').innerHTML = availableRoomHtml;
         });
     });
+
+    function openBookingModal(roomId) {
+        // Set the room ID in the hidden input of the booking form
+        document.getElementById('roomId').value = roomId;
+
+        // Now open the modal (Bootstrap 5)
+        var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+        bookingModal.show();
+    }
 
     // Function to filter rooms based on amenities
     function filterRooms() {
@@ -417,6 +428,41 @@
         document.getElementById('availabilityForm').submit();
     }
 
+    function openBookingModal(roomId) {
+        // Set the room ID in the hidden input of the booking form
+        document.getElementById('roomId').value = roomId;
+
+        // Now open the modal (Bootstrap 5)
+        var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+        bookingModal.show();
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Gather booking information
+        var fullName = document.getElementById('fullName').value;
+        var email = document.getElementById('email').value;
+        var roomId = document.getElementById('roomId').value; // Captured room UID
+        var checkInDate = document.getElementById('checkInDate').value;
+        var checkOutDate = document.getElementById('checkOutDate').value;
+
+        // Submit booking to Firebase under a specific room UID
+        var newReservationRef = firebase.database().ref('reservations').push();
+        newReservationRef.set({
+            roomId: roomId,
+            fullName: fullName,
+            email: email,
+            checkInDate: checkInDate,
+            checkOutDate: checkOutDate,
+            status: 'pending'
+        }).then(() => {
+            alert('Your booking is submitted and pending confirmation.');
+            $('#bookingModal').modal('hide');
+        }).catch((error) => {
+            console.error('Error submitting booking:', error);
+        });
+    });
 
     // Initialize Swiper
     var swiper = new Swiper('.swiper-container', {
