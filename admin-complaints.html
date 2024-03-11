@@ -50,12 +50,12 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="roomsDropdown">
                             <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
-                            <a class="dropdown-item" href="admin-reservations.html">Reservations</a> <!-- Added link to reservations -->
+                            <a class="dropdown-item" href="admin-addRoom.html">Room Form</a>
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a href="user-management.html" class="nav-link text-light">Users</a>
-                    </li>
+                    <a href="user-management.html" class="nav-link text-light">Users</a>
+                </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link text-light">Profile</a>
                     </li>
@@ -66,7 +66,7 @@
             </div>
         </div>   
     </nav>
-    
+
     <div class="container mt-5">
         <h2>Complaints</h2>
         <div id="complaintList"></div>
@@ -88,6 +88,7 @@
             messagingSenderId: "900973693171",
             appId: "1:900973693171:web:9062bf9b49221596294f86"
         };
+
         firebase.initializeApp(firebaseConfig);
 
         // Firebase Realtime Database
@@ -112,8 +113,8 @@
                         complaintDiv.className = 'border p-3 my-3';
 
                         const name = complaint.name || "Anonymous";
-                        const complaintMessage = complaint.description;
-                        const dateTime = complaint.submittedAt;
+                        const complaintMessage = complaint.complaintMessage;
+                        const dateTime = complaint.dateTime;
                         const resolved = complaint.resolved || false;
 
                         // Determine button text based on resolved status
@@ -137,48 +138,49 @@
 
         // Function to toggle the resolved status and send notification
         function toggleResolvedStatus(complaintKey, currentStatus) {
-            const newStatus = !currentStatus;
+        const newStatus = !currentStatus;
 
-            // Fetch the user ID associated with the complaint
-            database.ref(`complaints/${complaintKey}/userID`).once('value')
-                .then(userSnapshot => {
-                    const userID = userSnapshot.val();
-                    const dateTime = new Date().toLocaleString(); // Convert dateTime to readable format
-                    const notificationMessage = `The issue you submitted on ${dateTime} has been ${newStatus ? 'resolved' : 'marked unresolved'}.`;
+        // Fetch the user ID associated with the complaint
+        database.ref(`complaints/${complaintKey}/userID`).once('value')
+            .then(userSnapshot => {
+                const userID = userSnapshot.val();
+                const dateTime = new Date().toLocaleString(); // Convert dateTime to readable format
+                const notificationMessage = `The issue you submitted on ${dateTime} has been ${newStatus ? 'resolved' : 'marked unresolved'}.`;
 
-                    // Update the resolved status and add notification to the user's collection
-                    const userComplaintNotifsRef = database.ref(`users/${userID}/complaintNotifs`);
-                    const newNotificationKey = userComplaintNotifsRef.push().key;
-                    const notificationData = {
-                        complaintID: complaintKey,
-                        message: notificationMessage,
-                        dateTime: firebase.database.ServerValue.TIMESTAMP
-                    };
-                    let updates = {};
-                    updates[`users/${userID}/complaintNotifs/${newNotificationKey}`] = notificationData;
-                    return database.ref().update(updates);
-                })
-                .then(() => {
-                    // Update the resolved status in the complaints
-                    return database.ref(`complaints/${complaintKey}`).update({
-                        resolved: newStatus
-                    });
-                })
-                .then(() => {
-                    // Display updated complaints
-                    displayComplaints();
-
-                    const statusText = newStatus ? 'resolved' : 'unresolved';
-                    alert(`Complaint marked as ${statusText}. Notification sent to user.`);
-                })
-                .catch(error => {
-                    console.error(error.message);
-                    alert("Error marking complaint as resolved. Please try again.");
+                // Update the resolved status and add notification to the user's collection
+                database.ref(`users/${userID}/notifications`).push({
+                    complaintID: complaintKey,
+                    notification: newStatus ? notificationMessage : null,
+                    dateTime: firebase.database.ServerValue.TIMESTAMP
                 });
+
+                // Update the resolved status in the complaints
+                return database.ref(`complaints/${complaintKey}`).update({
+                    resolved: newStatus
+                });
+            })
+            .then(() => {
+                // Display updated complaints
+                displayComplaints();
+
+                const statusText = newStatus ? 'resolved' : 'unresolved';
+                alert(`Complaint marked as ${statusText}. Notification sent to user.`);
+            })
+            .catch(error => {
+                console.error(error.message);
+                alert("Error marking complaint as resolved. Please try again.");
+            });
+    }
+
+        // Function to send notification to the user (replace with your actual notification method)
+        function sendNotificationToUser(complaintKey, message) {
+            // This is a placeholder; replace it with your actual notification method
+            // For example, you might send a push notification to the user's device
+            console.log(`Notification sent to user for complaint ${complaintKey}: ${message}`);
         }
 
-        // Display complaints on page load
-        displayComplaints();
-    </script>
+            // Display complaints on page load
+            displayComplaints();
+        </script>
 </body>
 </html>

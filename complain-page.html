@@ -105,6 +105,7 @@
 
   <script>
     // Initialize Firebase
+    // Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
       authDomain: "megatower-hub-ca285.firebaseapp.com",
@@ -114,6 +115,7 @@
       messagingSenderId: "900973693171",
       appId: "1:900973693171:web:9062bf9b49221596294f86"
     };
+
     firebase.initializeApp(firebaseConfig);
 
     // Firebase Realtime Database
@@ -136,18 +138,18 @@
       }
 
       const name = document.getElementById('name').value;
-      const description = document.getElementById('complaintMessage').value; // Changed to description
+      const complaintMessage = document.getElementById('complaintMessage').value;
 
       // Get the current date and time
       const currentDate = new Date();
-      const submittedAt = currentDate.toISOString(); // Change dateTime to submittedAt
+      const dateTime = currentDate.toISOString();
 
       // Push data to Firebase Realtime Database
       database.ref('complaints').push({
           userID: userID,
           name: name,
-          description: description, // Changed to description
-          submittedAt: submittedAt, // Change dateTime to submittedAt
+          complaintMessage: complaintMessage,
+          dateTime: dateTime,
           resolved: false // Initially, the complaint is not resolved
         })
         .then(() => {
@@ -193,45 +195,46 @@
       }
     });
 
-    // Fetch and display notifications for the authenticated user
-    function displayNotificationsForUser(userID) {
-      const notificationsBox = document.getElementById('feedbackBox');
+   // Fetch and display notifications for the authenticated user
+  function displayNotificationsForUser(userID) {
+    const notificationsBox = document.getElementById('feedbackBox');
 
-      // Remove existing content
-      notificationsBox.innerHTML = "";
+    // Remove existing content
+    notificationsBox.innerHTML = "";
 
-      // Fetch notifications from Firebase for the authenticated user
-      database.ref('users/' + userID + '/complaintNotifs').orderByChild('dateTime').once('value')
-        .then(snapshot => {
-          snapshot.forEach(childSnapshot => {
-            const notification = childSnapshot.val();
-            const complaintID = notification.complaintID;
+    // Fetch notifications from Firebase for the authenticated user
+    database.ref('users/' + userID + '/notifications').orderByChild('dateTime').once('value')
+      .then(snapshot => {
+        snapshot.forEach(childSnapshot => {
+          const notification = childSnapshot.val();
+          const complaintID = notification.complaintID;
 
-            // Fetch the corresponding complaint message
-            database.ref('complaints/' + complaintID).once('value')
-              .then(complaintSnapshot => {
-                const complaint = complaintSnapshot.val();
+          // Fetch the corresponding complaint message
+          database.ref('complaints/' + complaintID).once('value')
+            .then(complaintSnapshot => {
+              const complaint = complaintSnapshot.val();
 
-                // Create HTML elements for each notification
-                const notificationDiv = document.createElement('div');
-                notificationDiv.innerHTML = `
-                  <strong>${complaint.name || 'Anonymous'}:</strong> ${complaint.description}<br>
-                  <small>${new Date(notification.dateTime).toLocaleString()}</small><br>
-                  <hr>
-                `;
+              // Create HTML elements for each notification
+              const notificationDiv = document.createElement('div');
+              notificationDiv.innerHTML = `
+                <strong>${complaint.name || 'Anonymous'}:</strong> ${complaint.complaintMessage}<br>
+                <small>${new Date(notification.dateTime).toLocaleString()}</small><br>
+                <hr>
+              `;
 
-                // Append the item to the box
-                notificationsBox.appendChild(notificationDiv);
-              })
-              .catch(error => {
-                console.error("Error retrieving complaint:", error);
-              });
-          });
-        })
-        .catch(error => {
-          console.error("Error retrieving notifications:", error);
+              // Append the item to the box
+              notificationsBox.appendChild(notificationDiv);
+            })
+            .catch(error => {
+              console.error("Error retrieving complaint:", error);
+            });
         });
-    }
+      })
+      .catch(error => {
+        console.error("Error retrieving notifications:", error);
+      });
+  }
+
   </script>
 </body>
 

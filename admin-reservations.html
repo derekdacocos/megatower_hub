@@ -17,59 +17,50 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
-        <div class="container">
-            <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
-                <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
-            </a>
+      <div class="container">
+          <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
+              <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
+          </a>
 
-            <button class="navbar-toggler" 
-            type="button" 
-            data-bs-toggle="collapse" 
-            data-bs-target="#navmenu" 
-            aria-controls="navmenu" 
-            aria-expanded="false" 
-            aria-label="Toggle navigation menu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+          <button class="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navmenu" 
+          aria-controls="navmenu" 
+          aria-expanded="false" 
+          aria-label="Toggle navigation menu">
+              <span class="navbar-toggler-icon"></span>
+          </button>
 
-            <div class="collapse navbar-collapse" id="navmenu">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-light">Notifications</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Request
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
-                            <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light" href="#" id="roomsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Rooms
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="roomsDropdown">
-                            <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
-                            <a class="dropdown-item" href="admin-reservations.html">Reservations</a> <!-- Added link to reservations -->
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a href="user-management.html" class="nav-link text-light">Users</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-light">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>   
+          <div class="collapse navbar-collapse" id="navmenu">
+              <ul class="navbar-nav ms-auto">
+                  <li class="nav-item">
+                      <a href="#" class="nav-link text-light">Notifications</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Request
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                          <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
+                          <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+                      </div>
+                  </li>
+                  <li class="nav-item">
+                    <a href="user-management.html" class="nav-link text-light">Users</a>
+                </li>
+                  <li class="nav-item">
+                      <a href="#" class="nav-link text-light">Profile</a>
+                  </li>
+                  <li class="nav-item">
+                      <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
+                  </li>
+              </ul>
+          </div>
+      </div>   
     </nav>
 
     <div class="container mt-5">
@@ -77,18 +68,18 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Full Name</th>
-                    <th>Room ID</th>
-                    <th>Status</th>
-                    <th>Check-In Date</th>
-                    <th>Check-Out Date</th>
+                    <th>Name</th>
+                    <th>Room Number</th>
+                    <th>Reservation Type</th>
+                    <th>Phone Number</th>
                     <th>Email</th>
-                    <th>Action</th> <!-- Added Action column -->
+                    <th>Timestamp</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="reservationTableBody"></tbody>
         </table>
-    </div>    
+    </div>
 
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -115,22 +106,22 @@
             reservationTableBody.innerHTML = ''; // Clear previous content
 
             // Retrieve data from Firebase Realtime Database
-            database.ref('reservations').once('value')
+            database.ref('reservations').orderByChild('timestamp').once('value')
                 .then((snapshot) => {
                     snapshot.forEach((childSnapshot) => {
                         const reservation = childSnapshot.val();
                         const tableRow = document.createElement('tr');
                         tableRow.innerHTML = `
-                            <td>${reservation.fullName}</td>
-                            <td>${reservation.roomId}</td>
-                            <td>${reservation.status}</td>
-                            <td>${reservation.checkInDate}</td>
-                            <td>${reservation.checkOutDate}</td>
+                            <td>${reservation.name}</td>
+                            <td>${reservation.roomNumber}</td>
+                            <td>${reservation.reservationType}</td>
+                            <td>${reservation.phoneNumber}</td>
                             <td>${reservation.email}</td>
+                            <td>${new Date(reservation.timestamp).toLocaleString()}</td>
                             <td>
-                                <button class="btn btn-success" onclick="confirmReservation('${childSnapshot.key}')">Confirm</button>
-                                <button class="btn btn-warning" onclick="cancelReservation('${childSnapshot.key}', '${reservation.roomId}', '${reservation.checkInDate}', '${reservation.checkOutDate}')">Cancel</button>
-                                <button class="btn btn-danger" onclick="rejectReservation('${childSnapshot.key}')">Reject</button>
+                                <button class="btn btn-success" onclick="toggleReservationStatus('${childSnapshot.key}', ${reservation.reserved})">
+                                    ${reservation.reserved ? 'Unconfirm' : 'Confirm'}
+                                </button>
                             </td>
                         `;
                         reservationTableBody.appendChild(tableRow);
@@ -142,111 +133,23 @@
                 });
         }
 
-        // Function to confirm reservation
-        function confirmReservation(reservationKey) {
-            const reservationRef = database.ref('reservations').child(reservationKey);
-            reservationRef.once('value')
-                .then((snapshot) => {
-                    const reservation = snapshot.val();
-                    const roomId = reservation.roomId;
-                    const checkInDate = reservation.checkInDate;
-                    const checkOutDate = reservation.checkOutDate;
-
-                    // Update reservation status to 'confirmed'
-                    reservationRef.update({
-                        status: 'confirmed'
-                    })
-                    .then(() => {
-                        // Update booked dates for the room
-                        const bookedDatesRef = database.ref('rooms').child(roomId).child('bookedDates');
-                        for (let date = checkInDate; date <= checkOutDate; date = getNextDate(date)) {
-                            bookedDatesRef.child(date).set(true);
-                        }
-
-                        // Success message
-                        alert('Reservation confirmed successfully.');
-                        // Refresh the table
-                        displayReservations();
-                    })
-                    .catch((error) => {
-                        // Error message
-                        console.error('Error confirming reservation:', error);
-                        alert('Error confirming reservation. Please try again.');
-                    });
-                })
-                .catch((error) => {
-                    // Error message
-                    console.error('Error retrieving reservation data:', error);
-                    alert('Error retrieving reservation data. Please try again.');
-                });
-        }
-
-        // Function to reject reservation
-        function rejectReservation(reservationKey) {
-            updateReservationStatus(reservationKey, 'rejected');
-        }
-
-        // Function to update reservation status and room check-in/check-out dates
-        function updateReservationStatus(reservationKey, status) {
+        // Function to toggle reservation status
+        function toggleReservationStatus(reservationKey, currentStatus) {
             const reservationsRef = database.ref('reservations');
-            reservationsRef.child(reservationKey).once('value')
-                .then((snapshot) => {
-                    const reservation = snapshot.val();
-                    const roomId = reservation.roomId;
-
-                    // Update reservation status
-                    reservationsRef.child(reservationKey).update({
-                        status: status
-                    })
-                    .then(() => {
-                        // Success message
-                        alert(`Reservation status successfully updated to ${status}.`);
-                        // Refresh the table
-                        displayReservations();
-                    })
-                    .catch((error) => {
-                        // Error message
-                        console.error('Error updating reservation status:', error);
-                        alert('Error updating reservation status. Please try again.');
-                    });
-                })
-                .catch((error) => {
-                    // Error message
-                    console.error('Error retrieving reservation data:', error);
-                    alert('Error retrieving reservation data. Please try again.');
-                });
-        }
-
-        function cancelReservation(reservationKey, roomId, checkInDate, checkOutDate) {
-            // Step 1: Update the reservation status to 'cancelled'
-            const reservationRef = database.ref('reservations').child(reservationKey);
-            reservationRef.update({ status: 'cancelled' })
+            reservationsRef.child(reservationKey).update({
+                reserved: !currentStatus
+            })
             .then(() => {
-                // Step 2: Remove the booked dates for the room
-                const bookedDatesRef = database.ref('rooms').child(roomId).child('bookedDates');
-                let currentDate = new Date(checkInDate);
-                const endDate = new Date(checkOutDate);
-
-                while (currentDate <= endDate) {
-                    const dateString = currentDate.toISOString().split('T')[0];
-                    bookedDatesRef.child(dateString).remove(); // Remove the booked date
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-
-                alert('Reservation cancelled successfully.');
+                // Success message
+                alert(`Reservation status successfully ${currentStatus ? 'unconfirmed' : 'confirmed'}.`);
+                // Refresh the table
                 displayReservations();
             })
             .catch((error) => {
-                console.error('Error cancelling reservation:', error);
-                alert('Error cancelling reservation. Please try again.');
+                // Error message
+                console.error('Error toggling reservation status:', error);
+                alert('Error toggling reservation status. Please try again.');
             });
-        }
-
-        // Function to get the next date
-        function getNextDate(date) {
-            const currentDate = new Date(date);
-            currentDate.setDate(currentDate.getDate() + 1);
-            return currentDate.toISOString().split('T')[0];
         }
 
         // Call the displayReservations function to show existing reservations

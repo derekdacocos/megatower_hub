@@ -51,6 +51,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="roomsDropdown">
                             <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                            <a class="dropdown-item" href="admin-addRoom.html">Room Form</a>
                         </div>
                     </li>
                     <li class="nav-item">
@@ -70,33 +71,22 @@
     <!-- Content -->
     <div class="container mt-5">
         <h2 class="mb-4">Maintenance Queue</h2>
-        <div class="row">
-            <div class="col-md-8">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Description</th>
-                            <th scope="col">Schedule</th>
-                            <th scope="col">Media</th> <!-- Added this line -->
-                            <th scope="col">Remarks</th> <!-- Added Remarks column -->
-                            <th scope="col">Submitted At</th>
-                            <th scope="col">Assign to</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="maintenanceQueue">
-                        <!-- Maintenance requests will be dynamically added here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-4">
-                <!-- Confirmation Box -->
-                <div id="confirmationBox" class="p-3" style="border: 1px solid #ced4da; border-radius: 5px; height: 300px; overflow-y: auto;">
-                    <h4 class="mb-3">Confirmation Box</h4>
-                    <ul id="confirmationMessages" class="list-group"></ul>
-                </div>
-            </div>
-        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Description</th>
+                    <th scope="col">Schedule</th>
+                    <th scope="col">Media</th> <!-- Added this line -->
+                    <th scope="col">Remarks</th> <!-- Added Remarks column -->
+                    <th scope="col">Submitted At</th>
+                    <th scope="col">Assign to</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="maintenanceQueue">
+                <!-- Maintenance requests will be dynamically added here -->
+            </tbody>
+        </table>
     </div>
 
     <!-- Bootstrap JS and Popper.js -->
@@ -129,59 +119,18 @@
             return date.toLocaleString();
         }
 
-        // Function to fetch and display confirmation messages
-        function displayConfirmationMessages() {
-            // Reference to the 'confirmationMessages' node
-            const confirmationMessagesRef = firebase.database().ref('confirmationMessages');
-
-            // Listen for changes in the confirmationMessages node
-            confirmationMessagesRef.on('child_added', (snapshot) => {
-                // Get the message data
-                const messageData = snapshot.val();
-                
-                // Display the message in the confirmation box
-                const confirmationMessages = document.getElementById('confirmationMessages');
-                const li = document.createElement('li');
-                li.className = "list-group-item";
-                li.innerHTML = `<strong>Message sent to ${messageData.fullName}:</strong> ${messageData.notification} (${new Date(messageData.dateTime).toLocaleString()})`;
-                // Prepend the new message to the list
-                confirmationMessages.insertBefore(li, confirmationMessages.firstChild);
-            });
-        }
-
-        // Call the function to display confirmation messages
-        displayConfirmationMessages();
-
-        // Function to display confirmation message and push it to Firebase
-        function displayConfirmation(notification, fullName) {
-            // Push confirmation message to Firebase
-            const confirmationRef = firebase.database().ref('confirmationMessages');
-            confirmationRef.push({
-                notification: notification,
-                fullName: fullName,
-                dateTime: firebase.database.ServerValue.TIMESTAMP
-            });
-        }
-
         // Function to send notification to the user
-        function sendNotificationToUser(userID, notification) {
-            // Display confirmation message
-            firebase.database().ref(`users/${userID}`).once('value').then(snapshot => {
-                const user = snapshot.val();
-                const fullName = user.fullName; // Assuming user has a 'fullName' property
-                displayConfirmation(notification, fullName);
-            });
-
-            // Add notification to the 'notifications' node
-            const notifRef = firebase.database().ref(`users/${userID}/notifications`);
+        function sendNotificationToUser(userID, message) {
+            // Add notification to the 'requestsNotif' node
+            const notifRef = firebase.database().ref(`users/${userID}/requestsNotif`);
             notifRef.push({
-                notification: notification,
+                message: message,
                 dateTime: firebase.database.ServerValue.TIMESTAMP
             });
 
             // This is a placeholder; replace it with your actual notification method
             // For example, you might send a push notification to the user's device
-            console.log(`Notification sent to user: ${notification}`);
+            console.log(`Notification sent to user: ${message}`);
         }
 
         // Function to mark maintenance as done
@@ -212,17 +161,29 @@
                 requestRef.update({ assignedTo });
 
                 // Send a message to the user
-                let message = '';
+                const dateTime = new Date().toLocaleString();
+                let message;
                 if (previousAssignedTo) {
-                    message = `The maintenance request you submitted has been reassigned to ${assignedTo}.`;
+                    message = `The maintenance request you submitted on ${dateTime} has been reassigned to ${assignedTo}.`;
                 } else {
-                    message = `The maintenance request you submitted has been assigned to ${assignedTo}.`;
+                    message = `The maintenance request you submitted on ${dateTime} has been assigned to ${assignedTo}.`;
                 }
+                
+                // Add the message to the user's notifications
+                firebase.database().ref(`users/${userID}/requestsNotif`).push({
+                    message: message,
+                    dateTime: firebase.database.ServerValue.TIMESTAMP
+                });
 
-                // Display confirmation message
-                sendNotificationToUser(userID, message);
+                // Show a confirmation message (you can customize this part)
+                alert(`Maintenance request ${previousAssignedTo ? 'reassigned' : 'assigned'} to ${assignedTo}. Notification sent to user.`);
+
+                // Update the dropdown button text
+                const dropdownButton = document.getElementById(`assignDropdown${requestId}`);
+                dropdownButton.innerText = `Assigned to: ${assignedTo}`;
             });
         }
+
 
         // Firebase listener for maintenance requests
         const maintenanceRef = firebase.database().ref('maintenanceRequests');
@@ -285,8 +246,8 @@
 
         // Function to display maintenance requests
         function displayMaintenanceRequests() {
-            // Your logic to fetch and display maintenance requests goes here
-        }
+                    // Your logic to fetch and display maintenance requests goes here
+                }
 
         // Call the initial display of maintenance requests
         displayMaintenanceRequests();
@@ -324,7 +285,6 @@
             $('#remarksModal').modal('hide');
         }
     </script>
-
 
     <!-- Modal for displaying media -->
     <div class="modal fade" id="mediaModal" tabindex="-1" aria-labelledby="mediaModalLabel" aria-hidden="true">
