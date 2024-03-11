@@ -51,12 +51,11 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="roomsDropdown">
                             <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
-                            <a class="dropdown-item" href="admin-reservations.html">Reservations</a> <!-- Added link to reservations -->
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a href="user-management.html" class="nav-link text-light">Users</a>
-                    </li>
+                    <a href="user-management.html" class="nav-link text-light">Users</a>
+                </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link text-light">Profile</a>
                     </li>
@@ -67,6 +66,38 @@
             </div>
         </div>   
     </nav>
+
+    <!-- Content -->
+    <div class="container mt-5">
+        <h2 class="mb-4">Maintenance Queue</h2>
+        <div class="row">
+            <div class="col-md-8">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Description</th>
+                            <th scope="col">Schedule</th>
+                            <th scope="col">Media</th> <!-- Added this line -->
+                            <th scope="col">Remarks</th> <!-- Added Remarks column -->
+                            <th scope="col">Submitted At</th>
+                            <th scope="col">Assign to</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="maintenanceQueue">
+                        <!-- Maintenance requests will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4">
+                <!-- Confirmation Box -->
+                <div id="confirmationBox" class="p-3" style="border: 1px solid #ced4da; border-radius: 5px; height: 300px; overflow-y: auto;">
+                    <h4 class="mb-3">Confirmation Box</h4>
+                    <ul id="confirmationMessages" class="list-group"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -226,17 +257,17 @@
                                     </td>
                                     <td>${formatTimestamp(request.submittedAt)}</td>
                                     <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="assignDropdown${request.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            ${request.assignedTo ? request.assignedTo : 'Assign to'}
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="assignDropdown${request.id}">
-                                            <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Juancho Madrigal')">Juancho Madrigal</a>
-                                            <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Gilbert Acuna')">Gilbert Acuna</a>
-                                            <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Cesar Martinez')">Cesar Martinez</a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="assignDropdown${request.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                ${request.assignedTo ? `Assigned to: ${request.assignedTo}` : 'Assign to'}
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="assignDropdown${request.id}">
+                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Juancho Madrigal')">Juancho Madrigal</a>
+                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Gilbert Acuna')">Gilbert Acuna</a>
+                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Cesar Martinez')">Cesar Martinez</a>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
+                                    </td>
                                     `;
 
                     // Button to mark maintenance as done
