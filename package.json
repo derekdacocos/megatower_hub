@@ -4,7 +4,8 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install"
+    "build": "npm install",
+    "start": "serve"
   },
   "keywords": [],
   "author": "TEAMBA",
