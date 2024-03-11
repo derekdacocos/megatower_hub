@@ -1,40 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Condo Reservation</title>
-  <!-- Add Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Add Bootstrap Datepicker CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-  <!-- Add Swiper CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Condo Reservation</title>
+<!-- Add Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Add Bootstrap Datepicker CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<!-- Add Swiper CSS -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+<style>
     /* Custom CSS for swiper */
     .swiper-container {
-      height: 50vh; /* Set swiper height to 20% of viewport height */
+    height: 50vh; /* Set swiper height to 20% of viewport height */
     }
 
     .swiper-slide img {
-      width: 100%; /* Make images fill the entire width of the swiper */
-      height: 100%; /* Make images fill the entire height of the swiper */
-      object-fit: cover; /* Maintain aspect ratio and cover entire slide */
+    width: 100%; /* Make images fill the entire width of the swiper */
+    height: 100%; /* Make images fill the entire height of the swiper */
+    object-fit: cover; /* Maintain aspect ratio and cover entire slide */
     }
-  </style>
+</style>
+<!-- Start of Async Drift Code -->
+<script>
+"use strict";
+
+!function() {
+  var t = window.driftt = window.drift = window.driftt || [];
+  if (!t.init) {
+    if (t.invoked) return void (window.console && console.error && console.error("Drift snippet included twice."));
+    t.invoked = !0, t.methods = [ "identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on" ], 
+    t.factory = function(e) {
+      return function() {
+        var n = Array.prototype.slice.call(arguments);
+        return n.unshift(e), t.push(n), t;
+      };
+    }, t.methods.forEach(function(e) {
+      t[e] = t.factory(e);
+    }), t.load = function(t) {
+      var e = 3e5, n = Math.ceil(new Date() / e) * e, o = document.createElement("script");
+      o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + n + "/" + t + ".js";
+      var i = document.getElementsByTagName("script")[0];
+      i.parentNode.insertBefore(o, i);
+    };
+  }
+}();
+drift.SNIPPET_VERSION = '0.3.1';
+drift.load('kin4c3m7twpw');
+</script>
+<!-- End of Async Drift Code -->
 </head>
 <body>
 <!-- Swiper -->
 <div class="swiper-container">
     <div class="swiper-wrapper">
-      <!-- Add your swiper slides here -->
-      <div class="swiper-slide">
+    <!-- Add your swiper slides here -->
+    <div class="swiper-slide">
         <img src="https://static.wixstatic.com/media/1817fe_e325baa235fe43539115cc7041c673e4~mv2.jpg/v1/fill/w_525,h_613,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/MEGATOWER%20RESIDENCES%20III%20(1).jpg" alt="Slide 1">
-      </div>
-      <div class="swiper-slide">
+    </div>
+    <div class="swiper-slide">
         <img src="https://static.wixstatic.com/media/ba324c_f2697c21035c436aa06e65852c7caaf1~mv2.jpg/v1/fill/w_380,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/megapines_tower-3-1.jpg" alt="Slide 2">
-      </div>
-      <!-- Add more slides as needed -->
+    </div>
+    <!-- Add more slides as needed -->
     </div>
 </div>
 <!-- Check availability form -->
@@ -106,13 +134,106 @@
 </div>
 <!-- Available Rooms -->
 <h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">AVAILABLE ROOMS</h2>
+<!-- Filter box -->
+<div class="container mb-4 rounded border" id="filterBox">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="dishes" id="filterDishes">
+                <label class="form-check-label" for="filterDishes">Dishes and dining utensils</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="microwave" id="filterMicrowave">
+                <label class="form-check-label" for="filterMicrowave">Microwave</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="refrigerator" id="filterRefrigerator">
+                <label class="form-check-label" for="filterRefrigerator">Refrigerator</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="bodywash" id="filterBodywash">
+                <label class="form-check-label" for="filterBodywash">Body wash</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="fans" id="filterFans">
+                <label class="form-check-label" for="filterFans">Fans (ceiling or portable)</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="laundry" id="filterLaundry">
+                <label class="form-check-label" for="filterLaundry">Laundromat nearby</label>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="garden" id="filterGarden">
+                <label class="form-check-label" for="filterGarden">Garden or backyard</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="internet" id="filterInternet">
+                <label class="form-check-label" for="filterInternet">Internet</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="tv" id="filterTV">
+                <label class="form-check-label" for="filterTV">TV</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="wifi" id="filterWifi">
+                <label class="form-check-label" for="filterWifi">Wi-Fi</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="linens" id="filterLinens">
+                <label class="form-check-label" for="filterLinens">Linens</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="coffee" id="filterCoffee">
+                <label class="form-check-label" for="filterCoffee">Coffee or tea</label>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="hairdryer" id="filterHairdryer">
+                <label class="form-check-label" for="filterHairdryer">Hair dryer</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="toiletries" id="filterToiletries">
+                <label class="form-check-label" for="filterToiletries">Toiletries</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="doorman" id="filterDoorman">
+                <label class="form-check-label" for="filterDoorman">Doorman</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="elevator" id="filterElevator">
+                <label class="form-check-label" for="filterElevator">Elevator</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="fireextinguisher" id="filterFireExtinguisher">
+                <label class="form-check-label" for="filterFireExtinguisher">Fire extinguisher</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="smokedetector" id="filterSmokeDetector">
+                <label class="form-check-label" for="filterSmokeDetector">Smoke detector</label>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="security24" id="filterSecurity24">
+                <label class="form-check-label" for="filterSecurity24">Security (24-hour)</label>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button type="button" class="btn btn-primary" onclick="filterRooms()">Apply Filters</button>
+        </div>            
+    </div>
+</div>
+
+<!-- Available Rooms -->
 <div class="container">
     <div class="row" id="availableRooms">
         <!-- Room cards will be dynamically added here -->
     </div>
 </div>
 
-</div>
 <!-- Amenities section -->
 <div class="container amenities-section mt-4">
     <div class="row">
@@ -195,6 +316,38 @@
         </div>
     </div>
 </div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingModalLabel">Complete Your Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm">
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="fullName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <input type="hidden" id="roomId">
+                    <input type="hidden" id="bookingCheckInDate">
+                    <input type="hidden" id="bookingCheckOutDate">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" form="bookingForm">Submit Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Add Bootstrap 5 JS and Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -208,8 +361,8 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
 <script>
-  // Firebase configuration
-  const firebaseConfig = {
+// Firebase configuration
+const firebaseConfig = {
     apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
     authDomain: "megatower-hub-ca285.firebaseapp.com",
     databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
@@ -217,16 +370,16 @@
     storageBucket: "megatower-hub-ca285.appspot.com",
     messagingSenderId: "900973693171",
     appId: "1:900973693171:web:9062bf9b49221596294f86"
-  };
+};
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
-  // Get a reference to the database service
-  const database = firebase.database();
+// Get a reference to the database service
+const database = firebase.database();
 
-  // Function to update the guest count
-  function updateGuestCount() {
+// Function to update the guest count
+function updateGuestCount() {
     var adultsCount = document.getElementById('adultsCount').value;
     var childrenCount = document.getElementById('childrenCount').value;
 
@@ -238,112 +391,142 @@
     alert('Guest count updated: Adults - ' + adultsCount + ', Children - ' + childrenCount);
     
     // You can also perform any other action you need here
-  }
+}
 
-    // Function to handle form submission
-    document.getElementById('availabilityForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent default form submission behavior
+document.getElementById('availabilityForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from submitting in the traditional way
 
-    // Fetch form inputs
-    var type = document.getElementById('typeDropdown').value;
     var checkInDate = new Date(document.getElementById('checkInDate').value);
     var checkOutDate = new Date(document.getElementById('checkOutDate').value);
-    var adultsCount = parseInt(document.getElementById('adultsCount').value);
-    var childrenCount = parseInt(document.getElementById('childrenCount').value);
-    var maxGuests = adultsCount + childrenCount;
-
-    // Query available rooms in Firebase
-    database.ref('rooms').once('value', function(snapshot) {
-      var availableRooms = snapshot.val();
-      if (availableRooms) {
-        // Filter available rooms based on criteria
-        var filteredRooms = [];
-        Object.keys(availableRooms).forEach(function(roomKey) {
-          var room = availableRooms[roomKey];
-          // Check if room type matches
-          if (room.type === type) {
-            // Check if there are no booked dates or if the selected dates are available
-            var bookedDates = room.bookedDates || {};
-            var isAvailable = true;
-            for (var bookedDate in bookedDates) {
-              var startDate = new Date(bookedDate);
-              var endDate = new Date(bookedDates[bookedDate]);
-              if ((checkInDate >= startDate && checkInDate <= endDate) || (checkOutDate >= startDate && checkOutDate <= endDate)) {
-                isAvailable = false;
-                break;
-              }
-            }
-            // Check if the number of guests is within the room's capacity
-            if (isAvailable && maxGuests <= room.maxGuests) {
-              filteredRooms.push(room);
-            }
-          }
-        });
-        // Display filtered rooms
-        var availableRoomHtml = '';
-        if (filteredRooms.length > 0) {
-        filteredRooms.forEach(function(room) {
-            // Generate HTML for each room card
-            availableRoomHtml += '<div class="col-lg-3 mb-3">';
-            availableRoomHtml += '<div class="card">';
-            availableRoomHtml += '<img src="' + room.image + '" class="card-img-top" alt="' + room.category + '">';
-            availableRoomHtml += '<div class="card-body">';
-            availableRoomHtml += '<h5 class="card-title">' + room.category + '</h5>';
-            availableRoomHtml += '<p class="card-text">Capacity: ' + room.maxGuests + '</p>';
-            availableRoomHtml += '<p class="card-text">Price: ' + room.price + '</p>';
-            availableRoomHtml += '<a href="reservation-form.html" class="btn btn-primary">Book Now</a>'; // Link to reservation form
-            availableRoomHtml += '</div>';
-            availableRoomHtml += '</div>';
-            availableRoomHtml += '</div>';
-        });
-        } else {
-        // No rooms available for the selected criteria
-        availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
-        }
-        // Display available rooms
-        document.getElementById('availableRooms').innerHTML = availableRoomHtml;
-      } else {
-        // No rooms available
-        document.getElementById('availableRooms').innerHTML = '<div class="col-lg-12"><p class="text-center">No rooms available.</p></div>';
-      }
+    var selectedAmenities = Array.from(document.querySelectorAll('#filterBox input[type="checkbox"]:checked')).map(function(checkbox) {
+        return checkbox.value;
     });
-  });
 
-  // Initialize Swiper
-  var swiper = new Swiper('.swiper-container', {
+    database.ref('rooms').once('value', function(snapshot) {
+        var rooms = snapshot.val();
+        var availableRoomHtml = '';
+
+        Object.keys(rooms).forEach(function(roomId) {
+            var room = rooms[roomId];
+            if (room.availability === 'available' && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
+                // Assuming the room is available if there are no bookedDates overlapping the requested period
+                var isOverlapping = Object.keys(room.bookedDates || {}).some(function(date) {
+                    var bookedDate = new Date(date);
+                    return bookedDate >= checkInDate && bookedDate <= checkOutDate;
+                });
+
+                if (!isOverlapping) {
+                    availableRoomHtml += `
+                        <div class="col-lg-4 mb-3">
+                            <div class="card h-100">
+                                <img src="${room.image}" class="card-img-top" alt="Room Image">
+                                <div class="card-body">
+                                    <h5 class="card-title">${room.category}</h5>
+                                    <p class="card-text">Price: ${room.price}</p>
+                                    <p class="card-text">Amenities: ${room.amenities.join(', ')}</p>
+                                    <button class="btn btn-primary" onclick="openBookingModal('${roomId}')">Book Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        if (availableRoomHtml === '') {
+            availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
+        }
+
+        document.getElementById('availableRooms').innerHTML = availableRoomHtml;
+    });
+});
+
+function openBookingModal(roomId) {
+    // Set the room ID in the hidden input of the booking form
+    document.getElementById('roomId').value = roomId;
+
+    // Now open the modal (Bootstrap 5)
+    var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+    bookingModal.show();
+}
+
+// Function to filter rooms based on amenities
+function filterRooms() {
+    // Trigger form submission to apply filters
+    document.getElementById('availabilityForm').submit();
+}
+
+function openBookingModal(roomId) {
+    // Set the room ID in the hidden input of the booking form
+    document.getElementById('roomId').value = roomId;
+
+    // Now open the modal (Bootstrap 5)
+    var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+    bookingModal.show();
+}
+
+document.getElementById('bookingForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Gather booking information
+    var fullName = document.getElementById('fullName').value;
+    var email = document.getElementById('email').value;
+    var roomId = document.getElementById('roomId').value; // Captured room UID
+    var checkInDate = document.getElementById('checkInDate').value;
+    var checkOutDate = document.getElementById('checkOutDate').value;
+
+    // Submit booking to Firebase under a specific room UID
+    var newReservationRef = firebase.database().ref('reservations').push();
+    newReservationRef.set({
+        roomId: roomId,
+        fullName: fullName,
+        email: email,
+        checkInDate: checkInDate,
+        checkOutDate: checkOutDate,
+        status: 'pending'
+    }).then(() => {
+        alert('Your booking is submitted and pending confirmation.');
+        $('#bookingModal').modal('hide');
+    }).catch((error) => {
+        console.error('Error submitting booking:', error);
+    });
+});
+
+// Initialize Swiper
+var swiper = new Swiper('.swiper-container', {
     // Add your swiper options here
     loop: true, // Loop through slides
     autoplay: {
-      delay: 3000, // Time between slides (in milliseconds)
+    delay: 3000, // Time between slides (in milliseconds)
     },
-  });
+});
 </script>
 <script>
-  // Initialize Datepicker
-  $(document).ready(function(){
+// Initialize Datepicker
+$(document).ready(function(){
     var today = new Date();
     today.setHours(0, 0, 0, 0);  // Set hours to 0 to include the entire day
 
     $('#checkInDate').datepicker({
-      autoclose: true,
-      format: 'yyyy-mm-dd',
-      startDate: today,
-      todayHighlight: true
+    autoclose: true,
+    format: 'yyyy-mm-dd',
+    startDate: today,
+    todayHighlight: true
     });
 
     $('#checkOutDate').datepicker({
-      autoclose: true,
-      format: 'yyyy-mm-dd',
-      startDate: today,
-      todayHighlight: true
+    autoclose: true,
+    format: 'yyyy-mm-dd',
+    startDate: today,
+    todayHighlight: true
     });
 
     // Optionally, you can set the start date of the second datepicker to the selected date in the first datepicker.
     $('#checkInDate').on('changeDate', function(selected){
-      var startDate = new Date(selected.date.valueOf());
-      $('#checkOutDate').datepicker('setStartDate', startDate);
+    var startDate = new Date(selected.date.valueOf());
+    $('#checkOutDate').datepicker('setStartDate', startDate);
     });
-  });
+});
 </script>
 </body>
 </html>
