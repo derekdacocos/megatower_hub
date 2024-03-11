@@ -4,13 +4,13 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "your_build_command_here"
+    "build": "npm install"
   },
   "keywords": [],
   "author": "TEAMBA",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "serve": "^12.0.2"
+    "serve": "^11.3.2"
   }
 }
