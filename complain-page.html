@@ -196,42 +196,33 @@
     });
 
    // Fetch and display notifications for the authenticated user
-   function displayNotificationsForUser(userID) {
-      const notificationsBox = document.getElementById('feedbackBox');
-      notificationsBox.innerHTML = "";
-      
-      // Fetch notifications from the 'complaintNotifs' node under the user's ID
-      database.ref('users/' + userID + '/complaintNotifs').orderByChild('dateTime').once('value')
-        .then(snapshot => {
-          snapshot.forEach(childSnapshot => {
-            const notification = childSnapshot.val();
-            const complaintID = notification.complaintID;
-            
-            // Fetch the corresponding complaint message
-            database.ref('complaints/' + complaintID).once('value')
-              .then(complaintSnapshot => {
-                const complaint = complaintSnapshot.val();
-                
-                // Create HTML elements for each notification
-                const notificationDiv = document.createElement('div');
-                notificationDiv.innerHTML = `
-                  <strong>${complaint.name ? complaint.name : 'Anonymous'}:</strong> ${complaint.complaintMessage}<br>
-                  <small>${new Date(notification.dateTime).toLocaleString()}</small><br>
-                  <hr>
-                `;
-                
-                // Append the item to the box
-                notificationsBox.appendChild(notificationDiv);
-              })
-              .catch(error => {
-                console.error("Error retrieving complaint:", error);
-              });
-          });
-        })
-        .catch(error => {
-          console.error("Error retrieving notifications:", error);
-        });
+      function displayNotificationsForUser(userID) {
+        const notificationsBox = document.getElementById('feedbackBox');
+        notificationsBox.innerHTML = "";
+
+        // Fetch notifications from the 'complaintNotifs' node under the user's ID
+        database.ref('users/' + userID + '/complaintNotifs').orderByChild('dateTime').once('value')
+            .then(snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const notification = childSnapshot.val();
+
+                    // Create HTML elements for each notification
+                    const notificationDiv = document.createElement('div');
+                    notificationDiv.innerHTML = `
+                        <p>${notification.message}</p>
+                        <small>${new Date(notification.dateTime).toLocaleString()}</small><br>
+                        <hr>
+                    `;
+
+                    // Append the item to the box
+                    notificationsBox.appendChild(notificationDiv);
+                });
+            })
+            .catch(error => {
+                console.error("Error retrieving notifications:", error);
+            });
     }
+
 
   </script>
 </body>
