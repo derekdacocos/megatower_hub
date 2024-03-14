@@ -54,8 +54,8 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                    <a href="user-management.html" class="nav-link text-light">Users</a>
-                </li>
+                        <a href="user-management.html" class="nav-link text-light">Users</a>
+                    </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link text-light">Profile</a>
                     </li>
@@ -238,47 +238,72 @@
                     ...requests[key]
                 }));
 
-                // Sort the array based on schedule date and time
-                const sortedRequests = requestArray.sort((a, b) => {
-                    const dateA = new Date(`${a.scheduleDate} ${a.scheduleTime}`);
-                    const dateB = new Date(`${b.scheduleDate} ${b.scheduleTime}`);
-                    return dateA - dateB;
-                });
+                // Counter to keep track of completed fetch operations
+                let counter = 0;
 
-                sortedRequests.forEach((request) => {
-                    const row = maintenanceQueue.insertRow();
-                    row.innerHTML = `<td>${request.description}</td>
-                                    <td>${request.scheduleDate} ${request.scheduleTime}</td>
-                                    <td>
-                                        ${request.mediaURL ? `<button class="btn btn-primary" onclick="openMediaModal('${request.mediaURL}', '${request.description}')">View Media</button>` : 'No Media'}
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-info" onclick="openRemarksModal('${request.id}')">Add Remarks</button>
-                                    </td>
-                                    <td>${formatTimestamp(request.submittedAt)}</td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="assignDropdown${request.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                ${request.assignedTo ? `Assigned to: ${request.assignedTo}` : 'Assign to'}
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="assignDropdown${request.id}">
-                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Juancho Madrigal')">Juancho Madrigal</a>
-                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Gilbert Acuna')">Gilbert Acuna</a>
-                                                <a class="dropdown-item" href="#" onclick="assignTo('${request.id}', 'Cesar Martinez')">Cesar Martinez</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    `;
+                requestArray.forEach((request) => {
+                    // Fetch the unitNumber based on userID
+                    firebase.database().ref(`users/${request.userID}`).once('value').then((userSnapshot) => {
+                        const user = userSnapshot.val();
+                        const unitNumber = user.unitNumber;
 
-                    // Button to mark maintenance as done
-                    const cell = row.insertCell();
-                    const doneButton = document.createElement('button');
-                    doneButton.className = 'btn btn-success';
-                    doneButton.innerText = 'Mark as Done';
-                    doneButton.addEventListener('click', () => {
-                        markAsDone(request);
+                        // Store the unitNumber with the request data
+                        request.unitNumber = unitNumber;
+
+                        // Increment counter
+                        counter++;
+
+                        // Check if all fetch operations are completed
+                        if (counter === requestArray.length) {
+                            // Sort the requests based on timestamp
+                            const sortedRequests = requestArray.sort((a, b) => b.submittedAt - a.submittedAt);
+
+                            // Render the sorted requests
+                            sortedRequests.forEach((sortedRequest) => {
+                                const row = maintenanceQueue.insertRow();
+                                row.innerHTML = `<td>${sortedRequest.description}</td>
+                                                <td>${sortedRequest.isEmergency ? '<b>ASAP</b>' : sortedRequest.scheduleDate + ' ' + sortedRequest.scheduleTime}</td>
+                                                <td>
+                                                    ${sortedRequest.mediaURL ? `<button class="btn btn-primary" onclick="openMediaModal('${sortedRequest.mediaURL}', '${sortedRequest.description}')">View Media</button>` : 'No Media'}
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-info" onclick="openRemarksModal('${sortedRequest.id}')">Add Remarks</button>
+                                                </td>
+                                                <td>
+                                                    Date Submitted: <b>${formatTimestamp(sortedRequest.submittedAt)}</b> <br>
+                                                    Unit: <b>${sortedRequest.unitNumber}</b>
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="assignDropdown${sortedRequest.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            ${sortedRequest.assignedTo ? `${sortedRequest.assignedTo}` : 'Assign to'}
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="assignDropdown${sortedRequest.id}">
+                                                            <a class="dropdown-item" href="#" onclick="assignTo('${sortedRequest.id}', 'Juancho Madrigal')">Juancho Madrigal</a>
+                                                            <a class="dropdown-item" href="#" onclick="assignTo('${sortedRequest.id}', 'Gilbert Acuna')">Gilbert Acuna</a>
+                                                            <a class="dropdown-item" href="#" onclick="assignTo('${sortedRequest.id}', 'Cesar Martinez')">Cesar Martinez</a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                `;
+
+                                // Button to mark maintenance as done
+                                const cell = row.insertCell();
+                                const doneButton = document.createElement('button');
+                                doneButton.className = 'btn btn-success';
+                                doneButton.innerText = 'Done';
+                                doneButton.addEventListener('click', () => {
+                                    markAsDone(sortedRequest);
+                                });
+                                cell.appendChild(doneButton);
+
+                                // Add the 'table-danger' class to the table row if the request is an emergency
+                                if (sortedRequest.isEmergency) {
+                                    row.classList.add('table-danger');
+                                }
+                            });
+                        }
                     });
-                    cell.appendChild(doneButton);
                 });
             }
         });

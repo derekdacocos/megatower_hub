@@ -175,23 +175,35 @@
           emergencyBtn.style.display = (requestType === 'maintenance') ? 'block' : 'none';
         });
 
-            // Emergency Maintenance Request Button Click Event
-            emergencyBtn.addEventListener('click', () => {
-                // Show a confirmation prompt with a warning about the seriousness of the request
-                const isEmergency = confirm("This is an emergency maintenance request. Are you sure?");
-                
-                if (isEmergency) {
-                    alert("Emergency request submitted! Please wait for assistance.");
-                    
-                    // TODO: Add logic to handle emergency request
-                    // For example, you can set a flag in the database to mark it as an emergency
-                } else {
-                    alert("Emergency request cancelled. Thank you for your cooperation.");
-                }
-            });
-        }
+        // Emergency Maintenance Request Button Click Event
+        emergencyBtn.addEventListener('click', () => {
+          // Show a confirmation prompt with a warning about the seriousness of the request
+          const isEmergency = confirm("This is an emergency maintenance request. Are you sure?");
+          
+          if (isEmergency) {
+            // Prompt for confirmation and proceed with the emergency request
+            submitEmergencyRequest();
+          } else {
+            // Inform the user that the emergency request is canceled
+            alert("Emergency request canceled. Thank you for your cooperation.");
+          }
+        });
+      }
 
-        requestForm.addEventListener('submit', (event) => {
+      // Function to submit an emergency maintenance request
+      function submitEmergencyRequest() {
+        // Construct the emergency request data
+        const requestData = {
+          description: "Emergency maintenance request",
+          isEmergency: true, // Mark the request as an emergency
+          // Add any other necessary data
+        };
+
+        // Submit the emergency request
+        submitRequest('maintenanceRequests', requestData);
+      }
+
+      requestForm.addEventListener('submit', (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
 
         const requestType = document.getElementById('requestType').value;
@@ -203,107 +215,107 @@
         const mediaFile = mediaUpload.files[0];
 
         const requestData = {
-            description,
-            scheduleDate,
-            scheduleTime,
-            // Add any other data you want to include
+          description,
+          scheduleDate,
+          scheduleTime,
+          // Add any other data you want to include
         };
 
         // Check the selected request type and submit to the corresponding collection
         if (requestType === 'maintenance') {
-            submitRequest('maintenanceRequests', requestData, mediaFile);
+          submitRequest('maintenanceRequests', requestData, mediaFile);
         } else if (requestType === 'cleaning') {
-            submitRequest('cleaningRequests', requestData, mediaFile);
+          submitRequest('cleaningRequests', requestData, mediaFile);
         }
-    });
+      });
 
-    // Function to submit request data to the specified collection
-    function submitRequest(collection, requestData, mediaFile) {
+      // Function to submit request data to the specified collection
+      function submitRequest(collection, requestData, mediaFile) {
         const user = firebase.auth().currentUser;
         if (user) {
-            const userUID = user.uid;
+          const userUID = user.uid;
 
-            // Add user-specific information to the request data
-            requestData.userID = userUID;
-            requestData.submittedAt = firebase.database.ServerValue.TIMESTAMP;
+          // Add user-specific information to the request data
+          requestData.userID = userUID;
+          requestData.submittedAt = firebase.database.ServerValue.TIMESTAMP;
 
-            // Check if a file is selected for upload
-            if (mediaFile) {
-                const storageRef = firebase.storage().ref();
-                // Define the folder based on the request type
-                const folder = collection === 'maintenanceRequests' ? 'maintenance' : 'cleaning';
-                const fileName = new Date().getTime() + '_' + mediaFile.name; // Unique file name
-                const fileRef = storageRef.child(`${folder}/${fileName}`);
+          // Check if a file is selected for upload
+          if (mediaFile) {
+            const storageRef = firebase.storage().ref();
+            // Define the folder based on the request type
+            const folder = collection === 'maintenanceRequests' ? 'maintenance' : 'cleaning';
+            const fileName = new Date().getTime() + '_' + mediaFile.name; // Unique file name
+            const fileRef = storageRef.child(`${folder}/${fileName}`);
 
-                fileRef.put(mediaFile)
-                    .then((snapshot) => {
-                        // File uploaded successfully, get download URL
-                        return snapshot.ref.getDownloadURL();
-                    })
-                    .then((downloadURL) => {
-                        // Add the download URL to the request data
-                        requestData.mediaURL = downloadURL;
+            fileRef.put(mediaFile)
+              .then((snapshot) => {
+                // File uploaded successfully, get download URL
+                return snapshot.ref.getDownloadURL();
+              })
+              .then((downloadURL) => {
+                // Add the download URL to the request data
+                requestData.mediaURL = downloadURL;
 
-                        // Add the request data to the specified collection
-                        firebase.database().ref(collection).push(requestData)
-                            .then(() => {
-                                alert('Request submitted successfully!');
-                                // You can add additional logic or UI updates as needed
-                                requestForm.reset();
-                            })
-                            .catch((error) => {
-                                console.error('Error submitting request:', error);
-                                alert('Error submitting request. Please try again.');
-                            });
-                    })
-                    .catch((error) => {
-                        console.error('Error uploading file:', error);
-                        alert('Error uploading file. Please try again.');
-                    });
-            } else {
-                // No file selected, submit request without media URL
+                // Add the request data to the specified collection
                 firebase.database().ref(collection).push(requestData)
-                    .then(() => {
-                        alert('Request submitted successfully!');
-                        // You can add additional logic or UI updates as needed
-                        requestForm.reset();
-                    })
-                    .catch((error) => {
-                        console.error('Error submitting request:', error);
-                        alert('Error submitting request. Please try again.');
-                    });
-            }
+                  .then(() => {
+                    alert('Request submitted successfully!');
+                    // You can add additional logic or UI updates as needed
+                    requestForm.reset();
+                  })
+                  .catch((error) => {
+                    console.error('Error submitting request:', error);
+                    alert('Error submitting request. Please try again.');
+                  });
+              })
+              .catch((error) => {
+                console.error('Error uploading file:', error);
+                alert('Error uploading file. Please try again.');
+              });
+          } else {
+            // No file selected, submit request without media URL
+            firebase.database().ref(collection).push(requestData)
+              .then(() => {
+                alert('Request submitted successfully!');
+                // You can add additional logic or UI updates as needed
+                requestForm.reset();
+              })
+              .catch((error) => {
+                console.error('Error submitting request:', error);
+                alert('Error submitting request. Please try again.');
+              });
+          }
         }
-    }
+      }
     });
 
     // Function to display feedback
     function displayFeedback(feedback) {
-        const feedbackBox = document.getElementById('feedbackBox');
-        feedbackBox.innerHTML = ''; // Clear the existing content
+      const feedbackBox = document.getElementById('feedbackBox');
+      feedbackBox.innerHTML = ''; // Clear the existing content
 
-        // Sort feedback based on timestamp in ascending order
-        const sortedFeedback = feedback.sort((a, b) => a.timestamp - b.timestamp);
+      // Sort feedback based on timestamp in ascending order
+      const sortedFeedback = feedback.sort((a, b) => a.timestamp - b.timestamp);
 
-        // Reverse the order to display from bottom to top
-        sortedFeedback.reverse();
+      // Reverse the order to display from bottom to top
+      sortedFeedback.reverse();
 
-        sortedFeedback.forEach(item => {
-            const feedbackItem = document.createElement('div');
-            feedbackItem.className = 'mb-3';
-            feedbackItem.innerHTML = `
-                <p>${item.message} - ${formatTimestamp(item.timestamp)}</p>
-                <hr>
-            `;
-            feedbackBox.appendChild(feedbackItem);
-        });
+      sortedFeedback.forEach(item => {
+        const feedbackItem = document.createElement('div');
+        feedbackItem.className = 'mb-3';
+        feedbackItem.innerHTML = `
+            <p>${item.message} - ${formatTimestamp(item.timestamp)}</p>
+            <hr>
+        `;
+        feedbackBox.appendChild(feedbackItem);
+      });
     }
 
     // Firebase listener for feedback
     const feedbackRef = firebase.database().ref('feedback');
     feedbackRef.on('value', (snapshot) => {
-        const feedbackData = snapshot.val() || [];
-        displayFeedback(Object.values(feedbackData));
+      const feedbackData = snapshot.val() || [];
+      displayFeedback(Object.values(feedbackData));
     });
 
     </script>
