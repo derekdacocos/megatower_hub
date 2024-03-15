@@ -249,64 +249,85 @@
         }
       });
 
-      // Function to submit request data to the specified collection
-      function submitRequest(collection, requestData, mediaFile) {
-        const user = firebase.auth().currentUser;
-        if (user) {
-          const userUID = user.uid;
+      // Function to submit request data to the specified collection and push a notification to admin
+function submitRequest(collection, requestData, mediaFile) {
+  const user = firebase.auth().currentUser;
+  if (user) {
+    const userUID = user.uid;
 
-          // Add user-specific information to the request data
-          requestData.userID = userUID;
-          requestData.submittedAt = firebase.database.ServerValue.TIMESTAMP;
+    // Add user-specific information to the request data
+    requestData.userID = userUID;
+    requestData.submittedAt = firebase.database.ServerValue.TIMESTAMP;
 
-          // Check if a file is selected for upload
-          if (mediaFile) {
-            const storageRef = firebase.storage().ref();
-            // Define the folder based on the request type
-            const folder = collection === 'maintenanceRequests' ? 'maintenance' : 'cleaning';
-            const fileName = new Date().getTime() + '_' + mediaFile.name; // Unique file name
-            const fileRef = storageRef.child(`${folder}/${fileName}`);
+    // Fetch the user's fullName
+    const userRef = firebase.database().ref(`users/${userUID}/fullName`);
+    userRef.once('value', (snapshot) => {
+      const fullName = snapshot.val();
 
-            fileRef.put(mediaFile)
-              .then((snapshot) => {
-                // File uploaded successfully, get download URL
-                return snapshot.ref.getDownloadURL();
-              })
-              .then((downloadURL) => {
-                // Add the download URL to the request data
-                requestData.mediaURL = downloadURL;
+      // Construct the admin notification message with fullName
+      const adminNotificationMessage = `New ${collection.replace('Requests', '')} request submitted by ${fullName}. Description: ${requestData.description}`;
 
-                // Add the request data to the specified collection
-                firebase.database().ref(collection).push(requestData)
-                  .then(() => {
-                    alert('Request submitted successfully!');
-                    // You can add additional logic or UI updates as needed
-                    requestForm.reset();
-                  })
-                  .catch((error) => {
-                    console.error('Error submitting request:', error);
-                    alert('Error submitting request. Please try again.');
-                  });
-              })
-              .catch((error) => {
-                console.error('Error uploading file:', error);
-                alert('Error uploading file. Please try again.');
-              });
-          } else {
-            // No file selected, submit request without media URL
-            firebase.database().ref(collection).push(requestData)
-              .then(() => {
-                alert('Request submitted successfully!');
-                // You can add additional logic or UI updates as needed
-                requestForm.reset();
-              })
-              .catch((error) => {
-                console.error('Error submitting request:', error);
-                alert('Error submitting request. Please try again.');
-              });
-          }
-        }
+      // Check if a file is selected for upload
+      if (mediaFile) {
+        const storageRef = firebase.storage().ref();
+        const folder = collection === 'maintenanceRequests' ? 'maintenance' : 'cleaning';
+        const fileName = new Date().getTime() + '_' + mediaFile.name;
+        const fileRef = storageRef.child(`${folder}/${fileName}`);
+
+        fileRef.put(mediaFile)
+          .then((snapshot) => {
+            return snapshot.ref.getDownloadURL();
+          })
+          .then((downloadURL) => {
+            requestData.mediaURL = downloadURL;
+
+            // Push the notification to the adminNotifications node
+            const adminNotification = {
+              type: collection.replace('Requests', ''),
+              message: adminNotificationMessage,
+              isRead: false,
+              submittedAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            return Promise.all([
+              firebase.database().ref(collection).push(requestData),
+              firebase.database().ref('adminNotifications').push(adminNotification)
+            ]);
+          })
+          .then(() => {
+            alert('Request submitted successfully!');
+            requestForm.reset();
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            alert('Error submitting request. Please try again.');
+          });
+      } else {
+        // No file selected, submit request without media URL
+        // Push the notification to the adminNotifications node
+        const adminNotification = {
+          type: collection.replace('Requests', ''),
+          message: adminNotificationMessage,
+          isRead: false,
+          submittedAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        Promise.all([
+          firebase.database().ref(collection).push(requestData),
+          firebase.database().ref('adminNotifications').push(adminNotification)
+        ])
+        .then(() => {
+          alert('Request submitted successfully!');
+          requestForm.reset();
+        })
+        .catch((error) => {
+          console.error('Error submitting request:', error);
+          alert('Error submitting request. Please try again.');
+        });
       }
+    });
+  }
+}
 
     // Function to display feedback in descending order by dateTime
     function displayFeedback(feedback) {
