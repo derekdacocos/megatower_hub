@@ -58,9 +58,9 @@
         <div class="collapse navbar-collapse" id="navmenu">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <button type="button" class="nav-link text-light btn" data-bs-toggle="modal" data-bs-target="#notificationsModal">
-                        Notifications
-                    </button>
+                  <button type="button" class="nav-link text-light btn" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+                    Notifications <span id="unreadCountBadge" class="badge bg-danger">0</span>
+                  </button>
                 </li>
                 <li class="nav-item">
                     <a href="complain-page.html" class="nav-link text-light">Complaints</a>
@@ -114,10 +114,6 @@
       </div>
     </div>
   </div>
-
-  <!-- ... (rest of your HTML) -->
-
-
 
   <!--Showcase-->  
   <section class="bg-light text-dark p-5 text-center text-sm-start">
@@ -334,6 +330,12 @@
         console.log('User not signed in.');
       }
     });
+    
+    // Update navbar with unread notifications count
+    function updateUnreadCountBadge(count) {
+      const unreadCountBadge = document.getElementById('unreadCountBadge');
+      unreadCountBadge.textContent = count;
+    }
 
     // Function to fetch notifications
     function fetchNotifications() {
@@ -343,7 +345,19 @@
       notificationsRef.once('value', function(snapshot) {
         var notifications = snapshot.val();
         displayNotifications(notifications);
+        updateUnreadCountBadge(countUnreadNotifications(notifications)); // Update unread count
       });
+    }
+
+    // Function to count unread notifications
+    function countUnreadNotifications(notifications) {
+      let unreadCount = 0;
+      for (const key in notifications) {
+        if (!notifications[key].isRead) {
+          unreadCount++;
+        }
+      }
+      return unreadCount;
     }
 
     // Function to display notifications
@@ -365,6 +379,12 @@
       notificationsArray.forEach(([key, notification]) => {
         const notificationElement = document.createElement('div');
         notificationElement.classList.add('notification', 'mb-4', 'p-3', 'border', 'rounded');
+        
+        // Check if the notification is unread (isRead is false)
+        if (!notification.isRead) {
+          notificationElement.classList.add('unread'); // Add a class for unread notifications
+        }
+        
         notificationElement.innerHTML = `
           <h6 class="text-warning">Notification</h6>
           <p class="mb-0">${notification.notification}</p>
@@ -373,6 +393,38 @@
       });
     }
 
+    // Function to fetch notifications and update read status
+    function fetchNotificationsAndUpdateReadStatus() {
+      var userId = firebase.auth().currentUser.uid; // Get current user's UID
+      var notificationsRef = firebase.database().ref('users/' + userId + '/notifications');
+
+      notificationsRef.once('value', function(snapshot) {
+        var notifications = snapshot.val();
+        // Mark notifications as read
+        markNotificationsAsRead(notifications);
+        // Display notifications
+        displayNotifications(notifications);
+        // Update unread count
+        updateUnreadCountBadge(countUnreadNotifications(notifications));
+      });
+    }
+
+    // Function to mark notifications as read
+    function markNotificationsAsRead(notifications) {
+      for (const key in notifications) {
+        // Update isRead property to true
+        notifications[key].isRead = true;
+        // Update the isRead property in the database
+        firebase.database().ref('users/' + userId + '/notifications/' + key).update({ isRead: true });
+      }
+    }
+
+    // Function to mark notifications as read when modal is opened
+    $('#notificationsModal').on('show.bs.modal', function (e) {
+      // Fetch notifications and mark them as read
+      fetchNotificationsAndUpdateReadStatus();
+    });
+    
     // Optional: Adjust to open the modal and fetch notifications based on your UI triggers
     $('#notificationsModal').on('show.bs.modal', function (e) {
       fetchNotifications();

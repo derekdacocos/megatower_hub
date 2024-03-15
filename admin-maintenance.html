@@ -176,19 +176,19 @@
             const notifRef = firebase.database().ref(`users/${userID}/notifications`);
             notifRef.push({
                 notification: notification,
-                dateTime: firebase.database.ServerValue.TIMESTAMP
+                dateTime: firebase.database.ServerValue.TIMESTAMP,
+                isRead: false  // Set isRead to false for unread messages
             });
 
             // Add notification to the 'requestsNotif' node
             const requestsNotifRef = firebase.database().ref(`users/${userID}/requestsNotif`);
             requestsNotifRef.push({
                 message: notification,
-                dateTime: firebase.database.ServerValue.TIMESTAMP
+                dateTime: firebase.database.ServerValue.TIMESTAMP,
             });
 
             console.log(`Notification sent to user: ${notification}`);
         }
-
 
         // Function to mark maintenance as done
         function markAsDone(request) {
