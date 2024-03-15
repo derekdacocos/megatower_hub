@@ -65,8 +65,10 @@
   </nav>
 
   <div class="container mt-5">
-      <h2 class="text-center mb-4">Payment Options</h2>
+      <!-- Payment reminder -->
+      <div class="alert alert-info" id="paymentReminder" style="display: none;"></div>
 
+      <h2 class="text-center mb-4">Payment Options</h2>
       <div class="row">
           <div class="col-md-4">
               <div class="card">
@@ -104,14 +106,81 @@
               </div>
           </div>
       </div>
-
-
   </div>
-
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Firebase SDK script -->
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+
+<script>
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+    authDomain: "megatower-hub-ca285.firebaseapp.com",
+    databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+    projectId: "megatower-hub-ca285",
+    storageBucket: "megatower-hub-ca285.appspot.com",
+    messagingSenderId: "900973693171",
+    appId: "1:900973693171:web:9062bf9b49221596294f86"
+  };
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const auth = firebase.auth();
+
+  // Function to fetch current user and display payment reminder
+function displayPaymentReminder() {
+    auth.onAuthStateChanged(function(user) {
+        if (user) {
+            const userId = user.uid;
+            const userRef = database.ref('users').child(userId);
+            userRef.once('value')
+                .then((snapshot) => {
+                    const user = snapshot.val();
+                    const paymentDate = user.paymentDate;
+                    if (paymentDate) {
+                        // Calculate next payment date (assuming monthly payments)
+                        const currentDate = new Date();
+                        const [paymentYear, paymentMonth, paymentDay] = paymentDate.split('-').map(Number);
+                        let nextPaymentDate = new Date(paymentYear, paymentMonth - 1, paymentDay); // Subtract 1 from month to adjust to JavaScript's 0-indexed months
+
+                        // If payment date has already passed this month, set next payment date to the same day of the next month
+                        if (currentDate.getDate() >= paymentDay) {
+                            nextPaymentDate.setMonth(nextPaymentDate.getMonth());
+                        }
+
+                        // Display payment reminder
+                        const daysUntilPayment = Math.ceil((nextPaymentDate - currentDate) / (1000 * 60 * 60 * 24));
+                        document.getElementById('paymentReminder').innerHTML = `Your next payment is due on ${nextPaymentDate.toDateString()}. ${daysUntilPayment} days left.`;
+                        document.getElementById('paymentReminder').style.display = 'block';
+                    } else {
+                        document.getElementById('paymentReminder').innerHTML = 'Payment details not found.';
+                        document.getElementById('paymentReminder').classList.add('alert-warning');
+                        document.getElementById('paymentReminder').style.display = 'block';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching user:', error);
+                    document.getElementById('paymentReminder').innerHTML = 'Error fetching user information.';
+                    document.getElementById('paymentReminder').classList.add('alert-danger');
+                    document.getElementById('paymentReminder').style.display = 'block';
+                });
+        } else {
+            console.log('No user logged in.');
+        }
+    });
+}
+
+
+  // Call the displayPaymentReminder function when the page loads
+  window.onload = displayPaymentReminder;
+</script>
 
 </body>
 </html>

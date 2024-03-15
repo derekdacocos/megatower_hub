@@ -84,6 +84,7 @@
                     <th>Role</th>
                     <th>Last Login</th>
                     <th>Unit Number</th>
+                    <th>Payment Date</th>
                     <th>Actions</th> <!-- New column for edit and delete buttons -->
                 </tr>
             </thead>
@@ -121,6 +122,10 @@
                         <div class="mb-3">
                             <label for="editUnitNumber" class="form-label">Unit Number</label>
                             <input type="text" class="form-control" id="editUnitNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPaymentDate" class="form-label">Payment Date</label>
+                            <input type="date" class="form-control" id="editPaymentDate">
                         </div>
                         <input type="hidden" id="editUserId">
                     </form>
@@ -181,6 +186,7 @@
                             <td>${user.role}</td>
                             <td>${new Date(user.lastLogin).toLocaleString()}</td>
                             <td>${user.unitNumber}</td>
+                            <td>${user.paymentDate || ''}</td>
                             <td><button class="btn btn-primary btn-sm" onclick="editUser('${user.userId}')">Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userId}')">Delete</button></td>
                         `;
                         tableRow.dataset.userId = user.userId;
@@ -205,6 +211,7 @@
                     document.getElementById('editPhoneNumber').value = user.phoneNumber;
                     document.getElementById('editDateOfBirth').value = user.dateOfBirth;
                     document.getElementById('editUnitNumber').value = user.unitNumber;
+                    document.getElementById('editPaymentDate').value = user.paymentDate || ''; // Populate payment date field
                     $('#editUserModal').modal('show'); // Show edit user modal
                 })
                 .catch((error) => {
@@ -213,7 +220,7 @@
                 });
         }
 
-        // Function to save edited user
+        // Function to save edited user with the payment date set to the same day every month
         function saveEditedUser() {
             const userId = document.getElementById('editUserId').value;
             const fullName = document.getElementById('editFullName').value;
@@ -222,13 +229,19 @@
             const dateOfBirth = document.getElementById('editDateOfBirth').value;
             const unitNumber = document.getElementById('editUnitNumber').value;
 
+            // Calculate the next payment date
+            const currentDate = new Date();
+            const currentDay = currentDate.getDate();
+            const paymentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDay).toISOString().slice(0, 10);
+
             const userRef = database.ref('users').child(userId);
             userRef.update({
                 fullName,
                 email,
                 phoneNumber,
                 dateOfBirth,
-                unitNumber
+                unitNumber,
+                paymentDate // Save payment date to the database
             })
             .then(() => {
                 $('#editUserModal').modal('hide'); // Hide edit user modal
