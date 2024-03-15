@@ -339,6 +339,7 @@ drift.load('kin4c3m7twpw');
                     <input type="hidden" id="bookingCheckInDate">
                     <input type="hidden" id="bookingCheckOutDate">
                 </form>
+                <p>Check our payment channels for booking. <a href="landing-payment.html" target="_blank">Payment Channels</a></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -450,11 +451,45 @@ function openBookingModal(roomId) {
     bookingModal.show();
 }
 
-// Function to filter rooms based on amenities
+// Function to filter rooms based on selected amenities
 function filterRooms() {
-    // Trigger form submission to apply filters
-    document.getElementById('availabilityForm').submit();
-}
+        var selectedAmenities = Array.from(document.querySelectorAll('#filterBox input[type="checkbox"]:checked')).map(checkbox => checkbox.value);
+        fetchAndDisplayRooms(selectedAmenities);
+    }
+
+    function fetchAndDisplayRooms(selectedAmenities) {
+        firebase.database().ref('rooms').once('value', snapshot => {
+            const rooms = snapshot.val();
+            let availableRoomHtml = '';
+
+            Object.keys(rooms).forEach(roomId => {
+                const room = rooms[roomId];
+                const hasAllSelectedAmenities = selectedAmenities.every(amenity => room.amenities.includes(amenity));
+
+                if (room.availability === 'available' && hasAllSelectedAmenities) {
+                    availableRoomHtml += `<div class="col-lg-4 mb-3">
+                                            <div class="card h-100">
+                                                <img src="${room.image}" class="card-img-top" alt="Room Image">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">${room.name}</h5>
+                                                    <p class="card-text">${room.description}</p>
+                                                    <button class="btn btn-primary">Book Now</button>
+                                                </div>
+                                            </div>
+                                        </div>`;
+                }
+            });
+
+            if (!availableRoomHtml) {
+                availableRoomHtml = '<div>No rooms available matching the selected amenities.</div>';
+            }
+
+            document.getElementById('availableRooms').innerHTML = availableRoomHtml;
+        });
+    }
+
+    // Trigger filtering rooms when "Apply Filters" button is clicked
+    document.querySelector('#filterBox button').addEventListener('click', filterRooms);
 
 function openBookingModal(roomId) {
     // Set the room ID in the hidden input of the booking form

@@ -51,6 +51,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="roomsDropdown">
                             <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                            <a class="dropdown-item" href="admin-reservations.html">Reservations</a> <!-- Added link to reservations -->
                         </div>
                     </li>
                     <li class="nav-item">
@@ -163,7 +164,6 @@
             });
         }
 
-        // Function to send notification to the user
         function sendNotificationToUser(userID, notification) {
             // Display confirmation message
             firebase.database().ref(`users/${userID}`).once('value').then(snapshot => {
@@ -179,10 +179,16 @@
                 dateTime: firebase.database.ServerValue.TIMESTAMP
             });
 
-            // This is a placeholder; replace it with your actual notification method
-            // For example, you might send a push notification to the user's device
+            // Add notification to the 'requestsNotif' node
+            const requestsNotifRef = firebase.database().ref(`users/${userID}/requestsNotif`);
+            requestsNotifRef.push({
+                message: notification,
+                dateTime: firebase.database.ServerValue.TIMESTAMP
+            });
+
             console.log(`Notification sent to user: ${notification}`);
         }
+
 
         // Function to mark maintenance as done
         function markAsDone(request) {
@@ -297,6 +303,15 @@
                                 });
                                 cell.appendChild(doneButton);
 
+                                // Button to apply penalty
+                                const penaltyButton = document.createElement('button');
+                                penaltyButton.className = 'btn btn-warning';
+                                penaltyButton.innerText = 'Penalty';
+                                penaltyButton.addEventListener('click', () => {
+                                    applyPenalty(sortedRequest.id);
+                                });
+                                cell.appendChild(penaltyButton);
+
                                 // Add the 'table-danger' class to the table row if the request is an emergency
                                 if (sortedRequest.isEmergency) {
                                     row.classList.add('table-danger');
@@ -347,6 +362,38 @@
 
             // Close the remarks modal
             $('#remarksModal').modal('hide');
+        }
+
+        // Function to apply a penalty to the user for 7 days for misusing the emergency request feature
+        function applyPenalty(requestId) {
+            // Display confirmation dialog
+            const confirmed = confirm("Are you sure you want to apply a penalty to this user?");
+            if (!confirmed) {
+                return; // Exit the function if the admin cancels
+            }
+
+            const requestRef = firebase.database().ref(`maintenanceRequests/${requestId}`);
+            requestRef.once('value').then((snapshot) => {
+                const request = snapshot.val();
+                const userID = request.userID;
+
+                // Calculate the penalty expiration date (current date + 7 days)
+                const penaltyExpiration = new Date();
+                penaltyExpiration.setDate(penaltyExpiration.getDate() + 7);
+
+                // Apply the penalty to the user
+                const userRef = firebase.database().ref(`users/${userID}`);
+                userRef.update({
+                    penaltyUntil: penaltyExpiration.getTime()
+                });
+
+                // Send a notification to the user
+                const confirmationMessage = `A penalty has been applied to your account for misusing the emergency maintenance request feature. You will not be able to submit emergency maintenance requests until ${penaltyExpiration.toLocaleString()}.`;
+                sendNotificationToUser(userID, confirmationMessage);
+
+                // Optionally, you can also display the confirmation in the console
+                console.log(adminConfirmation);
+            });
         }
     </script>
 

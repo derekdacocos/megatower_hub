@@ -351,18 +351,26 @@
       const notificationsContainer = document.querySelector('.modal-body'); // Adjust selector as needed
       notificationsContainer.innerHTML = ''; // Clear existing notifications
 
-      for (let key in notifications) {
-        if (notifications.hasOwnProperty(key)) {
-          const notification = notifications[key];
-          const notificationElement = document.createElement('div');
-          notificationElement.classList.add('notification', 'mb-4', 'p-3', 'border', 'rounded');
-          notificationElement.innerHTML = `
-            <h6 class="text-warning">Notification</h6>
-            <p class="mb-0">${notification.notification}</p>
-          `;
-          notificationsContainer.appendChild(notificationElement);
-        }
-      }
+      // Convert object to array for sorting
+      const notificationsArray = Object.entries(notifications);
+
+      // Sort notifications based on dateTime
+      notificationsArray.sort((a, b) => {
+        const dateTimeA = new Date(a[1].dateTime).getTime();
+        const dateTimeB = new Date(b[1].dateTime).getTime();
+        return dateTimeB - dateTimeA; // Sort in descending order (recent first)
+      });
+
+      // Display sorted notifications
+      notificationsArray.forEach(([key, notification]) => {
+        const notificationElement = document.createElement('div');
+        notificationElement.classList.add('notification', 'mb-4', 'p-3', 'border', 'rounded');
+        notificationElement.innerHTML = `
+          <h6 class="text-warning">Notification</h6>
+          <p class="mb-0">${notification.notification}</p>
+        `;
+        notificationsContainer.appendChild(notificationElement);
+      });
     }
 
     // Optional: Adjust to open the modal and fetch notifications based on your UI triggers

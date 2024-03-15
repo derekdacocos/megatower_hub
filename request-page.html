@@ -169,6 +169,23 @@
           feedbackBox.appendChild(notificationItem);
         });
 
+        // Check if the user has a penaltyUntil date in the users node
+        const userRef = firebase.database().ref(`users/${userUID}`);
+        userRef.once('value', (snapshot) => {
+          const userData = snapshot.val();
+          if (userData && userData.penaltyUntil) {
+            const penaltyUntil = userData.penaltyUntil;
+            const currentDate = new Date().getTime();
+            if (penaltyUntil > currentDate) {
+              // User has a penalty, disable the emergency button and show a message
+              emergencyBtn.disabled = true;
+              const formattedDate = new Date(penaltyUntil).toLocaleString();
+              const penaltyMessage = `A penalty has been applied to your account for misusing the emergency maintenance request feature. You will not be able to submit emergency maintenance requests until ${formattedDate}.`;
+              alert(penaltyMessage); // You can customize this message as per your UI design
+            }
+          }
+        });
+
         requestForm.addEventListener('change', () => {
           const requestType = document.getElementById('requestType').value;
           // Show or hide the emergency button based on the selected request type
@@ -189,6 +206,9 @@
           }
         });
       }
+    });
+
+
 
       // Function to submit an emergency maintenance request
       function submitEmergencyRequest() {
@@ -287,35 +307,39 @@
           }
         }
       }
-    });
 
-    // Function to display feedback
+    // Function to display feedback in descending order by dateTime
     function displayFeedback(feedback) {
       const feedbackBox = document.getElementById('feedbackBox');
-      feedbackBox.innerHTML = ''; // Clear the existing content
+      feedbackBox.innerHTML = ''; // Clear existing feedback
 
-      // Sort feedback based on timestamp in ascending order
-      const sortedFeedback = feedback.sort((a, b) => a.timestamp - b.timestamp);
-
-      // Reverse the order to display from bottom to top
-      sortedFeedback.reverse();
+      // Convert feedback object to an array and sort by dateTime in descending order
+      const sortedFeedback = Object.values(feedback).sort((a, b) => b.dateTime - a.dateTime);
 
       sortedFeedback.forEach(item => {
         const feedbackItem = document.createElement('div');
         feedbackItem.className = 'mb-3';
         feedbackItem.innerHTML = `
-            <p>${item.message} - ${formatTimestamp(item.timestamp)}</p>
+            <p>${item.message} - ${formatTimestamp(item.dateTime)}</p>
             <hr>
         `;
         feedbackBox.appendChild(feedbackItem);
       });
     }
 
-    // Firebase listener for feedback
+    // Function to format timestamp into a readable date string
+    function formatTimestamp(timestamp) {
+      // Create a new date object from the timestamp
+      const date = new Date(timestamp);
+      // Format the date into a readable string
+      return date.toLocaleString(); // Example output: "3/15/2024, 7:24:49 AM"
+    }
+
+    // Firebase listener for feedback, assuming feedback data structure matches the given example
     const feedbackRef = firebase.database().ref('feedback');
     feedbackRef.on('value', (snapshot) => {
       const feedbackData = snapshot.val() || [];
-      displayFeedback(Object.values(feedbackData));
+      displayFeedback(feedbackData);
     });
 
     </script>
