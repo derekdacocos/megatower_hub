@@ -397,12 +397,8 @@ function updateGuestCount() {
     var childrenCount = document.getElementById('childrenCount').value;
 
     // Set the placeholder of the "Guests" button
-    document.querySelector('.input-group button').textContent = 'Guests: ' + (parseInt(adultsCount) + parseInt(childrenCount));
+    document.querySelector('.input-group button').textContent = (parseInt(adultsCount) + parseInt(childrenCount));
 
-    // Update the guest count display if needed
-    // For example, you can display it in an alert
-    alert('Guest count updated: Adults - ' + adultsCount + ', Children - ' + childrenCount);
-    
     // You can also perform any other action you need here
 }
 
