@@ -82,15 +82,15 @@ drift.load('kin4c3m7twpw');
                             <option value="lease">Lease</option>
                         </select>
                     </div>
-                    <div class="col-lg-3 mb-3">
+                    <div class="col-lg-2 mb-3">
                         <label class="form-label" style="font-weight: 500;">Check-in</label>
                         <input type="date" class="form-control shadow-none datepicker" id="checkInDate">
                     </div>
-                    <div class="col-lg-3 mb-3">
+                    <div class="col-lg-2 mb-3">
                         <label class="form-label" style="font-weight: 500;">Check-out</label>
                         <input type="date" class="form-control shadow-none datepicker" id="checkOutDate">
                     </div>                    
-                    <div class="col-lg-2 mb-3">
+                    <div class="col-lg-1 mb-3">
                         <label class="form-label" style="font-weight: 500;">Guests</label>
                         <div class="input-group">
                             <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#guestModal">
@@ -98,7 +98,16 @@ drift.load('kin4c3m7twpw');
                             </button>
                         </div>
                     </div>
-                    <div class="col-lg-1 mb-lg-3 mt-2">
+                    <!-- Add amenities button -->
+                    <div class="col-lg-3 mb-3">
+                        <label class="form-label" style="font-weight: 500;">Amenities</label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#amenitiesModal">
+                                Amenities
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 mb-3">
                         <button type="submit" class="btn text-white shadow-none bg-primary">Submit</button>
                     </div>
                 </div>
@@ -106,6 +115,8 @@ drift.load('kin4c3m7twpw');
         </div>
     </div>
 </div>
+
+
 <!-- Guest Modal -->
 <div class="modal fade" id="guestModal" tabindex="-1" aria-labelledby="guestModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -132,100 +143,101 @@ drift.load('kin4c3m7twpw');
         </div>
     </div>
 </div>
-<!-- Available Rooms -->
-<h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">AVAILABLE ROOMS</h2>
-<!-- Filter box -->
-<div class="container mb-4 rounded border" id="filterBox">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="dishes" id="filterDishes">
-                <label class="form-check-label" for="filterDishes">Dishes and dining utensils</label>
+<!-- Amenities Modal -->
+<div class="modal fade" id="amenitiesModal" tabindex="-1" aria-labelledby="amenitiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="amenitiesModalLabel">Select Amenities</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="microwave" id="filterMicrowave">
-                <label class="form-check-label" for="filterMicrowave">Microwave</label>
+            <div class="modal-body">
+                <h6>Kitchen</h6>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Dishes and dining utensils" id="amenityDishes">
+                    <label class="form-check-label" for="amenityDishes">Dishes and dining utensils</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Microwave" id="amenityMicrowave">
+                    <label class="form-check-label" for="amenityMicrowave">Microwave</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Refrigerator" id="amenityRefrigerator">
+                    <label class="form-check-label" for="amenityRefrigerator">Refrigerator</label>
+                </div>
+
+                <h6>Bathroom</h6>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Body wash" id="amenityBodyWash">
+                    <label class="form-check-label" for="amenityBodyWash">Body wash</label>
+                </div>
+
+                <h6>Bedroom</h6>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Fans (ceiling or portable)" id="amenityFans">
+                    <label class="form-check-label" for="amenityFans">Fans (ceiling or portable)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Linens" id="amenityLinens">
+                    <label class="form-check-label" for="amenityLinens">Linens</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Hair dryer" id="amenityHairDryer">
+                    <label class="form-check-label" for="amenityHairDryer">Hair dryer</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Toiletries" id="amenityToiletries">
+                    <label class="form-check-label" for="amenityToiletries">Toiletries</label>
+                </div>
+
+                <h6>General</h6>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Laundromat nearby" id="amenityLaundromat">
+                    <label class="form-check-label" for="amenityLaundromat">Laundromat nearby</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Internet" id="amenityInternet">
+                    <label class="form-check-label" for="amenityInternet">Internet</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="TV" id="amenityTV">
+                    <label class="form-check-label" for="amenityTV">TV</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Wi-Fi" id="amenityWiFi">
+                    <label class="form-check-label" for="amenityWiFi">Wi-Fi</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Coffee or tea" id="amenityCoffeeTea">
+                    <label class="form-check-label" for="amenityCoffeeTea">Coffee or tea</label>
+                </div>
+
+                <h6>Security</h6>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Doorman" id="amenityDoorman">
+                    <label class="form-check-label" for="amenityDoorman">Doorman</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Fire extinguisher" id="amenityFireExtinguisher">
+                    <label class="form-check-label" for="amenityFireExtinguisher">Fire extinguisher</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Smoke detector" id="amenitySmokeDetector">
+                    <label class="form-check-label" for="amenitySmokeDetector">Smoke detector</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="Security [24-hour]" id="amenitySecurity24">
+                    <label class="form-check-label" for="amenitySecurity24">Security [24-hour]</label>
+                </div>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="refrigerator" id="filterRefrigerator">
-                <label class="form-check-label" for="filterRefrigerator">Refrigerator</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="bodywash" id="filterBodywash">
-                <label class="form-check-label" for="filterBodywash">Body wash</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="fans" id="filterFans">
-                <label class="form-check-label" for="filterFans">Fans (ceiling or portable)</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="laundry" id="filterLaundry">
-                <label class="form-check-label" for="filterLaundry">Laundromat nearby</label>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveChanges()">Save Changes</button>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="garden" id="filterGarden">
-                <label class="form-check-label" for="filterGarden">Garden or backyard</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="internet" id="filterInternet">
-                <label class="form-check-label" for="filterInternet">Internet</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="tv" id="filterTV">
-                <label class="form-check-label" for="filterTV">TV</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="wifi" id="filterWifi">
-                <label class="form-check-label" for="filterWifi">Wi-Fi</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="linens" id="filterLinens">
-                <label class="form-check-label" for="filterLinens">Linens</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="coffee" id="filterCoffee">
-                <label class="form-check-label" for="filterCoffee">Coffee or tea</label>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="hairdryer" id="filterHairdryer">
-                <label class="form-check-label" for="filterHairdryer">Hair dryer</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="toiletries" id="filterToiletries">
-                <label class="form-check-label" for="filterToiletries">Toiletries</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="doorman" id="filterDoorman">
-                <label class="form-check-label" for="filterDoorman">Doorman</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="elevator" id="filterElevator">
-                <label class="form-check-label" for="filterElevator">Elevator</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="fireextinguisher" id="filterFireExtinguisher">
-                <label class="form-check-label" for="filterFireExtinguisher">Fire extinguisher</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="smokedetector" id="filterSmokeDetector">
-                <label class="form-check-label" for="filterSmokeDetector">Smoke detector</label>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="security24" id="filterSecurity24">
-                <label class="form-check-label" for="filterSecurity24">Security (24-hour)</label>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <button type="button" class="btn btn-primary" onclick="filterRooms()">Apply Filters</button>
-        </div>            
     </div>
 </div>
+<!-- Available Rooms -->
+<h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">AVAILABLE ROOMS</h2>
 
 <!-- Available Rooms -->
 <div class="container">
@@ -339,7 +351,7 @@ drift.load('kin4c3m7twpw');
                     <input type="hidden" id="bookingCheckInDate">
                     <input type="hidden" id="bookingCheckOutDate">
                 </form>
-                <p>Check our payment channels for booking. <a href="landing-payment.html" target="_blank">Payment Channels</a></p>
+                <p>Check our payment channel for booking. <a href="landing-payment.html" target="_blank">Payment Channels</a></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -395,52 +407,52 @@ function updateGuestCount() {
 }
 
 document.getElementById('availabilityForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the form from submitting in the traditional way
+        event.preventDefault(); // Prevent the form from submitting in the traditional way
 
-    var checkInDate = new Date(document.getElementById('checkInDate').value);
-    var checkOutDate = new Date(document.getElementById('checkOutDate').value);
-    var selectedAmenities = Array.from(document.querySelectorAll('#filterBox input[type="checkbox"]:checked')).map(function(checkbox) {
-        return checkbox.value;
-    });
-
-    database.ref('rooms').once('value', function(snapshot) {
-        var rooms = snapshot.val();
-        var availableRoomHtml = '';
-
-        Object.keys(rooms).forEach(function(roomId) {
-            var room = rooms[roomId];
-            if (room.availability === 'available' && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
-                // Assuming the room is available if there are no bookedDates overlapping the requested period
-                var isOverlapping = Object.keys(room.bookedDates || {}).some(function(date) {
-                    var bookedDate = new Date(date);
-                    return bookedDate >= checkInDate && bookedDate <= checkOutDate;
-                });
-
-                if (!isOverlapping) {
-                    availableRoomHtml += `
-                        <div class="col-lg-4 mb-3">
-                            <div class="card h-100">
-                                <img src="${room.image}" class="card-img-top" alt="Room Image">
-                                <div class="card-body">
-                                    <h5 class="card-title">${room.category}</h5>
-                                    <p class="card-text">Price: ${room.price}</p>
-                                    <p class="card-text">Amenities: ${room.amenities.join(', ')}</p>
-                                    <button class="btn btn-primary" onclick="openBookingModal('${roomId}')">Book Now</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
+        var checkInDate = new Date(document.getElementById('checkInDate').value);
+        var checkOutDate = new Date(document.getElementById('checkOutDate').value);
+        var selectedAmenities = Array.from(document.querySelectorAll('#amenitiesModal input[type="checkbox"]:checked')).map(function(checkbox) {
+            return checkbox.value;
         });
 
-        if (availableRoomHtml === '') {
-            availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
-        }
+        database.ref('rooms').once('value', function(snapshot) {
+            var rooms = snapshot.val();
+            var availableRoomHtml = '';
 
-        document.getElementById('availableRooms').innerHTML = availableRoomHtml;
+            Object.keys(rooms).forEach(function(roomId) {
+                var room = rooms[roomId];
+                if (room.availability === 'available' && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
+                    // Assuming the room is available if there are no bookedDates overlapping the requested period
+                    var isOverlapping = Object.keys(room.bookedDates || {}).some(function(date) {
+                        var bookedDate = new Date(date);
+                        return bookedDate >= checkInDate && bookedDate <= checkOutDate;
+                    });
+
+                    if (!isOverlapping) {
+                        availableRoomHtml += `
+                            <div class="col-lg-4 mb-3">
+                                <div class="card h-100">
+                                    <img src="${room.image}" class="card-img-top" alt="Room Image">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${room.category}</h5>
+                                        <p class="card-text">Price: ${room.price}</p>
+                                        <p class="card-text">Amenities: ${room.amenities.join(', ')}</p>
+                                        <button class="btn btn-primary" onclick="openBookingModal('${roomId}')">Book Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            });
+
+            if (availableRoomHtml === '') {
+                availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
+            }
+
+            document.getElementById('availableRooms').innerHTML = availableRoomHtml;
+        });
     });
-});
 
 function openBookingModal(roomId) {
     // Set the room ID in the hidden input of the booking form
@@ -450,46 +462,6 @@ function openBookingModal(roomId) {
     var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
     bookingModal.show();
 }
-
-// Function to filter rooms based on selected amenities
-function filterRooms() {
-        var selectedAmenities = Array.from(document.querySelectorAll('#filterBox input[type="checkbox"]:checked')).map(checkbox => checkbox.value);
-        fetchAndDisplayRooms(selectedAmenities);
-    }
-
-    function fetchAndDisplayRooms(selectedAmenities) {
-        firebase.database().ref('rooms').once('value', snapshot => {
-            const rooms = snapshot.val();
-            let availableRoomHtml = '';
-
-            Object.keys(rooms).forEach(roomId => {
-                const room = rooms[roomId];
-                const hasAllSelectedAmenities = selectedAmenities.every(amenity => room.amenities.includes(amenity));
-
-                if (room.availability === 'available' && hasAllSelectedAmenities) {
-                    availableRoomHtml += `<div class="col-lg-4 mb-3">
-                                            <div class="card h-100">
-                                                <img src="${room.image}" class="card-img-top" alt="Room Image">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">${room.name}</h5>
-                                                    <p class="card-text">${room.description}</p>
-                                                    <button class="btn btn-primary">Book Now</button>
-                                                </div>
-                                            </div>
-                                        </div>`;
-                }
-            });
-
-            if (!availableRoomHtml) {
-                availableRoomHtml = '<div>No rooms available matching the selected amenities.</div>';
-            }
-
-            document.getElementById('availableRooms').innerHTML = availableRoomHtml;
-        });
-    }
-
-    // Trigger filtering rooms when "Apply Filters" button is clicked
-    document.querySelector('#filterBox button').addEventListener('click', filterRooms);
 
 function openBookingModal(roomId) {
     // Set the room ID in the hidden input of the booking form
@@ -526,6 +498,7 @@ document.getElementById('bookingForm').addEventListener('submit', function(event
         console.error('Error submitting booking:', error);
     });
 });
+
 
 // Initialize Swiper
 var swiper = new Swiper('.swiper-container', {
