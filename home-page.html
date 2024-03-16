@@ -303,7 +303,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
   <script>
-    // Firebase configuration
+    // Initialize Firebase
     var firebaseConfig = {
       apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
       authDomain: "megatower-hub-ca285.firebaseapp.com",
@@ -313,120 +313,91 @@
       messagingSenderId: "900973693171",
       appId: "1:900973693171:web:9062bf9b49221596294f86"
     };
-
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
-
-    // Check for authentication state changes
+  
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
-        // User is signed in, fetch notifications
         fetchNotifications();
       } else {
-        // No user is signed in.
         console.log('User not signed in.');
       }
     });
-    
-    // Update navbar with unread notifications count
-    function updateUnreadCountBadge(count) {
-      const unreadCountBadge = document.getElementById('unreadCountBadge');
-      unreadCountBadge.textContent = count;
-    }
-
-    // Function to fetch notifications
+  
     function fetchNotifications() {
-      var userId = firebase.auth().currentUser.uid; // Get current user's UID
-      var notificationsRef = firebase.database().ref('users/' + userId + '/notifications');
-
-      notificationsRef.once('value', function(snapshot) {
-        var notifications = snapshot.val();
+      const userId = firebase.auth().currentUser.uid;
+      const notificationsRef = firebase.database().ref('users/' + userId + '/notifications');
+  
+      notificationsRef.on('value', snapshot => {
+        const notifications = snapshot.val();
         displayNotifications(notifications);
-        updateUnreadCountBadge(countUnreadNotifications(notifications)); // Update unread count
-      });
-    }
-
-    // Function to count unread notifications
-    function countUnreadNotifications(notifications) {
-      let unreadCount = 0;
-      for (const key in notifications) {
-        if (!notifications[key].isRead) {
-          unreadCount++;
-        }
-      }
-      return unreadCount;
-    }
-
-    // Function to display notifications
-    function displayNotifications(notifications) {
-      const notificationsContainer = document.querySelector('.modal-body'); // Adjust selector as needed
-      notificationsContainer.innerHTML = ''; // Clear existing notifications
-
-      // Convert object to array for sorting
-      const notificationsArray = Object.entries(notifications);
-
-      // Sort notifications based on dateTime
-      notificationsArray.sort((a, b) => {
-        const dateTimeA = new Date(a[1].dateTime).getTime();
-        const dateTimeB = new Date(b[1].dateTime).getTime();
-        return dateTimeB - dateTimeA; // Sort in descending order (recent first)
-      });
-
-      // Display sorted notifications
-      notificationsArray.forEach(([key, notification]) => {
-        const notificationElement = document.createElement('div');
-        notificationElement.classList.add('notification', 'mb-4', 'p-3', 'border', 'rounded');
-        
-        // Check if the notification is unread (isRead is false)
-        if (!notification.isRead) {
-          notificationElement.classList.add('unread'); // Add a class for unread notifications
-        }
-        
-        notificationElement.innerHTML = `
-          <h6 class="text-warning">Notification</h6>
-          <p class="mb-0">${notification.notification}</p>
-        `;
-        notificationsContainer.appendChild(notificationElement);
-      });
-    }
-
-    // Function to fetch notifications and update read status
-    function fetchNotificationsAndUpdateReadStatus() {
-      var userId = firebase.auth().currentUser.uid; // Get current user's UID
-      var notificationsRef = firebase.database().ref('users/' + userId + '/notifications');
-
-      notificationsRef.once('value', function(snapshot) {
-        var notifications = snapshot.val();
-        // Mark notifications as read
-        markNotificationsAsRead(notifications);
-        // Display notifications
-        displayNotifications(notifications);
-        // Update unread count
         updateUnreadCountBadge(countUnreadNotifications(notifications));
       });
     }
+  
+    function displayNotifications(notifications) {
+      const notificationsContainer = document.querySelector('.modal-body');
+      notificationsContainer.innerHTML = '';
 
-    // Function to mark notifications as read
-    function markNotificationsAsRead(notifications) {
-      for (const key in notifications) {
-        // Update isRead property to true
-        notifications[key].isRead = true;
-        // Update the isRead property in the database
-        firebase.database().ref('users/' + userId + '/notifications/' + key).update({ isRead: true });
+      // Convert notifications object to an array of key-value pairs
+      const notificationsArray = Object.entries(notifications || {});
+
+      // Sort the notifications based on their timestamp (assuming you have a timestamp property)
+      notificationsArray.sort((a, b) => b[1].dateTime - a[1].dateTime);
+
+      // Loop through the sorted notifications array
+      notificationsArray.forEach(([key, notification]) => {
+        const notificationElement = document.createElement('div');
+        notificationElement.classList.add('notification', 'mb-4', 'p-3', 'border', 'rounded');
+
+        if (!notification.isRead) {
+          notificationElement.classList.add('unread');
+        }
+
+        // Ensure you are using the correct property names as stored in your Firebase database
+        notificationElement.innerHTML = `
+          <h6 class="text-warning">${notification.title || 'Notification'}</h6>
+          <p class="mb-0">${notification.notification || 'No message'}</p>
+        `; // Adjusted "notification.notification" to "notification.message"
+        notificationsContainer.appendChild(notificationElement);
+
+        notificationElement.addEventListener('click', () => {
+          markNotificationAsRead(key);
+        });
+      });
+    }
+  
+    function countUnreadNotifications(notifications) {
+      return Object.values(notifications || {}).filter(n => !n.isRead).length;
+    }
+  
+    function updateUnreadCountBadge(count) {
+      const badge = document.getElementById('unreadCountBadge');
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-block'; // Show badge
+      } else {
+        badge.style.display = 'none'; // Hide badge if no unread notifications
       }
     }
 
-    // Function to mark notifications as read when modal is opened
-    $('#notificationsModal').on('show.bs.modal', function (e) {
-      // Fetch notifications and mark them as read
-      fetchNotificationsAndUpdateReadStatus();
-    });
-    
-    // Optional: Adjust to open the modal and fetch notifications based on your UI triggers
-    $('#notificationsModal').on('show.bs.modal', function (e) {
-      fetchNotifications();
+    function markNotificationAsRead(key) {
+      const userId = firebase.auth().currentUser.uid;
+      firebase.database().ref(`users/${userId}/notifications/${key}`).update({ isRead: true });
+    }
+  
+    $('#notificationsModal').on('show.bs.modal', function () {
+      const userId = firebase.auth().currentUser.uid;
+      const notificationsRef = firebase.database().ref('users/' + userId + '/notifications');
+      notificationsRef.once('value').then(snapshot => {
+        snapshot.forEach(childSnapshot => {
+          childSnapshot.ref.update({ isRead: true });
+        });
+        // After marking notifications as read, refresh to reflect changes
+        fetchNotifications(); 
+      });
     });
   </script>
+  
 
     <script>
       function logout() {
