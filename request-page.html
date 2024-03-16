@@ -15,54 +15,47 @@
   <!--Navbar-->
   <nav class="navbar navbar-expand-lg bg-success navbar-dark fixed-top">
     <div class="container">
-      <a href="home-page.html" class="navbar-brand">MegaTower Hub</a>
+        <a href="home-page.html" class="navbar-brand">MegaTower Hub</a>
 
-      <button class="navbar-toggler" 
-      type="button" 
-      data-bs-toggle="collapse" 
-      data-bs-target="#navmenu" 
-      aria-controls="navmenu" 
-      aria-expanded="false" 
-      aria-label="Toggle navigation menu">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+        <button class="navbar-toggler" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#navmenu" 
+            aria-controls="navmenu" 
+            aria-expanded="false" 
+            aria-label="Toggle navigation menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-      <div class="collapse navbar-collapse" id="navmenu">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-light" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Notifications
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="notificationsDropdown" id="notificationDropdownMenu">
-              <!-- Notifications will be displayed here -->
+        <div class="collapse navbar-collapse" id="navmenu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <button type="button" class="nav-link text-light btn" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+                    Notifications <span id="unreadCountBadge" class="badge bg-danger">0</span>
+                  </button>
+                </li>
+                <li class="nav-item">
+                    <a href="complain-page.html" class="nav-link text-light">Complaints</a>
+                </li>
+                <li class="nav-item">
+                    <a href="request-page.html" class="nav-link text-light">Request</a>
+                </li>
+                <li class="nav-item">
+                    <a href="payment-page.html" class="nav-link text-light">Payment</a>
+                </li>
+                <li class="nav-item">
+                    <a href="forum-page.html" class="nav-link text-light">Forum</a>
+                </li>
+                <li class="nav-item">
+                    <a href="tenant-profile.html" class="nav-link text-light">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0);" onclick="logout()" class="nav-link text-light">Logout</a>
+                </li>
             </ul>
-          </li>
-          <li class="nav-item">
-            <a href="complain-page.html" class="nav-link text-light">Complaints</a>
-          </li>
-          <li class="nav-item">
-            <a href="request-page.html" class="nav-link text-light">Request</a>
-          </li>
-          <li class="nav-item">
-            <a href="payment-page.html" class="nav-link text-light">Payment</a>
-          </li>
-          <li class="nav-item">
-            <a href="forum-page.html" class="nav-link text-light">Forum</a>
-          </li>
-          <li class="nav-item">
-            <a href="#questions" class="nav-link text-light">FAQs</a>
-          </li>
-          <li class="nav-item">
-            <a href="tenant-profile.html" class="nav-link text-light">Profile</a>
-          </li>
-          <li class="nav-item">
-            <a href="javascript:void(0);" onclick="logout()" class="nav-link text-light">Logout</a>
-          </li>
-        </ul>
-      </div>
+        </div>
     </div>   
   </nav>
-
 
   <div class="container mt-5">
     <div class="row">
