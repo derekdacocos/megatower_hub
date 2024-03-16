@@ -57,6 +57,33 @@
     </div>   
   </nav>
 
+  <!-- Notifications Modal -->
+  <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="notificationsModalLabel">Notifications</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Sample notification content -->
+          <div class="notification mb-4 p-3 border rounded">
+            <h6 class="text-success">Welcome, Tenant!</h6>
+            <p class="mb-0">This is the content of the first notification. You can provide more details here.</p>
+          </div>
+
+          <div class="notification mb-4 p-3 border rounded">
+            <h6 class="text-warning">Maintenance Request</h6>
+            <p class="mb-0">The maintenance request you submitted on 12/9/2023, 8:46:24 AM has been resolved.</p>
+          </div>
+
+          <!-- Add more notifications as needed -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="container mt-5">
     <div class="row">
       <!-- Request Form Column (80%) -->
@@ -123,19 +150,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
 
+    <script src="script.js"></script>
+
     <script>
-        const firebaseConfig = {
-          apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
-          authDomain: "megatower-hub-ca285.firebaseapp.com",
-          databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
-          projectId: "megatower-hub-ca285",
-          storageBucket: "megatower-hub-ca285.appspot.com",
-          messagingSenderId: "900973693171",
-          appId: "1:900973693171:web:9062bf9b49221596294f86"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-
     const requestForm = document.getElementById('requestForm');
     const emergencyBtn = document.getElementById('emergencyBtn');
     const feedbackBox = document.getElementById('feedbackBox');
