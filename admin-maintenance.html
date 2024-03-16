@@ -31,7 +31,7 @@
             <div class="collapse navbar-collapse" id="navmenu">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-light">Notifications</a>
+                        <a href="#" class="nav-link text-light" id="notificationsLink">Notifications <span id="unreadCountBadge" class="badge bg-danger"></span></a>
                     </li>
                     <li class="nav-item">
                         <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
@@ -67,6 +67,21 @@
             </div>
         </div>   
     </nav>
+
+    <!-- Admin Notifications Modal -->
+    <div class="modal fade" id="adminNotificationsModal" tabindex="-1" aria-labelledby="adminNotificationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="adminNotificationsModalLabel">Admin Notifications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Notifications will be populated dynamically here -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Content -->
     <div class="container mt-5">
@@ -109,21 +124,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
 
+    <script src="admin-notifications.js"></script>
+
     <script>
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
-            authDomain: "megatower-hub-ca285.firebaseapp.com",
-            databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
-            projectId: "megatower-hub-ca285",
-            storageBucket: "megatower-hub-ca285.appspot.com",
-            messagingSenderId: "900973693171",
-            appId: "1:900973693171:web:9062bf9b49221596294f86"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-
         // Function to format timestamp
         function formatTimestamp(timestamp) {
             const date = new Date(timestamp);

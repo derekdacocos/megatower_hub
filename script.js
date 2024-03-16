@@ -41,25 +41,30 @@ var firebaseConfig = {
 
     // Loop through the sorted notifications array
     notificationsArray.forEach(([key, notification]) => {
-      const notificationElement = document.createElement('div');
-      notificationElement.classList.add('notification', 'mb-4', 'p-3', 'border', 'rounded');
+        const notificationElement = document.createElement('div');
+        notificationElement.classList.add('notification', 'mb-4', 'p-3', 'border', 'rounded');
 
-      if (!notification.isRead) {
-        notificationElement.classList.add('unread');
-      }
+        if (!notification.isRead) {
+            notificationElement.classList.add('unread');
+        }
 
-      // Ensure you are using the correct property names as stored in your Firebase database
-      notificationElement.innerHTML = `
-        <h6 class="text-warning">${notification.title || 'Notification'}</h6>
-        <p class="mb-0">${notification.notification || 'No message'}</p>
-      `; // Adjusted "notification.notification" to "notification.message"
-      notificationsContainer.appendChild(notificationElement);
+        // Get the date and time string from the timestamp
+        const dateTime = new Date(notification.dateTime).toLocaleString();
 
-      notificationElement.addEventListener('click', () => {
-        markNotificationAsRead(key);
-      });
+        // Ensure you are using the correct property names as stored in your Firebase database
+        notificationElement.innerHTML = `
+            <h6 class="text-warning">${notification.title || 'Notification'}</h6>
+            <p class="mb-1">${notification.notification || 'No message'}</p>
+            <small class="text-muted">${dateTime}</small> <!-- Display time -->
+        `;
+        notificationsContainer.appendChild(notificationElement);
+
+        notificationElement.addEventListener('click', () => {
+            markNotificationAsRead(key);
+        });
     });
-  }
+}
+
 
   function countUnreadNotifications(notifications) {
     return Object.values(notifications || {}).filter(n => !n.isRead).length;

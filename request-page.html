@@ -173,6 +173,7 @@
 
           notificationItem.innerHTML = `
             ${notificationMessage}<br>
+            <small>${new Date(notification.dateTime).toLocaleString()}</small><br>
             <hr>
           `;
 
@@ -217,8 +218,6 @@
         });
       }
     });
-
-
 
       // Function to submit an emergency maintenance request
       function submitEmergencyRequest() {

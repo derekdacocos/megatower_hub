@@ -30,7 +30,7 @@
             <div class="collapse navbar-collapse" id="navmenu">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-light">Notifications</a>
+                        <a href="#" class="nav-link text-light" id="notificationsLink">Notifications <span id="unreadCountBadge" class="badge bg-danger"></span></a>
                     </li>
                     <li class="nav-item">
                         <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
@@ -66,6 +66,21 @@
             </div>
         </div>   
     </nav>
+
+    <!-- Admin Notifications Modal -->
+    <div class="modal fade" id="adminNotificationsModal" tabindex="-1" aria-labelledby="adminNotificationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="adminNotificationsModalLabel">Admin Notifications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Notifications will be populated dynamically here -->
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="container mt-5">
         <h2>Complaints</h2>
@@ -75,21 +90,12 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
 
-    <script>
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
-            authDomain: "megatower-hub-ca285.firebaseapp.com",
-            databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
-            projectId: "megatower-hub-ca285",
-            storageBucket: "megatower-hub-ca285.appspot.com",
-            messagingSenderId: "900973693171",
-            appId: "1:900973693171:web:9062bf9b49221596294f86"
-        };
-        firebase.initializeApp(firebaseConfig);
+    <script src="admin-notifications.js"></script>
 
+    <script>
         // Firebase Realtime Database
         const database = firebase.database();
 
@@ -135,41 +141,59 @@
                 });
         }
 
-        // Function to toggle the resolved status and send notification
+        // Function to toggle the resolved status and send notifications
         function toggleResolvedStatus(complaintKey, currentStatus) {
             const newStatus = !currentStatus;
 
             // Fetch the user ID associated with the complaint
-            database.ref(`complaints/${complaintKey}/userID`).once('value')
-                .then(userSnapshot => {
-                    const userID = userSnapshot.val();
-                    const dateTime = new Date().toLocaleString(); // Convert dateTime to readable format
-                    const notificationMessage = `The issue you submitted on ${dateTime} has been ${newStatus ? 'resolved' : 'marked unresolved'}.`;
+            database.ref(`complaints/${complaintKey}`).once('value')
+                .then(complaintSnapshot => {
+                    const complaintData = complaintSnapshot.val();
+                    const userID = complaintData.userID;
+                    const submittedAt = complaintData.submittedAt; // Use the submittedAt value from the complaint data
+                    const submittedAtFormatted = new Date(submittedAt).toLocaleString(); // Convert submittedAt to readable format
+                    const complaintMessage = `The issue you submitted on ${submittedAtFormatted} has been ${newStatus ? 'resolved' : 'marked unresolved'}.`;
+                    const notificationMessage = `The complaint you have submitted on ${submittedAtFormatted} has been ${newStatus ? 'resolved' : 'marked unresolved'}.`;
 
-                    // Update the resolved status and add notification to the user's collection
-                    const userComplaintNotifsRef = database.ref(`users/${userID}/complaintNotifs`);
-                    const newNotificationKey = userComplaintNotifsRef.push().key;
-                    const notificationData = {
-                        complaintID: complaintKey,
-                        message: notificationMessage,
-                        dateTime: firebase.database.ServerValue.TIMESTAMP
-                    };
-                    let updates = {};
-                    updates[`users/${userID}/complaintNotifs/${newNotificationKey}`] = notificationData;
-                    return database.ref().update(updates);
-                })
-                .then(() => {
                     // Update the resolved status in the complaints
                     return database.ref(`complaints/${complaintKey}`).update({
                         resolved: newStatus
+                    }).then(() => {
+                        // Push notification to the 'notifications' node under the user's ID
+                        const userNotificationsRef = database.ref(`users/${userID}/notifications`);
+                        const newNotificationKey = userNotificationsRef.push().key;
+                        const notificationData = {
+                            complaintID: complaintKey,
+                            notification: notificationMessage,
+                            dateTime: firebase.database.ServerValue.TIMESTAMP,
+                            isRead: false
+                        };
+                        userNotificationsRef.child(newNotificationKey).set(notificationData);
+
+                        // Push notification to the 'complaintNotifs' node
+                        const userComplaintNotifsRef = database.ref(`users/${userID}/complaintNotifs`);
+                        const newComplaintNotificationKey = userComplaintNotifsRef.push().key;
+                        const complaintNotificationData = {
+                            complaintID: complaintKey,
+                            message: complaintMessage,
+                            dateTime: firebase.database.ServerValue.TIMESTAMP,
+                            isRead: false
+                        };
+                        return userComplaintNotifsRef.child(newComplaintNotificationKey).set(complaintNotificationData);
                     });
                 })
                 .then(() => {
+                    // Remove the existing complaint element if it exists
+                    const complaintElement = document.getElementById(complaintKey);
+                    if (complaintElement) {
+                        complaintElement.remove();
+                    }
+
                     // Display updated complaints
                     displayComplaints();
 
                     const statusText = newStatus ? 'resolved' : 'unresolved';
-                    alert(`Complaint marked as ${statusText}. Notification sent to user.`);
+                    alert(`Complaint marked as ${statusText}. Notifications sent to users.`);
                 })
                 .catch(error => {
                     console.error(error.message);
