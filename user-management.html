@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
 </head>
 <body>
@@ -62,11 +63,8 @@
                         <a href="user-management.html" class="nav-link text-light">Users</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-light">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
-                    </li>
+                        <a href="#" class="nav-link text-light" onclick="logout()" id="logoutBtn">Logout</a>
+                    </li>  
                 </ul>
             </div>
         </div>   
@@ -277,6 +275,27 @@
 
         // Call the displayUsers function to show existing users
         displayUsers();
+    </script>
+
+    <script>
+        // Function to handle logout
+        function logout() {
+            // Check if a user is authenticated
+            const user = firebase.auth().currentUser;
+            if (user) {
+                // If authenticated, sign out
+                firebase.auth().signOut().then(() => {
+                    // Sign-out successful.
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    // An error happened.
+                    console.error('Logout error:', error);
+                });
+            } else {
+                // If not authenticated, redirect to index.html
+                window.location.href = 'index.html';
+            }
+        }
     </script>
 </body>
 </html>

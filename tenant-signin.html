@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="x-icon" href="src/megatower-hub-iconx.png">
     <title>Tenant Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
     rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
@@ -14,6 +15,10 @@
     <div class="container mt-5">
         <div class="col-md-6 offset-md-3 border p-4">
             <h2 class="mb-4">Tenant Login</h2>
+            
+            <!-- Bootstrap Alert Messages -->
+            <div id="alertContainer"></div>
+            
             <form id="loginForm">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
@@ -30,25 +35,26 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
 
     <script>
         const firebaseConfig = {
-          apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
-          authDomain: "megatower-hub-ca285.firebaseapp.com",
-          databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
-          projectId: "megatower-hub-ca285",
-          storageBucket: "megatower-hub-ca285.appspot.com",
-          messagingSenderId: "900973693171",
-          appId: "1:900973693171:web:9062bf9b49221596294f86"
+            apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+            authDomain: "megatower-hub-ca285.firebaseapp.com",
+            databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+            projectId: "megatower-hub-ca285",
+            storageBucket: "megatower-hub-ca285.appspot.com",
+            messagingSenderId: "900973693171",
+            appId: "1:900973693171:web:9062bf9b49221596294f86"
         };
 
         firebase.initializeApp(firebaseConfig);
 
         const loginForm = document.getElementById('loginForm');
+        const alertContainer = document.getElementById('alertContainer');
+        let alertShown = false;
 
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -65,7 +71,8 @@
                 })
                 .catch((error) => {
                     console.error(error.message);
-                    alert("Login failed. Please check your email and password.");
+                    // Display error message in Bootstrap alert
+                    showAlert('danger', 'Login failed. Please check your email and password.');
                 });
         });
 
@@ -81,16 +88,16 @@
                         if (userData[userId].role === 'tenant') {
                             // Check if 'lastLogin' exists
                             if ('lastLogin' in userData[userId]) {
-                                alert("Login successful! You are a tenant.");
+                                showAlert('success', 'Login successful! You are a tenant.');
                                 // Redirect to the tenant dashboard
                                 window.location.href = 'home-page.html';
                             } else {
-                                alert("Your account hasn't been registered. Please proceed to the Registration Page.");
+                                showAlert('warning', "Your account hasn't been registered. Please proceed to the Registration Page.");
                                 // Redirect to the tenant signup page
                                 window.location.href = 'tenant-signup.html';
                             }
                         } else {
-                            alert("Access denied. You are not a tenant.");
+                            showAlert('danger', 'Access denied. You are not a tenant.');
                             // Sign out the user
                             firebase.auth().signOut();
                         }
@@ -101,6 +108,27 @@
                 .catch((error) => {
                     console.error(error.message);
                 });
+        }
+
+        // Function to display Bootstrap alert messages
+        function showAlert(type, message) {
+            if (!alertShown) {
+                const alertDiv = document.createElement('div');
+                alertDiv.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show');
+                alertDiv.setAttribute('role', 'alert');
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                alertContainer.appendChild(alertDiv);
+                alertShown = true;
+
+                // Remove the alert after 5 seconds
+                setTimeout(() => {
+                    alertDiv.remove();
+                    alertShown = false;
+                }, 5000);
+            }
         }
     </script>
 </body>

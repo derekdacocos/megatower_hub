@@ -2,6 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8"/>
+	<link rel="shortcut icon" type="x-icon" href="src/megatower-hub-iconx.png">
 	<title>MegaTower Hub Portal</title>
 	<!-- bootstrap cdn -->
 	<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"/>
@@ -49,7 +50,7 @@
 			<div class="col-md-12 navbar">
 				<a href="index.html" class="logo navbar-brand text-white offset-md-2">MegaTower Hub</a>
 				<ul class="nav">
-					<li class="nav-item"><a href="#" class="nav-link">About Us</a></li>
+					<li class="nav-item"><a href="about-us.html" class="nav-link">Contact Us</a></li>
 					<li class="nav-item"><a href="reservation-page.html" class="nav-link">Reservation</a></li>
           <li class="nav-item"><a href="landing-payment.html" class="nav-link">Payment</a></li>
           <li class="nav-item dropdown">
@@ -108,29 +109,19 @@
 	<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
 	<script>
-	  // Initialize Firebase
-	  const firebaseConfig = {
-		apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
-		authDomain: "megatower-hub-ca285.firebaseapp.com",
-		databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
-		projectId: "megatower-hub-ca285",
-		storageBucket: "megatower-hub-ca285.appspot.com",
-		messagingSenderId: "900973693171",
-		appId: "1:900973693171:web:9062bf9b49221596294f86"
-	};
-	  firebase.initializeApp(firebaseConfig);
-  
-	  // Check authentication state
-	  firebase.auth().onAuthStateChanged(function(user) {
-		if (user) {
-		  // User is signed in, redirect to home page
-		  window.location.href = 'home-page.html';
-		} else {
-		  // No user is signed in, keep them on the index page
-		  console.log('No user is signed in.');
-		}
-	  });
-	</script>
+        const firebaseConfig = {
+			apiKey: "AIzaSyB0w3oovf85ZTyZBfKapuZxx1i0OiGyRZ0",
+			authDomain: "megatower-hub-ca285.firebaseapp.com",
+			databaseURL: "https://megatower-hub-ca285-default-rtdb.firebaseio.com",
+			projectId: "megatower-hub-ca285",
+			storageBucket: "megatower-hub-ca285.appspot.com",
+			messagingSenderId: "900973693171",
+			appId: "1:900973693171:web:9062bf9b49221596294f86"
+		};
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+    </script>
 
 	<!-- bootstrap javascript cdn -->
 	<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
