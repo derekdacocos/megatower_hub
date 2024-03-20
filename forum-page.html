@@ -504,8 +504,8 @@ function fetchRecentDiscussions() {
               <div class="card-body">
                 <h5 class="card-title">${postData.title}</h5>
                 <p class="card-text">${postData.content}</p>
-                <small class="text-muted">Posted by ${postData.authorUID === firebase.auth().currentUser.uid ? 'You' : postData.authorUID ? postData.fullName || 'Unknown' : 'Unknown'} on ${new Date(postData.timestamp).toLocaleString()}</small>
-                
+                <small class="text-muted">Posted by ${authorName === firebase.auth().currentUser.displayName ? 'You' : authorName} on ${new Date(postData.timestamp).toLocaleString()}</small>
+
                 <!-- Tags section -->
                 <div class="mt-3">
                   ${postData.tags.map(tag => `<span class="badge bg-secondary rounded-pill">${tag}</span>`).join(' ')}
