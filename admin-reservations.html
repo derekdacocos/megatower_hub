@@ -128,18 +128,30 @@
                 .then((snapshot) => {
                     snapshot.forEach((childSnapshot) => {
                         const reservation = childSnapshot.val();
+                        let statusColorClass = '';
+
+                        // Assign color class based on status
+                        if (reservation.status === 'confirmed') {
+                            statusColorClass = 'bg-success';
+                        } else if (reservation.status === 'cancelled') {
+                            statusColorClass = 'bg-danger';
+                        } else if (reservation.status === 'pending') {
+                            statusColorClass = 'bg-warning';
+                        }
+
                         const tableRow = document.createElement('tr');
                         tableRow.innerHTML = `
                             <td>${reservation.fullName}</td>
                             <td>${reservation.roomId}</td>
-                            <td>${reservation.status}</td>
+                            <td><span class="badge ${statusColorClass} rounded-pill">${reservation.status}</span></td>
                             <td>${reservation.checkInDate}</td>
                             <td>${reservation.checkOutDate}</td>
                             <td>${reservation.email}</td>
                             <td>
-                                <button class="btn btn-success" onclick="confirmReservation('${childSnapshot.key}')">Confirm</button>
-                                <button class="btn btn-warning" onclick="cancelReservation('${childSnapshot.key}', '${reservation.roomId}', '${reservation.checkInDate}', '${reservation.checkOutDate}')">Cancel</button>
-                                <button class="btn btn-danger" onclick="rejectReservation('${childSnapshot.key}')">Reject</button>
+                                <button class="btn ${reservation.status === 'confirmed' ? 'btn-danger' : 'btn-success'}" onclick="toggleReservation('${childSnapshot.key}', '${reservation.status}', this)">
+                                    ${reservation.status === 'confirmed' ? 'Cancel' : 'Confirm'}
+                                </button>
+                                <button class="btn btn-warning" onclick="archiveReservation('${childSnapshot.key}')">Archive</button>
                             </td>
                         `;
                         reservationTableBody.appendChild(tableRow);
@@ -151,44 +163,108 @@
                 });
         }
 
-        // Function to confirm reservation
-        function confirmReservation(reservationKey) {
+        // Function to archive reservation
+        function archiveReservation(reservationKey) {
             const reservationRef = database.ref('reservations').child(reservationKey);
+
+            // Move reservation to 'archivedReservations' node
             reservationRef.once('value')
                 .then((snapshot) => {
-                    const reservation = snapshot.val();
-                    const roomId = reservation.roomId;
-                    const checkInDate = reservation.checkInDate;
-                    const checkOutDate = reservation.checkOutDate;
-
-                    // Update reservation status to 'confirmed'
-                    reservationRef.update({
-                        status: 'confirmed'
-                    })
-                    .then(() => {
-                        // Update booked dates for the room
-                        const bookedDatesRef = database.ref('rooms').child(roomId).child('bookedDates');
-                        for (let date = checkInDate; date <= checkOutDate; date = getNextDate(date)) {
-                            bookedDatesRef.child(date).set(true);
-                        }
-
-                        // Success message
-                        alert('Reservation confirmed successfully.');
-                        // Refresh the table
-                        displayReservations();
-                    })
-                    .catch((error) => {
-                        // Error message
-                        console.error('Error confirming reservation:', error);
-                        alert('Error confirming reservation. Please try again.');
-                    });
+                    const reservationData = snapshot.val();
+                    const archivedReservationsRef = database.ref('archivedReservations').push();
+                    archivedReservationsRef.set(reservationData)
+                        .then(() => {
+                            // Remove reservation from 'reservations' node
+                            reservationRef.remove()
+                                .then(() => {
+                                    // Success message
+                                    alert('Reservation archived successfully.');
+                                    // Refresh the table
+                                    displayReservations();
+                                })
+                                .catch((error) => {
+                                    console.error('Error removing reservation:', error);
+                                    alert('Error removing reservation. Please try again.');
+                                });
+                        })
+                        .catch((error) => {
+                            console.error('Error archiving reservation:', error);
+                            alert('Error archiving reservation. Please try again.');
+                        });
                 })
                 .catch((error) => {
-                    // Error message
                     console.error('Error retrieving reservation data:', error);
                     alert('Error retrieving reservation data. Please try again.');
                 });
         }
+
+        // Function to toggle reservation status between 'confirmed' and 'cancelled'
+function toggleReservation(reservationKey, currentStatus, buttonElement) {
+    const reservationRef = database.ref('reservations').child(reservationKey);
+    const newStatus = currentStatus === 'confirmed' ? 'cancelled' : 'confirmed'; // Toggle status
+
+    // Update reservation status
+    reservationRef.update({
+        status: newStatus
+    })
+    .then(() => {
+        // Update button text based on new status
+        buttonElement.textContent = newStatus === 'confirmed' ? 'Confirm' : 'Cancel';
+        // Success message
+        alert(`Reservation status successfully updated to ${newStatus}.`);
+        
+        if (newStatus === 'confirmed') {
+            // If reservation is confirmed, update booked dates for the room
+            reservationRef.once('value', (snapshot) => {
+                const reservationData = snapshot.val();
+                const roomId = reservationData.roomId;
+                const checkInDate = new Date(reservationData.checkInDate);
+                const checkOutDate = new Date(reservationData.checkOutDate);
+                
+                const bookedDatesRef = database.ref('rooms').child(roomId).child('bookedDates');
+                let currentDate = new Date(checkInDate);
+
+                while (currentDate <= checkOutDate) {
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    bookedDatesRef.child(dateString).set(true); // Set the booked date
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                // Success message
+                alert('Booked dates updated successfully for the room.');
+                // Refresh the table
+                displayReservations();
+            })
+            .catch((error) => {
+                console.error('Error updating booked dates for the room:', error);
+                alert('Error updating booked dates for the room. Please try again.');
+            });
+        } else if (newStatus === 'cancelled') {
+            // If reservation is cancelled, remove booked dates for the room
+            reservationRef.once('value', (snapshot) => {
+                const reservationData = snapshot.val();
+                const roomId = reservationData.roomId;
+                const checkInDate = reservationData.checkInDate;
+                const checkOutDate = reservationData.checkOutDate;
+                
+                cancelReservation(reservationKey, roomId, checkInDate, checkOutDate);
+            })
+            .catch((error) => {
+                console.error('Error removing booked dates for the room:', error);
+                alert('Error removing booked dates for the room. Please try again.');
+            });
+        } else {
+            // Refresh the table for other status changes
+            displayReservations();
+        }
+    })
+    .catch((error) => {
+        // Error message
+        console.error('Error updating reservation status:', error);
+        alert('Error updating reservation status. Please try again.');
+    });
+}
+
 
         // Function to reject reservation
         function rejectReservation(reservationKey) {
