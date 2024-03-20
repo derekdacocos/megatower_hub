@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="x-icon" href="src/megatower-hub-iconx.png">
+    <title>Admin Profile</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
+    <div class="container">
+        <a href="admin-dashboard.html" class="navbar-brand">Megatower Hub
+            <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
+        </a>
+
+        <button class="navbar-toggler" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#navmenu" 
+            aria-controls="navmenu" 
+            aria-expanded="false" 
+            aria-label="Toggle navigation menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navmenu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light" id="notificationsLink">Notifications <span id="unreadCountBadge" class="badge bg-danger"></span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Request
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
+                        <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="roomsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Rooms
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="roomsDropdown">
+                        <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                        <a class="dropdown-item" href="admin-reservations.html">Reservations</a> <!-- Added link to reservations -->
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="user-management.html" class="nav-link text-light">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a href="admin-profile.html" class="nav-link text-light">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link text-light" id="logoutBtn">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>   
+  </nav>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Admin Profile</h2>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Profile Information</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Full Name:</strong> <span id="fullName"></span></p>
+                        <p><strong>Email:</strong> <span id="email"></span></p>
+                        <p><strong>Role:</strong> <span id="role"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Date of Birth:</strong> <span id="dateOfBirth"></span></p>
+                        <p><strong>Department:</strong> <span id="department"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="script.js"></script>
+
+    <script>
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Check if a user is authenticated
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Retrieve admin profile information from Firebase
+                const userId = user.uid;
+                const adminProfileRef = database.ref('admins/' + userId);
+
+                adminProfileRef.once('value')
+                    .then((snapshot) => {
+                        const admin = snapshot.val();
+                        if (admin) {
+                            document.getElementById('fullName').textContent = admin.fullName;
+                            document.getElementById('email').textContent = admin.email;
+                            document.getElementById('role').textContent = admin.role;
+                            document.getElementById('dateOfBirth').textContent = admin.dateOfBirth;
+                            document.getElementById('department').textContent = admin.department;
+                        } else {
+                            alert('Admin not found.');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error retrieving admin profile:', error);
+                        alert('Error retrieving admin profile. Please try again.');
+                    });
+            } else {
+                // User is not logged in, redirect to login page
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+
+</body>
+</html>

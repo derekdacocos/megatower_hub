@@ -88,7 +88,7 @@
                         if (userData[userId].role === 'tenant') {
                             // Check if 'lastLogin' exists
                             if ('lastLogin' in userData[userId]) {
-                                showAlert('success', 'Login successful! You are a tenant.');
+                                showAlert('success', 'Login successful!');
                                 // Redirect to the tenant dashboard
                                 window.location.href = 'home-page.html';
                             } else {
