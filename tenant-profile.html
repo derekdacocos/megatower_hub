@@ -128,25 +128,60 @@
     </div>
   </div>
 
-    <div class="container mt-5">
-        <h2 class="mb-4">User Profile</h2>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Profile Information</h5>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Full Name:</strong> <span id="fullName"></span></p>
-                        <p><strong>Email:</strong> <span id="email"></span></p>
-                        <p><strong>Phone Number:</strong> <span id="phoneNumber"></span></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Date of Birth:</strong> <span id="dateOfBirth"></span></p>
-                        <p><strong>Unit Number:</strong> <span id="unitNumber"></span></p>
-                    </div>
+  <div class="container mt-5">
+    <h2 class="mb-4">User Profile</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Profile Information</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Full Name:</strong> <span id="fullName"></span></p>
+                    <p><strong>Email:</strong> <span id="email"></span></p>
+                    <p><strong>Phone Number:</strong> <span id="phoneNumber"></span></p>
                 </div>
+                <div class="col-md-6">
+                    <p><strong>Date of Birth:</strong> <span id="dateOfBirth"></span></p>
+                    <p><strong>Unit Number:</strong> <span id="unitNumber"></span></p>
+                </div>
+            </div>
+            <button class="btn btn-primary mt-3" onclick="enableProfileEditing()">Change Profile</button>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Update Modal -->
+<div class="modal fade" id="profileUpdateModal" tabindex="-1" aria-labelledby="profileUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileUpdateModalLabel">Update Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="fullNameInput" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="fullNameInput">
+                </div>
+                <div class="mb-3">
+                    <label for="phoneNumberInput" class="form-label">Phone Number</label>
+                    <input type="text" class="form-control" id="phoneNumberInput">
+                </div>
+                <div class="mb-3">
+                    <label for="dateOfBirthInput" class="form-label">Date of Birth</label>
+                    <input type="text" class="form-control" id="dateOfBirthInput">
+                </div>
+                <div class="mb-3">
+                    <label for="unitNumberInput" class="form-label">Unit Number</label>
+                    <input type="text" class="form-control" id="unitNumberInput">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateProfile()">Save changes</button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -207,6 +242,56 @@
                 document.querySelector('.nav-link.text-light').removeAttribute('disabled');
             });
         }
+
+        function enableProfileEditing() {
+            const fullNameSpan = document.getElementById('fullName');
+            const phoneNumberSpan = document.getElementById('phoneNumber');
+            const dateOfBirthSpan = document.getElementById('dateOfBirth');
+            const unitNumberSpan = document.getElementById('unitNumber');
+
+            const fullNameInput = document.getElementById('fullNameInput');
+            const phoneNumberInput = document.getElementById('phoneNumberInput');
+            const dateOfBirthInput = document.getElementById('dateOfBirthInput');
+            const unitNumberInput = document.getElementById('unitNumberInput');
+
+            fullNameInput.value = fullNameSpan.textContent;
+            phoneNumberInput.value = phoneNumberSpan.textContent;
+            dateOfBirthInput.value = dateOfBirthSpan.textContent;
+            unitNumberInput.value = unitNumberSpan.textContent;
+
+            $('#profileUpdateModal').modal('show');
+        }
+
+        function updateProfile() {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                const userId = user.uid;
+                const userProfileRef = database.ref('users/' + userId);
+
+                const fullName = document.getElementById('fullNameInput').value;
+                const phoneNumber = document.getElementById('phoneNumberInput').value;
+                const dateOfBirth = document.getElementById('dateOfBirthInput').value;
+                const unitNumber = document.getElementById('unitNumberInput').value;
+
+                userProfileRef.update({
+                    fullName: fullName,
+                    phoneNumber: phoneNumber,
+                    dateOfBirth: dateOfBirth,
+                    unitNumber: unitNumber
+                }).then(() => {
+                    alert('Profile updated successfully!');
+                    // Refresh the page to display updated information
+                    window.location.reload();
+                }).catch((error) => {
+                    console.error('Error updating profile:', error);
+                    alert('Error updating profile. Please try again.');
+                });
+            } else {
+                console.error('User not authenticated.');
+                alert('User not authenticated. Please log in.');
+            }
+        }
+
     </script>
 </body>
 </html>
