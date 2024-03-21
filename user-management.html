@@ -90,6 +90,10 @@
 
     <div class="container mt-5">
         <h2 class="mb-4">User List</h2>
+
+        <!-- Button to Add User -->
+        <button type="button" class="btn btn-primary float-end mb-3" data-bs-toggle="modal" data-bs-target="#addUserModal">Add User</button>
+
         <table class="table">
             <thead>
                 <tr>
@@ -149,6 +153,35 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" onclick="saveEditedUser()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for adding a user -->
+                    <form id="addUserForm">
+                        <div class="mb-3">
+                            <label for="inputEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="inputEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="inputPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addUser()">Add User</button>
                 </div>
             </div>
         </div>
@@ -299,6 +332,73 @@
                 window.location.href = 'index.html';
             }
         }
+
+        // Function to add a user
+        function addUser() {
+            const email = document.getElementById('inputEmail').value;
+            const password = document.getElementById('inputPassword').value;
+
+            // Register user with email and password
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // User registration successful
+                    const user = userCredential.user;
+                    const uid = user.uid;
+
+                    // Push user data to Realtime Database
+                    database.ref('users/' + uid).set({
+                        email: email,
+                        role: 'tenant'
+                    }).then(() => {
+                        console.log('User data saved successfully');
+                        // Clear input fields
+                        document.getElementById('inputEmail').value = '';
+                        document.getElementById('inputPassword').value = '';
+                        $('#addUserModal').modal('hide');
+                        // Show confirmation message
+                        alert('User added successfully!');
+                        displayUsers(); // Refresh user list
+                    }).catch((error) => {
+                        console.error('Error saving user data:', error);
+                    });
+                })
+                .catch((error) => {
+                    // Handle errors during registration
+                    console.error('Error registering user:', error);
+                    // Display error message to user, if needed
+                });
+        }
+
+        // Function to delete user
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                const userRef = database.ref('users').child(userId);
+                userRef.remove()
+                    .then(() => {
+                        // User successfully deleted from Realtime Database
+                        console.log('User deleted from Realtime Database');
+                        // Proceed to delete user from Authentication
+                        firebase.auth().deleteUser(userId)
+                            .then(() => {
+                                // User successfully deleted from Authentication
+                                console.log('User deleted from Authentication');
+                                displayUsers(); // Refresh user list
+                            })
+                            .catch((error) => {
+                                // Handle errors when deleting user from Authentication
+                                console.error('Error deleting user from Authentication:', error);
+                                alert('Error deleting user from Authentication. Please try again.');
+                                displayUsers(); // Refresh user list
+                            });
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting user from Realtime Database:', error);
+                        alert('Error deleting user from Realtime Database. Please try again.');
+                        displayUsers(); // Refresh user list
+                    });
+            }
+        }
+
     </script>
 </body>
 </html>
