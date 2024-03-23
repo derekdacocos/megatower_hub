@@ -254,7 +254,7 @@
                     // Fetch the unitNumber based on userID
                     firebase.database().ref(`users/${request.userID}`).once('value').then((userSnapshot) => {
                         const user = userSnapshot.val();
-                        const unitNumber = user.unitNumber;
+                        const unitNumber = user ? user.unitNumber : 'Unknown'; // Handle null user or unitNumber
 
                         // Store the unitNumber with the request data
                         request.unitNumber = unitNumber;
@@ -271,7 +271,7 @@
                             sortedRequests.forEach((sortedRequest) => {
                                 const row = maintenanceQueue.insertRow();
                                 row.innerHTML = `<td>${sortedRequest.description}</td>
-                                                <td>${sortedRequest.isEmergency ? '<b>ASAP</b>' : sortedRequest.scheduleDate + ' ' + sortedRequest.scheduleTime}</td>
+                                                <td>${sortedRequest.isEmergency ? '<b>ASAP</b>' : (sortedRequest.scheduleDate && sortedRequest.scheduleTime ? sortedRequest.scheduleDate + ' ' + sortedRequest.scheduleTime : 'Not provided')}</td>
                                                 <td>
                                                     ${sortedRequest.mediaURL ? `<button class="btn btn-primary" onclick="openMediaModal('${sortedRequest.mediaURL}', '${sortedRequest.description}')">View Media</button>` : 'No Media'}
                                                 </td>
