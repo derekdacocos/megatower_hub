@@ -139,22 +139,33 @@
                             statusColorClass = 'bg-warning';
                         }
 
-                        const tableRow = document.createElement('tr');
-                        tableRow.innerHTML = `
-                            <td>${reservation.fullName}</td>
-                            <td>${reservation.roomId}</td>
-                            <td><span class="badge ${statusColorClass} rounded-pill">${reservation.status}</span></td>
-                            <td>${reservation.checkInDate}</td>
-                            <td>${reservation.checkOutDate}</td>
-                            <td>${reservation.email}</td>
-                            <td>
-                                <button class="btn ${reservation.status === 'confirmed' ? 'btn-danger' : 'btn-success'}" onclick="toggleReservation('${childSnapshot.key}', '${reservation.status}', this)">
-                                    ${reservation.status === 'confirmed' ? 'Cancel' : 'Confirm'}
-                                </button>
-                                <button class="btn btn-warning" onclick="archiveReservation('${childSnapshot.key}')">Archive</button>
-                            </td>
-                        `;
-                        reservationTableBody.appendChild(tableRow);
+                        // Fetch room data based on room UID
+                        const roomId = reservation.roomId;
+                        database.ref('rooms').child(roomId).once('value')
+                            .then((roomSnapshot) => {
+                                const roomData = roomSnapshot.val();
+                                const roomValue = roomData.room; // Assuming 'room' is the property to display
+                                const tableRow = document.createElement('tr');
+                                tableRow.innerHTML = `
+                                    <td>${reservation.fullName}</td>
+                                    <td>${roomValue}</td> <!-- Displaying room value -->
+                                    <td><span class="badge ${statusColorClass} rounded-pill">${reservation.status}</span></td>
+                                    <td>${reservation.checkInDate}</td>
+                                    <td>${reservation.checkOutDate}</td>
+                                    <td>${reservation.email}</td>
+                                    <td>
+                                        <button class="btn ${reservation.status === 'confirmed' ? 'btn-danger' : 'btn-success'}" onclick="toggleReservation('${childSnapshot.key}', '${reservation.status}', this)">
+                                            ${reservation.status === 'confirmed' ? 'Cancel' : 'Confirm'}
+                                        </button>
+                                        <button class="btn btn-warning" onclick="archiveReservation('${childSnapshot.key}')">Archive</button>
+                                    </td>
+                                `;
+                                reservationTableBody.appendChild(tableRow);
+                            })
+                            .catch((error) => {
+                                console.error('Error fetching room data:', error);
+                                alert('Error fetching room data. Please try again.');
+                            });
                     });
                 })
                 .catch((error) => {
