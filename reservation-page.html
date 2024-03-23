@@ -408,21 +408,24 @@ function updateGuestCount() {
 }
 
 document.getElementById('availabilityForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the form from submitting in the traditional way
+    event.preventDefault(); // Prevent the form from submitting in the traditional way
 
-        var checkInDate = new Date(document.getElementById('checkInDate').value);
-        var checkOutDate = new Date(document.getElementById('checkOutDate').value);
-        var selectedAmenities = Array.from(document.querySelectorAll('#amenitiesModal input[type="checkbox"]:checked')).map(function(checkbox) {
-            return checkbox.value;
-        });
+    var checkInDate = new Date(document.getElementById('checkInDate').value);
+    var checkOutDate = new Date(document.getElementById('checkOutDate').value);
+    var selectedAmenities = Array.from(document.querySelectorAll('#amenitiesModal input[type="checkbox"]:checked')).map(function(checkbox) {
+        return checkbox.value;
+    });
+    var selectedType = document.getElementById('typeDropdown').value; // Get the selected type
 
-        database.ref('rooms').once('value', function(snapshot) {
-            var rooms = snapshot.val();
-            var availableRoomHtml = '';
+    database.ref('rooms').once('value', function(snapshot) {
+        var rooms = snapshot.val();
+        var availableRoomHtml = '';
 
-            Object.keys(rooms).forEach(function(roomId) {
-                var room = rooms[roomId];
-                if (room.availability === 'available' && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
+        Object.keys(rooms).forEach(function(roomId) {
+            var room = rooms[roomId];
+            if (room.availability === 'available' && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
+                // Check if the room type matches the selected type
+                if (selectedType === 'Choose...' || room.type === selectedType) {
                     // Assuming the room is available if there are no bookedDates overlapping the requested period
                     var isOverlapping = Object.keys(room.bookedDates || {}).some(function(date) {
                         var bookedDate = new Date(date);
@@ -445,15 +448,16 @@ document.getElementById('availabilityForm').addEventListener('submit', function(
                         `;
                     }
                 }
-            });
-
-            if (availableRoomHtml === '') {
-                availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
             }
-
-            document.getElementById('availableRooms').innerHTML = availableRoomHtml;
         });
+
+        if (availableRoomHtml === '') {
+            availableRoomHtml = '<div class="col-lg-12"><p class="text-center">No rooms available for the selected criteria.</p></div>';
+        }
+
+        document.getElementById('availableRooms').innerHTML = availableRoomHtml;
     });
+});
 
 function openBookingModal(roomId) {
     // Set the room ID in the hidden input of the booking form
