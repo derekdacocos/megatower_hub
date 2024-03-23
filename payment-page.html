@@ -11,34 +11,53 @@
     crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
 
+
+    <style>
+        .card {
+            border: 1px solid #dee2e6; /* Aligning borders */
+            border-radius: 10px; /* Rounded corners */
+            margin-bottom: 20px; /* Spacing between cards */
+        }
+
+        .card-img-top {
+            max-height: 100px; /* Limiting image height */
+            object-fit: contain; /* Scaling images */
+        }
+
+        .card-body {
+            text-align: center; /* Centering text */
+        }
+    </style>
+
     <!-- Start of Async Drift Code -->
-  <script>
-    "use strict";
-    
-    !function() {
-      var t = window.driftt = window.drift = window.driftt || [];
-      if (!t.init) {
-        if (t.invoked) return void (window.console && console.error && console.error("Drift snippet included twice."));
-        t.invoked = !0, t.methods = [ "identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on" ], 
-        t.factory = function(e) {
-          return function() {
-            var n = Array.prototype.slice.call(arguments);
-            return n.unshift(e), t.push(n), t;
+    <script>
+      "use strict";
+      
+      !function() {
+        var t = window.driftt = window.drift = window.driftt || [];
+        if (!t.init) {
+          if (t.invoked) return void (window.console && console.error && console.error("Drift snippet included twice."));
+          t.invoked = !0, t.methods = [ "identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on" ], 
+          t.factory = function(e) {
+            return function() {
+              var n = Array.prototype.slice.call(arguments);
+              return n.unshift(e), t.push(n), t;
+            };
+          }, t.methods.forEach(function(e) {
+            t[e] = t.factory(e);
+          }), t.load = function(t) {
+            var e = 3e5, n = Math.ceil(new Date() / e) * e, o = document.createElement("script");
+            o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + n + "/" + t + ".js";
+            var i = document.getElementsByTagName("script")[0];
+            i.parentNode.insertBefore(o, i);
           };
-        }, t.methods.forEach(function(e) {
-          t[e] = t.factory(e);
-        }), t.load = function(t) {
-          var e = 3e5, n = Math.ceil(new Date() / e) * e, o = document.createElement("script");
-          o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + n + "/" + t + ".js";
-          var i = document.getElementsByTagName("script")[0];
-          i.parentNode.insertBefore(o, i);
-        };
-      }
-    }();
-    drift.SNIPPET_VERSION = '0.3.1';
-    drift.load('kin4c3m7twpw');
+        }
+      }();
+      drift.SNIPPET_VERSION = '0.3.1';
+      drift.load('kin4c3m7twpw');
     </script>
     <!-- End of Async Drift Code -->
+
 </head>
 <body>
 
@@ -130,42 +149,62 @@
 
       <h2 class="text-center mb-4">Payment Options</h2>
       <div class="row">
-          <div class="col-md-4">
+          <div class="col-md-6">
               <div class="card">
                   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/BDO_Unibank_%28logo%29.svg/1200px-BDO_Unibank_%28logo%29.svg.png" class="card-img-top" alt="BDO Bank">
                   <div class="card-body">
                       <h5 class="card-title">BDO Bank</h5>
                       <p class="card-text">Pay Through BDO Bank</p>
-                      <p class="card-text">Account Holder: Mega Pines</p>
-                      <p class="card-text">Account Number: 1234567890</p>
+                      <p class="card-text">Account Name: MegaPines Realty and <br>Development Inc.</p>
+                      <p class="card-text">Account Number: 005470412009</p>
                   </div>
               </div>
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-6">
               <div class="card">
                   <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/c2/Bank_of_the_Philippine_Islands_logo.svg/1200px-Bank_of_the_Philippine_Islands_logo.svg.png" class="card-img-top" alt="BPI Bank">
                   <div class="card-body">
                       <h5 class="card-title">BPI Bank </h5>
                       <p class="card-text">Pay Through BPI Bank</p>
-                      <p class="card-text">Account Holder: MegaPines</p>
-                      <p class="card-text">Account Number: 1234567890</p>
-                  </div>
-              </div>
-          </div>
-
-          <div class="col-md-4">
-              <div class="card">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Metropolitan_Bank_and_Trust_Company.svg/2560px-Metropolitan_Bank_and_Trust_Company.svg.png" class="card-img-top" alt="Bank Transfer">
-                  <div class="card-body">
-                      <h5 class="card-title">Metrobank</h5>
-                      <p class="card-text">Transfer funds to our bank account.</p>
-                      <p class="card-text">Account Holder: MegaPines</p>
-                      <p class="card-text">Account Number: 1234567890</p>
+                      <p class="card-text">Account Name: MegaPines Realty and <br>Development Inc.</p>
+                      <p class="card-text">Account Number: 0573350294</p>
                   </div>
               </div>
           </div>
       </div>
+      </div>
+      <!-- Button and form for sending proof of payment -->
+      <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#proofOfPaymentModal">
+                Send Proof of Payment
+            </button>
+            <div class="modal fade" id="proofOfPaymentModal" tabindex="-1" aria-labelledby="proofOfPaymentModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="proofOfPaymentModalLabel">Send Proof of Payment</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="proofOfPaymentForm">
+                                <div class="mb-3">
+                                    <label for="proofFile" class="form-label">Upload Proof of Payment:</label>
+                                    <input type="file" class="form-control" id="proofFile" accept=".jpg, .jpeg, .png, .pdf" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="paymentDescription" class="form-label">Description:</label>
+                                    <textarea class="form-control" id="paymentDescription" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
   </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -176,6 +215,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
 
 <script src="script.js"></script>
 
@@ -250,6 +290,67 @@ function displayPaymentReminder() {
             document.querySelector('.nav-link.text-light').removeAttribute('disabled');
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const database = firebase.database();
+
+        // Function to handle form submission for proof of payment
+        document.getElementById('proofOfPaymentForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get the current user
+            const user = firebase.auth().currentUser;
+
+            // Get the file and description input values
+            const file = document.getElementById('proofFile').files[0];
+            const description = document.getElementById('paymentDescription').value;
+
+            // Check if a file is selected
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            // Create a storage reference with a unique filename
+            const storageRef = firebase.storage().ref().child(`proofs/${user.uid}/${file.name}`);
+
+            // Upload the file to Firebase Storage
+            storageRef.put(file).then(function(snapshot) {
+                console.log('File uploaded:', snapshot);
+
+                // Get the download URL of the uploaded file
+                snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                    console.log('File download URL:', downloadURL);
+
+                    // Get the current timestamp
+                    const timestamp = Date.now();
+
+                    // Update the user's node in the database with proof of payment information
+                    database.ref('users/' + user.uid + '/proofOfPayment').push({
+                        downloadURL: downloadURL,
+                        description: description,
+                        timestamp: timestamp
+                    }).then(function() {
+                        alert('Proof of payment submitted successfully.');
+                        // Reset the form
+                        document.getElementById('proofOfPaymentForm').reset();
+                        // Close the modal
+                        const modal = new bootstrap.Modal(document.getElementById('proofOfPaymentModal'));
+                        modal.hide();
+                    }).catch(function(error) {
+                        console.error('Error updating database:', error);
+                        alert('An error occurred. Please try again.');
+                    });
+                }).catch(function(error) {
+                    console.error('Error getting download URL:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            }).catch(function(error) {
+                console.error('Error uploading file:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+    });
   </script>
 
 </body>

@@ -10,6 +10,23 @@
     rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
     crossorigin="anonymous">
 
+    <style>
+      .card {
+          border: 1px solid #dee2e6; /* Aligning borders */
+          border-radius: 10px; /* Rounded corners */
+          margin-bottom: 20px; /* Spacing between cards */
+      }
+
+      .card-img-top {
+          max-height: 100px; /* Limiting image height */
+          object-fit: contain; /* Scaling images */
+      }
+
+      .card-body {
+          text-align: center; /* Centering text */
+      }
+  </style>
+
     <!-- Start of Async Drift Code -->
   <script>
     "use strict";
@@ -44,40 +61,29 @@
   <div class="container mt-5">
       <!-- Back button at the top-left corner -->
       <a href="index.html" class="btn btn-primary">Back</a>
+      
       <h2 class="text-center mb-4">Payment Options</h2>
       <div class="row">
-          <div class="col-md-4">
+          <div class="col-md-6">
               <div class="card">
                   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/BDO_Unibank_%28logo%29.svg/1200px-BDO_Unibank_%28logo%29.svg.png" class="card-img-top" alt="BDO Bank">
                   <div class="card-body">
                       <h5 class="card-title">BDO Bank</h5>
                       <p class="card-text">Pay Through BDO Bank</p>
-                      <p class="card-text">Account Holder: Mega Pines</p>
-                      <p class="card-text">Account Number: 1234567890</p>
+                      <p class="card-text">Account Name: MegaPines Realty and <br>Development Inc.</p>
+                      <p class="card-text">Account Number: 005470412009</p>
                   </div>
               </div>
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-6">
               <div class="card">
                   <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/c2/Bank_of_the_Philippine_Islands_logo.svg/1200px-Bank_of_the_Philippine_Islands_logo.svg.png" class="card-img-top" alt="BPI Bank">
                   <div class="card-body">
                       <h5 class="card-title">BPI Bank </h5>
                       <p class="card-text">Pay Through BPI Bank</p>
-                      <p class="card-text">Account Holder: MegaPines</p>
-                      <p class="card-text">Account Number: 1234567890</p>
-                  </div>
-              </div>
-          </div>
-
-          <div class="col-md-4">
-              <div class="card">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Metropolitan_Bank_and_Trust_Company.svg/2560px-Metropolitan_Bank_and_Trust_Company.svg.png" class="card-img-top" alt="Bank Transfer">
-                  <div class="card-body">
-                      <h5 class="card-title">Metrobank</h5>
-                      <p class="card-text">Transfer funds to our bank account.</p>
-                      <p class="card-text">Account Holder: MegaPines</p>
-                      <p class="card-text">Account Number: 1234567890</p>
+                      <p class="card-text">Account Name: MegaPines Realty and <br>Development Inc.</p>
+                      <p class="card-text">Account Number: 0573350294</p>
                   </div>
               </div>
           </div>
