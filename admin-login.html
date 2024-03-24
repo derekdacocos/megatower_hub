@@ -9,6 +9,8 @@
     rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
     crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
+    <!-- Include Bootstrap Icons CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .alert {
             padding: .75rem 1.25rem;
@@ -47,7 +49,12 @@
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" required>
+                        <button class="btn btn-outline-secondary d-none" type="button" id="togglePassword">
+                            <i class="bi bi-eye-slash-fill"></i>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
@@ -96,6 +103,28 @@
                 });
         });
 
+        // Reference to the password input field and the eye icon
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('togglePassword');
+
+        // Function to toggle password visibility
+        passwordInput.addEventListener('input', function() {
+            // If password input has content, show the eye icon; otherwise, hide it
+            if (passwordInput.value.trim() !== '') {
+                eyeIcon.classList.remove('d-none');
+            } else {
+                eyeIcon.classList.add('d-none');
+            }
+        });
+
+        // Event listener for toggling password visibility
+        eyeIcon.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('bi-eye');
+            this.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+
         function updateLastLogin(uid) {
             // Update lastLogin in the 'admins' collection with the current date and time
             firebase.database().ref(`admins/${uid}`).update({
@@ -113,7 +142,7 @@
 
                         // Check if the user has an 'admin' role
                         if (adminData[adminId].role === 'admin') {
-                            showAlert("Login successful! You are an admin.", "success");
+                            showAlert("Login successful!", "success");
                             // Redirect to the admin dashboard
                             window.location.href = 'admin-dashboard.html';
                         } else {
@@ -132,11 +161,24 @@
 
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');
-            alertDiv.classList.add('alert', `alert-${type}`);
+            alertDiv.classList.add('alert');
+
+            if (type === 'success') {
+                alertDiv.classList.add('alert-success');
+            } else if (type === 'danger') {
+                alertDiv.classList.add('alert-danger');
+            }
+
             alertDiv.setAttribute('role', 'alert');
             alertDiv.innerHTML = message;
             document.body.appendChild(alertDiv);
+            
+            // Remove the alert after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
         }
+
     </script>
 </body>
 </html>
