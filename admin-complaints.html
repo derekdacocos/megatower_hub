@@ -102,43 +102,55 @@
         // Fetch and display complaints
         function displayComplaints() {
             const complaintList = document.getElementById('complaintList');
+            const complaintsArray = []; // Array to store complaints
 
-            // Remove existing content
-            complaintList.innerHTML = "";
+            // Fetch complaints from Firebase and listen for real-time updates
+            database.ref('complaints').orderByChild('submittedAt').on('value', snapshot => {
+                // Clear the complaint list
+                complaintList.innerHTML = "";
+                complaintsArray.length = 0; // Clear the complaints array
 
-            // Fetch complaints from Firebase, order by date and time
-            database.ref('complaints').orderByChild('dateTime').once('value')
-                .then(snapshot => {
-                    snapshot.forEach(childSnapshot => {
-                        const complaint = childSnapshot.val();
-                        const complaintKey = childSnapshot.key;
+                snapshot.forEach(childSnapshot => {
+                    const complaint = childSnapshot.val();
+                    const complaintKey = childSnapshot.key;
 
-                        // Create HTML elements for each complaint
-                        const complaintDiv = document.createElement('div');
-                        complaintDiv.className = 'border p-3 my-3';
+                    const name = complaint.name || "Anonymous";
+                    const complaintMessage = complaint.description;
+                    const dateTime = new Date(complaint.submittedAt).toLocaleString(); // Format dateTime
+                    const resolved = complaint.resolved || false;
 
-                        const name = complaint.name || "Anonymous";
-                        const complaintMessage = complaint.description;
-                        const dateTime = complaint.submittedAt;
-                        const resolved = complaint.resolved || false;
+                    // Create HTML elements for each complaint
+                    const complaintDiv = document.createElement('div');
+                    complaintDiv.className = 'border p-3 my-3';
+                    complaintDiv.id = complaintKey; // Set ID for easy removal later
 
-                        // Determine button text based on resolved status
-                        const buttonText = resolved ? "Mark Unresolved" : "Set as Resolved";
+                    // Determine button text based on resolved status
+                    const buttonText = resolved ? "Mark Unresolved" : "Set as Resolved";
 
-                        complaintDiv.innerHTML = `
-                            <strong>${name}</strong> (${dateTime})<br>
-                            ${complaintMessage}<br>
-                            Resolved: ${resolved ? 'Yes' : 'No'}<br>
-                            <button class="btn btn-success" onclick="toggleResolvedStatus('${complaintKey}', ${resolved})">${buttonText}</button>
-                            <hr>
-                        `;
+                    complaintDiv.innerHTML = `
+                        <strong>${name}</strong> (${dateTime})<br>
+                        ${complaintMessage}<br>
+                        Resolved: ${resolved ? 'Yes' : 'No'}<br>
+                        <button class="btn btn-success" onclick="toggleResolvedStatus('${complaintKey}', ${resolved})">${buttonText}</button>
+                        <hr>
+                    `;
 
-                        complaintList.appendChild(complaintDiv);
+                    // Add the complaint to the array
+                    complaintsArray.push({
+                        key: complaintKey,
+                        element: complaintDiv,
+                        timestamp: complaint.submittedAt
                     });
-                })
-                .catch(error => {
-                    console.error(error.message);
                 });
+
+                // Sort complaints by timestamp
+                complaintsArray.sort((a, b) => b.timestamp - a.timestamp);
+
+                // Append sorted complaints to the complaint list
+                complaintsArray.forEach(complaint => {
+                    complaintList.appendChild(complaint.element);
+                });
+            });
         }
 
         // Function to toggle the resolved status and send notifications
