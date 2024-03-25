@@ -96,7 +96,9 @@
                     <th>Check-In Date</th>
                     <th>Check-Out Date</th>
                     <th>Email</th>
+                    <th>Submitted At</th>
                     <th>Action</th> <!-- Added Action column -->
+                    <th>Proof of Payment</th>
                 </tr>
             </thead>
             <tbody id="reservationTableBody"></tbody>
@@ -117,62 +119,67 @@
     <script>
         const database = firebase.database();
 
+// Define the event listener function separately
+function reservationsValueListener(snapshot) {
+    const reservationTableBody = document.getElementById('reservationTableBody');
+    reservationTableBody.innerHTML = ''; // Clear previous content
 
-        // Function to retrieve and display reservations
-        function displayReservations() {
-            const reservationTableBody = document.getElementById('reservationTableBody');
-            reservationTableBody.innerHTML = ''; // Clear previous content
+    snapshot.forEach((childSnapshot) => {
+        const reservation = childSnapshot.val();
+        let statusColorClass = '';
 
-            // Retrieve data from Firebase Realtime Database
-            database.ref('reservations').once('value')
-                .then((snapshot) => {
-                    snapshot.forEach((childSnapshot) => {
-                        const reservation = childSnapshot.val();
-                        let statusColorClass = '';
-
-                        // Assign color class based on status
-                        if (reservation.status === 'confirmed') {
-                            statusColorClass = 'bg-success';
-                        } else if (reservation.status === 'cancelled') {
-                            statusColorClass = 'bg-danger';
-                        } else if (reservation.status === 'pending') {
-                            statusColorClass = 'bg-warning';
-                        }
-
-                        // Fetch room data based on room UID
-                        const roomId = reservation.roomId;
-                        database.ref('rooms').child(roomId).once('value')
-                            .then((roomSnapshot) => {
-                                const roomData = roomSnapshot.val();
-                                const roomValue = roomData.room; // Assuming 'room' is the property to display
-                                const tableRow = document.createElement('tr');
-                                tableRow.innerHTML = `
-                                    <td>${reservation.fullName}</td>
-                                    <td>${roomValue}</td> <!-- Displaying room value -->
-                                    <td><span class="badge ${statusColorClass} rounded-pill">${reservation.status}</span></td>
-                                    <td>${reservation.checkInDate}</td>
-                                    <td>${reservation.checkOutDate}</td>
-                                    <td>${reservation.email}</td>
-                                    <td>
-                                        <button class="btn ${reservation.status === 'confirmed' ? 'btn-danger' : 'btn-success'}" onclick="toggleReservation('${childSnapshot.key}', '${reservation.status}', this)">
-                                            ${reservation.status === 'confirmed' ? 'Cancel' : 'Confirm'}
-                                        </button>
-                                        <button class="btn btn-warning" onclick="archiveReservation('${childSnapshot.key}')">Archive</button>
-                                    </td>
-                                `;
-                                reservationTableBody.appendChild(tableRow);
-                            })
-                            .catch((error) => {
-                                console.error('Error fetching room data:', error);
-                                alert('Error fetching room data. Please try again.');
-                            });
-                    });
-                })
-                .catch((error) => {
-                    console.error('Error retrieving reservations:', error);
-                    alert('Error retrieving reservations. Please try again.');
-                });
+        // Assign color class based on status
+        if (reservation.status === 'confirmed') {
+            statusColorClass = 'bg-success';
+        } else if (reservation.status === 'cancelled') {
+            statusColorClass = 'bg-danger';
+        } else if (reservation.status === 'pending') {
+            statusColorClass = 'bg-warning';
         }
+
+        // Format submittedAt into a readable format
+        const submittedAtDate = new Date(reservation.submittedAt).toLocaleString();
+
+        // Fetch room data based on room UID
+        const roomId = reservation.roomId;
+        database.ref('rooms').child(roomId).once('value')
+            .then((roomSnapshot) => {
+                const roomData = roomSnapshot.val();
+                const roomValue = roomData.room; // Assuming 'room' is the property to display
+                const tableRow = document.createElement('tr');
+                tableRow.innerHTML = `
+                    <td>${reservation.fullName}</td>
+                    <td>${roomValue}</td>
+                    <td><span class="badge ${statusColorClass} rounded-pill">${reservation.status}</span></td>
+                    <td>${reservation.checkInDate}</td>
+                    <td>${reservation.checkOutDate}</td>
+                    <td>${reservation.email}</td>
+                    <td>${submittedAtDate}</td> <!-- Display readable submittedAt date -->
+                    <td>${reservation.proofOfPaymentURL ? `<a href="${reservation.proofOfPaymentURL}" target="_blank">View Proof</a>` : 'Not Available'}</td>
+                    <td>
+                        <button class="btn ${reservation.status === 'confirmed' ? 'btn-danger' : 'btn-success'}" onclick="toggleReservation('${childSnapshot.key}', '${reservation.status}', this)">
+                            ${reservation.status === 'confirmed' ? 'Cancel' : 'Confirm'}
+                        </button>
+                        <button class="btn btn-warning" onclick="archiveReservation('${childSnapshot.key}')">Archive</button>
+                    </td>
+                `;
+                reservationTableBody.appendChild(tableRow); // Append row to table body
+            })
+            .catch((error) => {
+                console.error('Error fetching room data:', error);
+                alert('Error fetching room data. Please try again.');
+            });
+    });
+}
+
+// Function to retrieve and display reservations
+function displayReservations() {
+    // Detach previous event listener to prevent duplication
+    database.ref('reservations').off('value', reservationsValueListener);
+
+    // Set up new event listener for reservations, ordering by submittedAt in descending order
+    database.ref('reservations').orderByChild('submittedAt').limitToLast(10).on('value', reservationsValueListener);
+}
 
         // Function to send confirmation email
         function sendConfirmationEmail(reservationRef) {

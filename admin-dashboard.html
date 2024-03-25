@@ -269,9 +269,12 @@
             const row = recentRequestsTableBody.insertRow();
             const typeClass = getRequestTypeClass(request.type);
 
+            // Adjusted line to display "Not Available" for undefined descriptions
+            const description = request.description ? request.description : 'Not Available';
+
             row.innerHTML = `
                 <td>${index + 1}</td>
-                <td>${request.description}</td>
+                <td>${description}</td>
                 <td class="${typeClass}">${request.type}</td>
                 <td>${formatDate(request.submittedAt)}</td>
                 <td class="bg-warning">Pending</td>
