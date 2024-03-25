@@ -174,6 +174,44 @@
                 });
         }
 
+        // Function to send confirmation email
+        function sendConfirmationEmail(reservationRef) {
+            reservationRef.once('value', (snapshot) => {
+                const reservationData = snapshot.val();
+                const email = reservationData.email;
+                const subject = 'Reservation Confirmation';
+                // Format check-in and check-out dates into a more readable format
+                const checkInDate = new Date(reservationData.checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const checkOutDate = new Date(reservationData.checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const body = `Dear Guest,\n\nThank you for choosing Megatower Hub! Your reservation from ${checkInDate} to ${checkOutDate} has been confirmed.\n\nBest regards,\nAdmin`;
+                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.open(mailtoLink, '_blank');
+            })
+            .catch((error) => {
+                console.error('Error sending confirmation email:', error);
+                alert('Error sending confirmation email. Please try again.');
+            });
+        }
+
+        // Function to send cancellation email
+        function sendCancellationEmail(reservationRef) {
+            reservationRef.once('value', (snapshot) => {
+                const reservationData = snapshot.val();
+                const email = reservationData.email;
+                const subject = 'Reservation Cancellation';
+                // Format check-in and check-out dates into a more readable format
+                const checkInDate = new Date(reservationData.checkInDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const checkOutDate = new Date(reservationData.checkOutDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const body = `Dear Guest,\n\nWe regret to inform you that your reservation from ${checkInDate} to ${checkOutDate} has been cancelled.\n\nBest regards,\nAdmin`;
+                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.open(mailtoLink, '_blank');
+            })
+            .catch((error) => {
+                console.error('Error sending cancellation email:', error);
+                alert('Error sending cancellation email. Please try again.');
+            });
+        }
+
         // Function to archive reservation
         function archiveReservation(reservationKey) {
             const reservationRef = database.ref('reservations').child(reservationKey);
@@ -210,77 +248,81 @@
         }
 
         // Function to toggle reservation status between 'confirmed' and 'cancelled'
-function toggleReservation(reservationKey, currentStatus, buttonElement) {
-    const reservationRef = database.ref('reservations').child(reservationKey);
-    const newStatus = currentStatus === 'confirmed' ? 'cancelled' : 'confirmed'; // Toggle status
+        function toggleReservation(reservationKey, currentStatus, buttonElement) {
+            const reservationRef = database.ref('reservations').child(reservationKey);
+            const newStatus = currentStatus === 'confirmed' ? 'cancelled' : 'confirmed'; // Toggle status
 
-    // Update reservation status
-    reservationRef.update({
-        status: newStatus
-    })
-    .then(() => {
-        // Update button text based on new status
-        buttonElement.textContent = newStatus === 'confirmed' ? 'Confirm' : 'Cancel';
-        // Success message
-        alert(`Reservation status successfully updated to ${newStatus}.`);
-        
-        if (newStatus === 'confirmed') {
-            // If reservation is confirmed, update booked dates for the room
-            reservationRef.once('value', (snapshot) => {
-                const reservationData = snapshot.val();
-                const roomId = reservationData.roomId;
-                const checkInDate = new Date(reservationData.checkInDate);
-                const checkOutDate = new Date(reservationData.checkOutDate);
-                
-                const bookedDatesRef = database.ref('rooms').child(roomId).child('bookedDates');
-                let currentDate = new Date(checkInDate);
-
-                while (currentDate <= checkOutDate) {
-                    const dateString = currentDate.toISOString().split('T')[0];
-                    bookedDatesRef.child(dateString).set(true); // Set the booked date
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-
+            // Update reservation status
+            reservationRef.update({
+                status: newStatus
+            })
+            .then(() => {
+                // Update button text based on new status
+                buttonElement.textContent = newStatus === 'confirmed' ? 'Confirm' : 'Cancel';
                 // Success message
-                alert('Booked dates updated successfully for the room.');
-                // Refresh the table
-                displayReservations();
-            })
-            .catch((error) => {
-                console.error('Error updating booked dates for the room:', error);
-                alert('Error updating booked dates for the room. Please try again.');
-            });
-        } else if (newStatus === 'cancelled') {
-            // If reservation is cancelled, remove booked dates for the room
-            reservationRef.once('value', (snapshot) => {
-                const reservationData = snapshot.val();
-                const roomId = reservationData.roomId;
-                const checkInDate = reservationData.checkInDate;
-                const checkOutDate = reservationData.checkOutDate;
+                alert(`Reservation status successfully updated to ${newStatus}.`);
                 
-                cancelReservation(reservationKey, roomId, checkInDate, checkOutDate);
+                if (newStatus === 'confirmed') {
+                    // If reservation is confirmed, send email
+                    sendConfirmationEmail(reservationRef);
+
+                    // Also add booked dates for the room
+                    reservationRef.once('value', (snapshot) => {
+                        const reservationData = snapshot.val();
+                        const roomId = reservationData.roomId;
+                        const checkInDate = reservationData.checkInDate;
+                        const checkOutDate = reservationData.checkOutDate;
+                        
+                        addBookedDates(roomId, checkInDate, checkOutDate);
+                    })
+                    .catch((error) => {
+                        console.error('Error adding booked dates for the room:', error);
+                        alert('Error adding booked dates for the room. Please try again.');
+                    });
+                } else if (newStatus === 'cancelled') {
+                    // If reservation is cancelled, send cancellation email
+                    sendCancellationEmail(reservationRef);
+                    // Also remove booked dates for the room
+                    reservationRef.once('value', (snapshot) => {
+                        const reservationData = snapshot.val();
+                        const roomId = reservationData.roomId;
+                        const checkInDate = reservationData.checkInDate;
+                        const checkOutDate = reservationData.checkOutDate;
+                        
+                        cancelReservation(reservationKey, roomId, checkInDate, checkOutDate);
+                    })
+                    .catch((error) => {
+                        console.error('Error removing booked dates for the room:', error);
+                        alert('Error removing booked dates for the room. Please try again.');
+                    });
+                } else {
+                    // Refresh the table for other status changes
+                    displayReservations();
+                }
             })
             .catch((error) => {
-                console.error('Error removing booked dates for the room:', error);
-                alert('Error removing booked dates for the room. Please try again.');
+                // Error message
+                console.error('Error updating reservation status:', error);
+                alert('Error updating reservation status. Please try again.');
             });
-        } else {
-            // Refresh the table for other status changes
+        }
+
+        // Function to add booked dates for the room
+        function addBookedDates(roomId, checkInDate, checkOutDate) {
+            const bookedDatesRef = database.ref('rooms').child(roomId).child('bookedDates');
+            let currentDate = new Date(checkInDate);
+            const endDate = new Date(checkOutDate);
+
+            while (currentDate <= endDate) {
+                const dateString = currentDate.toISOString().split('T')[0];
+                bookedDatesRef.child(dateString).set(true); // Add the booked date
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            alert('Booked dates added successfully.');
             displayReservations();
         }
-    })
-    .catch((error) => {
-        // Error message
-        console.error('Error updating reservation status:', error);
-        alert('Error updating reservation status. Please try again.');
-    });
-}
 
-
-        // Function to reject reservation
-        function rejectReservation(reservationKey) {
-            updateReservationStatus(reservationKey, 'rejected');
-        }
 
         // Function to update reservation status and room check-in/check-out dates
         function updateReservationStatus(reservationKey, status) {
