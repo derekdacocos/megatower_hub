@@ -302,21 +302,22 @@ function fetchRecentDiscussions() {
       }
     });
 
-    // Function to toggle comment input visibility
+    // Function to toggle comment input visibility and fetch comments for the discussion
     function toggleCommentInput(postKey) {
-      console.log('Toggling comment input for postKey:', postKey);
-      var commentSection = document.getElementById('commentSection-' + postKey);
-      console.log('Comment section:', commentSection);
-      if (commentSection) {
-        if (commentSection.style.display === 'none') {
-          commentSection.style.display = 'block';
+        var commentSection = document.getElementById('commentSection-' + postKey);
+        if (commentSection) {
+            if (commentSection.style.display === 'none') {
+                commentSection.style.display = 'block';
+                // Fetch and display comments for this discussion
+                fetchComments(postKey);
+            } else {
+                commentSection.style.display = 'none';
+            }
         } else {
-          commentSection.style.display = 'none';
+            console.error('Comment section not found for postKey:', postKey);
         }
-      } else {
-        console.error('Comment section not found for postKey:', postKey);
-      }
     }
+
 
     // Function to post a comment
     function postComment(postKey) {
@@ -492,7 +493,7 @@ function fetchRecentDiscussions() {
     }
 
     // Function to display matching discussions after search
-    function displayMatchingDiscussions(matchingDiscussions) {
+    function displayMatchingDiscussions(matchingDiscussions, authorName) {
         var recentDiscussionsDiv = document.getElementById('recentDiscussions');
         recentDiscussionsDiv.innerHTML = ''; // Clear previous discussions
         matchingDiscussions.forEach(function(postData) {
@@ -537,6 +538,7 @@ function fetchRecentDiscussions() {
             fetchComments(postKey);
         });
     }
+
   </script>
 
   <script>
