@@ -9,6 +9,14 @@
     rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
     crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .navbar {
+            background-color: #EFBC9B !important;
+        }
+        .btn-action {
+            width: 150px; /* Adjust the width as needed */
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -17,7 +25,7 @@
             <a href="admin-dashboard.html" class="navbar-brand">
                 <img src="src/megatower-hub-icon.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
                 Megatower Hub
-                <span class="text-secondary" style="font-size: 0.8em;">Admin Dashboard</span>
+                <span class="text" style="font-size: 0.8em;">Admin Dashboard</span>
             </a>
 
             <button class="navbar-toggler" 
@@ -84,8 +92,25 @@
     
     <div class="container mt-5">
         <h2>Complaints</h2>
-        <div id="complaintList"></div>
+        <!-- Replace the existing <div> with a table structure -->
+        <div id="complaintList" class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Submitted At</th>
+                        <th>Resolved</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <!-- Use a <tbody> element with id="complaintsTableBody" to dynamically populate complaints -->
+                <tbody id="complaintsTableBody"></tbody>
+            </table>
+        </div>
     </div>
+    
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -101,54 +126,50 @@
 
         // Fetch and display complaints
         function displayComplaints() {
-            const complaintList = document.getElementById('complaintList');
-            const complaintsArray = []; // Array to store complaints
+            const complaintsTableBody = document.getElementById('complaintsTableBody');
+            complaintsTableBody.innerHTML = ''; // Clear the table body
 
-            // Fetch complaints from Firebase and listen for real-time updates
-            database.ref('complaints').orderByChild('submittedAt').on('value', snapshot => {
-                // Clear the complaint list
-                complaintList.innerHTML = "";
-                complaintsArray.length = 0; // Clear the complaints array
+            let count = 1; // Initialize count variable
 
+            database.ref('complaints').orderByChild('submittedAt').limitToLast(10).on('value', snapshot => {
+                const complaintsArray = [];
                 snapshot.forEach(childSnapshot => {
                     const complaint = childSnapshot.val();
                     const complaintKey = childSnapshot.key;
 
                     const name = complaint.name || "Anonymous";
-                    const complaintMessage = complaint.description;
-                    const dateTime = new Date(complaint.submittedAt).toLocaleString(); // Format dateTime
+                    const description = complaint.description || "Not Available";
+                    const submittedAt = new Date(complaint.submittedAt).toLocaleString();
                     const resolved = complaint.resolved || false;
 
-                    // Create HTML elements for each complaint
-                    const complaintDiv = document.createElement('div');
-                    complaintDiv.className = 'border p-3 my-3';
-                    complaintDiv.id = complaintKey; // Set ID for easy removal later
-
-                    // Determine button text based on resolved status
-                    const buttonText = resolved ? "Mark Unresolved" : "Set as Resolved";
-
-                    complaintDiv.innerHTML = `
-                        <strong>${name}</strong> (${dateTime})<br>
-                        ${complaintMessage}<br>
-                        Resolved: ${resolved ? 'Yes' : 'No'}<br>
-                        <button class="btn btn-success" onclick="toggleResolvedStatus('${complaintKey}', ${resolved})">${buttonText}</button>
-                        <hr>
-                    `;
-
-                    // Add the complaint to the array
                     complaintsArray.push({
                         key: complaintKey,
-                        element: complaintDiv,
-                        timestamp: complaint.submittedAt
+                        name: name,
+                        description: description,
+                        submittedAt: submittedAt,
+                        resolved: resolved
                     });
                 });
 
-                // Sort complaints by timestamp
-                complaintsArray.sort((a, b) => b.timestamp - a.timestamp);
+                // Sort complaints by submittedAt in descending order
+                complaintsArray.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 
-                // Append sorted complaints to the complaint list
+                // Populate the table with sorted complaints
                 complaintsArray.forEach(complaint => {
-                    complaintList.appendChild(complaint.element);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${count++}</td>
+                        <td>${complaint.name}</td>
+                        <td>${complaint.description}</td>
+                        <td>${complaint.submittedAt}</td>
+                        <td>${complaint.resolved ? 'Yes' : 'No'}</td>
+                        <td>
+                        <button class="btn btn-success btn-action" onclick="toggleResolvedStatus('${complaint.key}', ${complaint.resolved})">
+                            ${complaint.resolved ? 'Mark Unresolved' : 'Set as Resolved'}
+                        </button>
+                    </td>
+                    `;
+                    complaintsTableBody.appendChild(row);
                 });
             });
         }
