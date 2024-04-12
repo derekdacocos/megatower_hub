@@ -3,6 +3,13 @@ body::before {
   content: '';
   height: 60px;
 }
+.navbar-nav .nav-link, .navbar-brand {
+  color: #000 !important; /* Set text color to black */
+}
+.navbar-nav .nav-link:hover {
+  color: #fff !important; /* Change the color to black on hover */
+  border-bottom: 2px solid #000; /* Add a bottom border on hover */
+}
 
 /* Style for the floating chat icon */
 .chat-icon {

@@ -4,7 +4,7 @@
     top: 0;
     z-index: 99999;
     padding: 25px 0;
-    background-color: rgba(253, 169, 58, 0.8); /* Adjust the alpha value for transparency */
+    background-color: rgba(255, 203, 114, 0.8); /* Adjust the alpha value for transparency */
     backdrop-filter: blur(30px); /* Adjust the blur radius as needed */
     border-radius: 10px; /* Add some border radius for a smoother look */
     padding: 10px 20px; /* Add padding to give some space */
@@ -42,6 +42,10 @@
 
 
 /*slider*/
+.carousel-item img {
+	filter: blur(600px); /* Adjust the blur intensity as needed */
+}
+
 #carouselExampleIndicators{
 	position: relative;
 	height: 100vh;
