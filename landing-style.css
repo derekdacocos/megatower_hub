@@ -7,6 +7,11 @@
 	top: 0;
 	z-index: 99999;
 	padding: 25px 0;
+	background-color: rgba(255, 255, 255, 0.2); /* Adjust the alpha value for transparency */
+    backdrop-filter: blur(30px); /* Adjust the blur radius as needed */
+    border-radius: 10px; /* Add some border radius for a smoother look */
+    padding: 10px 20px; /* Add padding to give some space */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
 }
 .navbar .logo{
 	font-size: 1.5em;
