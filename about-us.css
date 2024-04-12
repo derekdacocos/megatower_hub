@@ -155,23 +155,22 @@ section {
   transform: translateY(-20px);
 }
 
-.contact-form .input-box input[type="submit"]
-{
+.contact-form .input-box input[type="submit"] {
   width: 100%;
-  background: #00bcd4;
-  color: #FFF;
+  background: #ed7209; /* Background color */
+  color: #441b06; /* Text color */
   border: none;
   cursor: pointer;
   padding: 10px;
   font-size: 18px;
-  border: 1px solid #00bcd4;
+  border: 1px solid #ed7209; /* Border color */
   transition: 0.5s;
 }
 
-.contact-form .input-box input[type="submit"]:hover
-{
+.contact-form .input-box input[type="submit"]:hover {
   background: #FFF;
-  color: #00bcd4;
+  color: #c4560a; /* Text color on hover */
+  border-color: #c4560a; /* Border color on hover */
 }
 
 @media (max-width: 991px) {
