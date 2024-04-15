@@ -145,7 +145,6 @@
                       <p><strong>Phone Number:</strong> <span id="phoneNumber"></span></p>
                   </div>
                   <div class="col-md-6">
-                      <p><strong>Date of Birth:</strong> <span id="dateOfBirth"></span></p>
                       <p><strong>Unit Number:</strong> <span id="unitNumber"></span></p>
                   </div>
               </div>
@@ -173,10 +172,6 @@
                 <div class="mb-3">
                     <label for="phoneNumberInput" class="form-label">Phone Number</label>
                     <input type="text" class="form-control" id="phoneNumberInput">
-                </div>
-                <div class="mb-3">
-                    <label for="dateOfBirthInput" class="form-label">Date of Birth</label>
-                    <input type="text" class="form-control" id="dateOfBirthInput">
                 </div>
                 <div class="mb-3">
                     <label for="unitNumberInput" class="form-label">Unit Number</label>
@@ -216,7 +211,6 @@
                             document.getElementById('fullName').textContent = user.fullName;
                             document.getElementById('email').textContent = user.email;
                             document.getElementById('phoneNumber').textContent = user.phoneNumber;
-                            document.getElementById('dateOfBirth').textContent = user.dateOfBirth;
                             document.getElementById('unitNumber').textContent = user.unitNumber;
                         } else {
                             alert('User not found.');
@@ -254,17 +248,14 @@
         function enableProfileEditing() {
             const fullNameSpan = document.getElementById('fullName');
             const phoneNumberSpan = document.getElementById('phoneNumber');
-            const dateOfBirthSpan = document.getElementById('dateOfBirth');
             const unitNumberSpan = document.getElementById('unitNumber');
 
             const fullNameInput = document.getElementById('fullNameInput');
             const phoneNumberInput = document.getElementById('phoneNumberInput');
-            const dateOfBirthInput = document.getElementById('dateOfBirthInput');
             const unitNumberInput = document.getElementById('unitNumberInput');
 
             fullNameInput.value = fullNameSpan.textContent;
             phoneNumberInput.value = phoneNumberSpan.textContent;
-            dateOfBirthInput.value = dateOfBirthSpan.textContent;
             unitNumberInput.value = unitNumberSpan.textContent;
 
             $('#profileUpdateModal').modal('show');
@@ -278,13 +269,11 @@
 
                 const fullName = document.getElementById('fullNameInput').value;
                 const phoneNumber = document.getElementById('phoneNumberInput').value;
-                const dateOfBirth = document.getElementById('dateOfBirthInput').value;
                 const unitNumber = document.getElementById('unitNumberInput').value;
 
                 userProfileRef.update({
                     fullName: fullName,
                     phoneNumber: phoneNumber,
-                    dateOfBirth: dateOfBirth,
                     unitNumber: unitNumber
                 }).then(() => {
                     alert('Profile updated successfully!');
