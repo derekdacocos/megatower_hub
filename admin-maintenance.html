@@ -277,10 +277,10 @@
                                 row.innerHTML = `<td>${sortedRequest.description}</td>
                                                 <td>${sortedRequest.isEmergency ? '<b>ASAP</b>' : (sortedRequest.scheduleDate && sortedRequest.scheduleTime ? sortedRequest.scheduleDate + ' ' + sortedRequest.scheduleTime : 'Not provided')}</td>
                                                 <td>
-                                                    ${sortedRequest.mediaURL ? `<button class="btn btn-primary" onclick="openMediaModal('${sortedRequest.mediaURL}', '${sortedRequest.description}')">View Media</button>` : 'No Media'}
+                                                    ${sortedRequest.mediaURL ? `<button class="btn btn-primary btn-sm" onclick="openMediaModal('${sortedRequest.mediaURL}', '${sortedRequest.description}')">View Media</button>` : 'No Media'}
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-info" onclick="openRemarksModal('${sortedRequest.id}')">Add Remarks</button>
+                                                    <button class="btn btn-info btn-sm" onclick="openRemarksModal('${sortedRequest.id}')">Add Remarks</button>
                                                 </td>
                                                 <td>
                                                     Date Submitted: <b>${formatTimestamp(sortedRequest.submittedAt)}</b> <br>
@@ -288,7 +288,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="dropdown">
-                                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="assignDropdown${sortedRequest.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="assignDropdown${sortedRequest.id}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             ${sortedRequest.assignedTo ? `${sortedRequest.assignedTo}` : 'Assign to'}
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="assignDropdown${sortedRequest.id}">
@@ -300,24 +300,35 @@
                                                 </td>
                                                 `;
 
+                                // Create div for buttons to ensure same width and spacing
+                                const buttonWrapper = document.createElement('div');
+                                buttonWrapper.className = 'btn-group-vertical'; // Display buttons vertically
+                                buttonWrapper.role = 'group';
+
                                 // Button to mark maintenance as done
-                                const cell = row.insertCell();
                                 const doneButton = document.createElement('button');
-                                doneButton.className = 'btn btn-success';
+                                doneButton.className = 'btn btn-success btn-sm rounded-3';
                                 doneButton.innerText = 'Done';
                                 doneButton.addEventListener('click', () => {
                                     markAsDone(sortedRequest);
                                 });
-                                cell.appendChild(doneButton);
+                                buttonWrapper.appendChild(doneButton);
+
+                                // Add margin between buttons
+                                buttonWrapper.appendChild(document.createElement('br'));
 
                                 // Button to apply penalty
                                 const penaltyButton = document.createElement('button');
-                                penaltyButton.className = 'btn btn-warning';
+                                penaltyButton.className = 'btn btn-warning btn-sm rounded-3';
                                 penaltyButton.innerText = 'Penalty';
                                 penaltyButton.addEventListener('click', () => {
                                     applyPenalty(sortedRequest.id);
                                 });
-                                cell.appendChild(penaltyButton);
+                                buttonWrapper.appendChild(penaltyButton);
+
+                                // Add the buttons to the cell
+                                const cell = row.insertCell();
+                                cell.appendChild(buttonWrapper);
 
                                 // Add the 'table-danger' class to the table row if the request is an emergency
                                 if (sortedRequest.isEmergency) {

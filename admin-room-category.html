@@ -636,8 +636,12 @@
                     </td>
                     <td>Status: ${availability}</td>
                     <td>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="editRoom('${key}', '${room}', '${category}', '${capacity}', '${floor}', '${type}', '${price}', '${availability}')">Edit</button>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteRoom('${key}')">Delete</button>
+                        <div style="margin-bottom: 5px;">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="editRoom('${key}', '${room}', '${category}', '${capacity}', '${floor}', '${type}', '${price}', '${availability}')">Edit</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteRoom('${key}')">Delete</button>
+                        </div>
                     </td>
                 `;
                 addedRoomsTableBody.appendChild(tr);

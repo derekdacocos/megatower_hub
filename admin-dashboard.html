@@ -83,53 +83,62 @@
                 </ol>
                 <div class="row">
                     <div class="col-xl-3 col-md-6">
-                        <div class="card bg-primary text-white mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title" id="complaintsCount">Loading...</h5>
-                                <p class="card-text">Complaints</p>
+                        <div class="card bg-danger text-white mb-4">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h5 class="card-title" id="complaintsCount">Loading...</h5>
+                                    <p class="card-text">Complaints</p>
+                                </div>
+                                <div class="small text-white"><i class="fas fa-exclamation-triangle fa-3x"></i></div> <!-- Icon -->
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between">
                                 <a class="small text-white stretched-link" href="admin-complaints.html">View Details</a>
-                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6">
-                        <div class="card bg-warning text-white mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title" id="maintenanceCount">Loading...</h5>
-                                <p class="card-text">Maintenance Requests</p>
+                        <div class="card bg-secondary text-white mb-4">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h5 class="card-title" id="maintenanceCount">Loading...</h5>
+                                    <p class="card-text">Maintenance Requests</p>
+                                </div>
+                                <div class="small text-white"><i class="fas fa-tools fa-3x"></i></div> <!-- Icon -->
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between">
                                 <a class="small text-white stretched-link" href="admin-maintenance.html">View Details</a>
-                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6">
                         <div class="card bg-success text-white mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title" id="cleaningCount">Loading...</h5>
-                                <p class="card-text">Cleaning Requests</p>
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h5 class="card-title" id="cleaningCount">Loading...</h5>
+                                    <p class="card-text">Cleaning Requests</p>
+                                </div>
+                                <div class="small text-white"><i class="fas fa-broom fa-3x"></i></div> <!-- Icon -->
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between">
                                 <a class="small text-white stretched-link" href="admin-cleaning.html">View Details</a>
-                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6">
-                        <div class="card bg-danger text-white mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title" id="reservationCount">Loading...</h5>
-                                <p class="card-text">Reservation Requests</p>
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h5 class="card-title" id="reservationCount">Loading...</h5>
+                                    <p class="card-text">Reservation Requests</p>
+                                </div>
+                                <div class="small text-white"><i class="fas fa-calendar-alt fa-3x"></i></div> <!-- Icon -->
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between">
                                 <a class="small text-white stretched-link" href="admin-reservations.html">View Details</a>
-                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
                     </div>
+                    
                 </div>
                 <div class="row">
                     <div class="col-xl-12">
@@ -272,19 +281,19 @@
 
         unresolvedRequests.slice(0, 10).forEach((request, index) => {
             const row = recentRequestsTableBody.insertRow();
-            const typeClass = getRequestTypeClass(request.type);
-
+            
             // Adjusted line to display "Not Available" for undefined descriptions
             const description = request.description ? request.description : 'Not Available';
 
             row.innerHTML = `
                 <td>${index + 1}</td>
                 <td>${description}</td>
-                <td class="${typeClass}">${request.type}</td>
+                <td>${request.type}</td>
                 <td>${formatDate(request.submittedAt)}</td>
-                <td class="bg-warning">Pending</td>
+                <td><span class="badge rounded-pill bg-warning">Pending</span></td> <!-- Applied badge class for rounded pill and background color -->
             `;
         });
+
     }
 
     function formatDate(timestamp) {
