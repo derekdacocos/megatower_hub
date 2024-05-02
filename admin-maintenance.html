@@ -275,7 +275,7 @@
                             sortedRequests.forEach((sortedRequest) => {
                                 const row = maintenanceQueue.insertRow();
                                 row.innerHTML = `<td>${sortedRequest.description}</td>
-                                                <td>${sortedRequest.isEmergency ? '<b>ASAP</b>' : (sortedRequest.scheduleDate && sortedRequest.scheduleTime ? sortedRequest.scheduleDate + ' ' + sortedRequest.scheduleTime : 'Not provided')}</td>
+                                                <td>${sortedRequest.isEmergency ? '<b>URGENT</b>' : (sortedRequest.scheduleDate && sortedRequest.scheduleTime ? sortedRequest.scheduleDate + ' ' + sortedRequest.scheduleTime : 'Not provided')}</td>
                                                 <td>
                                                     ${sortedRequest.mediaURL ? `<button class="btn btn-primary btn-sm" onclick="openMediaModal('${sortedRequest.mediaURL}', '${sortedRequest.description}')">View Media</button>` : 'No Media'}
                                                 </td>
