@@ -167,6 +167,69 @@
           <span class="visually-hidden">Loading...</span>
       </div>
     </div>
+
+    <!-- Modal for reporting -->
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="reportModalLabel">Report Post</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Let us know why you're reporting this post:</p>
+            <form id="reportForm">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="reason1" value="Inappropriate Content">
+                <label class="form-check-label" for="reason1">
+                  Inappropriate Content
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="reason2" value="Hate Speech">
+                <label class="form-check-label" for="reason2">
+                  Hate Speech
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="reason3" value="Spam">
+                <label class="form-check-label" for="reason3">
+                  Spam
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="reason4" value="False Information">
+                <label class="form-check-label" for="reason4">
+                  False Information
+                </label>
+              </div>
+              <div class="mb-3">
+                <label for="otherReasons" class="form-label">Others</label>
+                <textarea class="form-control" id="otherReasons" rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary mt-3 float-end">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>    
+
+<script>
+  // Function to handle report submission
+  document.getElementById('reportForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
+    var reasons = []; // Array to store selected reasons
+    // Check each checkbox and add selected reasons to the array
+    document.querySelectorAll('#reportForm input[type="checkbox"]:checked').forEach(function(checkbox) {
+      reasons.push(checkbox.value);
+    });
+    // Store the report in Firebase or perform any other desired action
+    console.log('Report submitted with reasons:', reasons);
+    // Close the modal after submission
+    $('#reportModal').modal('hide');
+  });
+</script>
+
   
   <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
@@ -182,6 +245,39 @@
   <script src="script.js"></script>
 
   <script>
+    // Function to handle Firebase Authentication state changes
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in
+        // Display username or any other information if needed
+        console.log('User is signed in:', user.displayName);
+
+        const userUID = user.uid;
+
+        // Check if the user has a penaltyUntil date in the users node
+        const userRef = firebase.database().ref(`users/${userUID}`);
+        userRef.once('value', (snapshot) => {
+          const userData = snapshot.val();
+          if (userData && userData.penaltyUntil) {
+            const penaltyUntil = userData.penaltyUntil;
+            const currentDate = new Date().getTime();
+            if (penaltyUntil > currentDate) {
+              // User has a penalty, disable access to the forum page and show a message
+              window.location.href = 'home-page.html'; // Redirect to a page indicating the penalty
+              const formattedDate = new Date(penaltyUntil).toLocaleString();
+              const penaltyMessage = `A suspension has been applied to your account due to violation of community guidelines. You will not be able to access the forum until ${formattedDate}.`;
+              alert(penaltyMessage); // You can customize this message as per your UI design
+            }
+          }
+        });
+
+      } else {
+        // User is signed out
+        // Redirect or handle accordingly
+        console.log('User is signed out');
+      }
+    });
+
     // Reference to the Firebase Realtime Database
     var database = firebase.database();
 
@@ -224,7 +320,17 @@ function fetchRecentDiscussions() {
 
         // Append discussion post to the recentDiscussions div
         var discussionHTML = `
-        <div class="card mt-3">
+        <div class="card mt-3 position-relative">
+          <div class="dropdown">
+            <button class="btn btn-link position-absolute top-0 end-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-item" onclick="reportPost('${postKey}')">
+                Report
+              </div>
+            </ul>
+          </div>
           <div class="card-body">
             <h5 class="card-title">${postData.title}</h5>
             <p class="card-text">${postData.content}</p>
@@ -542,6 +648,100 @@ function fetchRecentDiscussions() {
             // Fetch and display comments for this discussion
             fetchComments(postKey);
         });
+    }
+
+    // Function to show options menu (Kebab button)
+    function showOptionsMenu(event, postKey) {
+      event.stopPropagation();
+      var optionsMenu = event.target.closest('.dropdown').querySelector('.dropdown-menu');
+      var postAuthorUID = getPostAuthorUID(postKey);
+
+      // Check if the post was authored by the current user
+      if (postAuthorUID !== firebase.auth().currentUser.uid) {
+        optionsMenu.classList.toggle('show');
+        // Remove options menu when clicking outside of it
+        document.addEventListener('click', function closeOptionsMenu() {
+          optionsMenu.classList.remove('show');
+          document.removeEventListener('click', closeOptionsMenu);
+        });
+      }
+    }
+
+    // Function to handle reporting a post
+    function reportPost(postKey) {
+      $('#reportModal').modal('show'); // Show the report modal
+    }
+
+    // Function to get the author UID of a post
+    function getPostAuthorUID(postKey) {
+      var postRef = database.ref('discussions/' + postKey + '/authorUID');
+      return postRef.once('value').then(function(snapshot) {
+        return snapshot.val();
+      });
+    }
+
+    // Function to handle reporting a post
+    function reportPost(postKey) {
+      // Get the current user
+      var currentUser = firebase.auth().currentUser;
+
+      // Check if the user is logged in
+      if (currentUser) {
+        // Show the report modal
+        $('#reportModal').modal('show');
+
+        // Get a reference to the reports node in Firebase
+        var reportsRef = database.ref('reports');
+
+        // Fetch the authorUID of the reported post
+        database.ref('discussions/' + postKey + '/authorUID').once('value').then(function(snapshot) {
+          var authorUID = snapshot.val();
+
+          // Handle form submission inside the report modal
+          document.getElementById('reportForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Get the reason(s) for the report
+            var reasons = [];
+            document.querySelectorAll('#reportForm input[type="checkbox"]:checked').forEach(function(checkbox) {
+              reasons.push(checkbox.value);
+            });
+
+            // Additional reasons if any
+            var otherReasons = document.getElementById('otherReasons').value.trim();
+            if (otherReasons !== '') {
+              reasons.push(otherReasons);
+            }
+
+            // Create a report object
+            var reportData = {
+              postKey: postKey,
+              authorUID: authorUID,
+              reportedBy: currentUser.uid,
+              reasons: reasons
+            };
+
+            // Push the report data to Firebase
+            reportsRef.push(reportData)
+              .then(function() {
+                console.log('Report submitted:', reportData);
+                // Close the report modal after submission
+                $('#reportModal').modal('hide');
+              })
+              .catch(function(error) {
+                console.error('Error submitting report:', error.message);
+                // Handle error
+              });
+          });
+        }).catch(function(error) {
+          console.error('Error fetching authorUID:', error.message);
+          // Handle error
+        });
+      } else {
+        // If the user is not logged in, redirect to the login page or show a message
+        console.log('User not logged in');
+        // You can redirect or display a message to prompt the user to log in
+      }
     }
 
   </script>
