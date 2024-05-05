@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="x-icon" href="src/megatower-hub-iconx.png">
+    <title>Admin Confirmation</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .navbar {
+            background-color: #EFBC9B !important;
+        }
+      </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top">
+        <div class="container">
+            <a href="admin-dashboard.html" class="navbar-brand">
+                <img src="src/megatower-hub-icon.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2">
+                Megatower Hub
+                <span class="text" style="font-size: 0.8em;">Admin Dashboard</span>
+            </a>
+
+            <button class="navbar-toggler" 
+            type="button" 
+            data-bs-toggle="collapse" 
+            data-bs-target="#navmenu" 
+            aria-controls="navmenu" 
+            aria-expanded="false" 
+            aria-label="Toggle navigation menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light" id="notificationsLink">Notifications <span id="unreadCountBadge" class="badge bg-danger"></span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin-complaints.html" class="nav-link text-light">Complaints</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Request
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="admin-maintenance.html">Maintenance</a>
+                            <a class="dropdown-item" href="admin-cleaning.html">Cleaning</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="roomsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Rooms
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="roomsDropdown">
+                            <a class="dropdown-item" href="admin-room-category.html">Room Category</a>
+                            <a class="dropdown-item" href="admin-reservations.html">Reservations</a> <!-- Added link to reservations -->
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="usersDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Users
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="usersDropdown">
+                            <a class="dropdown-item" href="user-management.html">User Management</a>
+                            <a class="dropdown-item" href="admin-payments.html">Payments</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="admin-reports.html" class="nav-link text-light">Forum</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-light" onclick="logout()" id="logoutBtn">Logout</a>
+                    </li> 
+                </ul>
+            </div>
+        </div>   
+    </nav>
+
+    <!-- Admin Notifications Modal -->
+    <div class="modal fade" id="adminNotificationsModal" tabindex="-1" aria-labelledby="adminNotificationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="adminNotificationsModalLabel">Admin Notifications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Notifications will be populated dynamically here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Payment Confirmation</h2>
+        <!-- Button to open the modal for confirmed payments -->
+        <button type="button" class="btn btn-primary mb-3" onclick="openConfirmedPaymentsModal()">View Confirmed Payments</button>
+        <table class="table table-striped" id="paymentTable">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Description</th>
+                    <th>Date Submitted</th>
+                    <th>Proof of Payment</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="paymentTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+    
+    <script src="admin-notifications.js"></script>
+
+    <script>
+        const database = firebase.database();
+        let lastTimestamp = 0;
+
+        // Fetch and display payment data
+        function fetchPayments() {
+            const paymentTableBody = document.getElementById('paymentTableBody');
+            paymentTableBody.innerHTML = ''; // Clear previous data
+            
+            database.ref('proofs').once('value')
+                .then((snapshot) => {
+                    const payments = snapshot.val();
+                    if (payments) {
+                        // Convert object to array for sorting
+                        const paymentArray = Object.entries(payments).map(([key, value]) => ({ key, ...value }));
+                        // Sort by newest Date Submitted
+                        paymentArray.sort((a, b) => b.timestamp - a.timestamp);
+                        // Create an array of promises to fetch and create rows asynchronously
+                        const promises = paymentArray.map(payment => createPaymentRow(payment));
+                        // Wait for all promises to resolve
+                        Promise.all(promises)
+                            .then(rows => {
+                                rows.forEach(row => {
+                                    paymentTableBody.appendChild(row);
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error creating payment rows:', error);
+                            });
+                    } else {
+                        const noPaymentsRow = document.createElement('tr');
+                        noPaymentsRow.innerHTML = '<td colspan="5">No payments awaiting confirmation.</td>';
+                        paymentTableBody.appendChild(noPaymentsRow);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching payments:', error);
+                });
+        }
+
+        // Function to create a table row for payment data
+        function createPaymentRow(payment) {
+            return new Promise((resolve, reject) => {
+                database.ref('users/' + payment.userId).once('value')
+                    .then((snapshot) => {
+                        const user = snapshot.val();
+                        const fullName = user ? user.fullName : 'Unknown';
+                        const description = payment.description || 'No Description';
+                        const submissionDate = new Date(payment.timestamp);
+                        const formattedDate = submissionDate.toLocaleString();
+                        const paymentRow = document.createElement('tr');
+                        paymentRow.innerHTML = `
+                            <td>${fullName}</td>
+                            <td>${description}</td>
+                            <td>${formattedDate}</td>
+                            <td><a href="${payment.downloadURL}" target="_blank">View Proof</a></td>
+                            <td><button type="button" class="btn btn-primary" onclick="confirmPayment('${payment.key}')">Confirm Payment</button></td>
+                        `;
+                        resolve(paymentRow);
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    });
+            });
+        }
+
+        // Function to confirm payment
+        function confirmPayment(paymentKey) {
+            if (window.confirm("Are you sure you want to confirm this payment?")) {
+                // Get the payment data
+                database.ref('proofs/' + paymentKey).once('value')
+                    .then((snapshot) => {
+                        const paymentData = snapshot.val();
+                        // Add a timestamp for confirmation
+                        const confirmationTimestamp = firebase.database.ServerValue.TIMESTAMP;
+                        paymentData.confirmationTimestamp = confirmationTimestamp;
+                        // Move the payment data to the confirmedPayments node
+                        database.ref('confirmedPayments').push(paymentData)
+                            .then(() => {
+                                console.log('Payment confirmed and moved to confirmedPayments node.');
+                                // Remove the payment from the proofs node
+                                return database.ref('proofs/' + paymentKey).remove();
+                            })
+                            .then(() => {
+                                console.log('Payment removed from database.');
+                                // Refresh payment list
+                                fetchPayments();
+                            })
+                            .catch((error) => {
+                                console.error('Error moving payment to confirmedPayments node:', error);
+                            });
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching payment data:', error);
+                    });
+            }
+        }
+
+        // Function to fetch and display confirmed payments in a modal
+        function fetchConfirmedPayments() {
+            const confirmedPaymentsModalBody = document.getElementById('confirmedPaymentsModalBody');
+            confirmedPaymentsModalBody.innerHTML = ''; // Clear previous data
+
+            database.ref('confirmedPayments').once('value')
+                .then((snapshot) => {
+                    const confirmedPayments = snapshot.val();
+                    if (confirmedPayments) {
+                        // Convert object to array for sorting
+                        const paymentArray = Object.entries(confirmedPayments).map(([key, value]) => ({ key, ...value }));
+                        // Sort by newest Date Confirmed
+                        paymentArray.sort((a, b) => b.confirmationTimestamp - a.confirmationTimestamp);
+                        // Create an array of promises to create rows asynchronously
+                        const promises = paymentArray.map(payment => createConfirmedPaymentRow(payment));
+                        // Wait for all promises to resolve
+                        Promise.all(promises)
+                            .then(rows => {
+                                rows.forEach(row => {
+                                    confirmedPaymentsModalBody.appendChild(row);
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error creating payment rows:', error);
+                            });
+                    } else {
+                        const noConfirmedPaymentsRow = document.createElement('tr');
+                        noConfirmedPaymentsRow.innerHTML = '<td colspan="5">No confirmed payments.</td>';
+                        confirmedPaymentsModalBody.appendChild(noConfirmedPaymentsRow);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching confirmed payments:', error);
+                });
+        }
+
+        // Function to create a table row for confirmed payment data in the modal
+        function createConfirmedPaymentRow(payment) {
+            return new Promise((resolve, reject) => {
+                database.ref('users/' + payment.userId).once('value')
+                    .then((snapshot) => {
+                        const user = snapshot.val();
+                        const fullName = user ? user.fullName : 'Unknown';
+                        const description = payment.description || 'No Description';
+                        const confirmationDate = new Date(payment.confirmationTimestamp);
+                        const formattedConfirmationDate = confirmationDate.toLocaleString();
+                        const submissionDate = new Date(payment.timestamp);
+                        const formattedSubmissionDate = submissionDate.toLocaleString();
+                        const paymentRow = document.createElement('tr');
+                        paymentRow.innerHTML = `
+                            <td>${fullName}</td>
+                            <td>${description}</td>
+                            <td>${formattedSubmissionDate}</td>
+                            <td><a href="${payment.downloadURL}" target="_blank">View</a></td>
+                            <td>${formattedConfirmationDate}</td>
+                        `;
+                        resolve(paymentRow);
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    });
+            });
+        }
+
+        // Call fetchPayments function when the page loads
+        window.onload = function() {
+            fetchPayments();
+        };
+
+        // Function to open the modal and fetch confirmed payments
+        function openConfirmedPaymentsModal() {
+            fetchConfirmedPayments();
+            $('#confirmedPaymentsModal').modal('show');
+        }
+    </script>
+
+    <!-- Modal for Confirmed Payments -->
+    <div class="modal fade" id="confirmedPaymentsModal" tabindex="-1" aria-labelledby="confirmedPaymentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmedPaymentsModalLabel">Confirmed Payments</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Description</th>
+                                <th>Date Submitted</th>
+                                <th>Proof</th>
+                                <th>Date Confirmed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="confirmedPaymentsModalBody"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -175,9 +175,39 @@
               </div>
           </div>
       </div>
+      <!-- Submit Button for Proof of Payment -->
+      <div class="text-center mt-4">
+        <button id="proofOfPaymentSubmit" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#proofOfPaymentModal">Submit Proof of Payment</button>
+      </div>
       </div>
     </div>
   </div>
+
+  <!-- Proof of Payment Modal -->
+<div class="modal fade" id="proofOfPaymentModal" tabindex="-1" aria-labelledby="proofOfPaymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="proofOfPaymentModalLabel">Submit Proof of Payment</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <!-- Proof of Payment Form -->
+              <form id="proofOfPaymentForm">
+                  <div class="mb-3">
+                      <label for="proofFile" class="form-label">Select File:</label>
+                      <input type="file" class="form-control" id="proofFile" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="paymentDescription" class="form-label">Description:</label>
+                      <textarea class="form-control" id="paymentDescription" rows="3"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
@@ -284,7 +314,7 @@ function displayPaymentReminder() {
             }
 
             // Create a storage reference with a unique filename
-            const storageRef = firebase.storage().ref().child(`proofs/${user.uid}/${file.name}`);
+            const storageRef = firebase.storage().ref().child(`proofs/${file.name}`);
 
             // Upload the file to Firebase Storage
             storageRef.put(file).then(function(snapshot) {
@@ -297,8 +327,9 @@ function displayPaymentReminder() {
                     // Get the current timestamp
                     const timestamp = Date.now();
 
-                    // Update the user's node in the database with proof of payment information
-                    database.ref('users/' + user.uid + '/proofOfPayment').push({
+                    // Push proof of payment information directly into the "proofs" folder
+                    database.ref('proofs').push({
+                        userId: user.uid,
                         downloadURL: downloadURL,
                         description: description,
                         timestamp: timestamp
