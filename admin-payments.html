@@ -297,6 +297,27 @@
         }
     </script>
 
+    <script>
+        // Function to handle logout
+        function logout() {
+            // Check if a user is authenticated
+            const user = firebase.auth().currentUser;
+            if (user) {
+                // If authenticated, sign out
+                firebase.auth().signOut().then(() => {
+                    // Sign-out successful.
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    // An error happened.
+                    console.error('Logout error:', error);
+                });
+            } else {
+                // If not authenticated, redirect to index.html
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+
     <!-- Modal for Confirmed Payments -->
     <div class="modal fade" id="confirmedPaymentsModal" tabindex="-1" aria-labelledby="confirmedPaymentsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
