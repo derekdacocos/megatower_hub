@@ -340,6 +340,14 @@ function displayPaymentReminder() {
                         // Close the modal
                         const modal = new bootstrap.Modal(document.getElementById('proofOfPaymentModal'));
                         modal.hide();
+
+                        // Push notification to adminNotifications
+                        database.ref('adminNotifications').push({
+                            isRead: false,
+                            message: "A new proof of payment has been submitted. Check payments page.",
+                            submittedAt: new Date().toISOString(), // Use current time as submittedAt
+                            type: "payment"
+                        });
                     }).catch(function(error) {
                         console.error('Error updating database:', error);
                         alert('An error occurred. Please try again.');

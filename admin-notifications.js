@@ -35,7 +35,7 @@ function fetchAdminNotifications() {
             const submittedAt = new Date(notification.submittedAt).toLocaleString(); // Get submittedAt
             const capitalizedType = notification.type.charAt(0).toUpperCase() + notification.type.slice(1); // Capitalize the first letter
             notificationElement.innerHTML = `
-                <h6 class="text-${notification.type === 'Maintenance' ? 'warning' : 'success'}">${capitalizedType} Request</h6>
+                <h6 class="text-${notification.type === 'Maintenance' ? 'warning' : 'success'}">${capitalizedType} Notification</h6>
                 <p class="mb-1">${notification.message}</p> <!-- Message -->
                 <small class="text-muted">${submittedAt}</small> <!-- SubmittedAt -->
             `;

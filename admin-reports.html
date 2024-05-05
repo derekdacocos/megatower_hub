@@ -240,10 +240,47 @@
 
     // Function to delete the reported post
     function deletePost(reportKey, postKey) {
-      // Delete the post from Firebase
-      database.ref('discussions/' + postKey).remove();
-      // Refresh the reports list
-      fetchReports();
+        // Delete the post from Firebase
+        database.ref('discussions/' + postKey).remove()
+        .then(function() {
+            // Once the post is deleted, send notification to the user who reported it
+            database.ref('reports/' + reportKey).once('value').then(function(snapshot) {
+                var reportData = snapshot.val();
+                var reportedByUID = reportData.reportedBy;
+
+                // Get the current date and time for dateTime
+                var dateTime = Date.now();
+
+                // Create the notification data
+                var notificationData = {
+                    dateTime: dateTime,
+                    isRead: false,
+                    notification: "The post you reported has been successfully removed. Thank you for helping maintain our community standards."
+                };
+
+                // Push the notification data to the user's notifications node
+                var userNotificationsRef = database.ref('users/' + reportedByUID + '/notifications');
+                userNotificationsRef.push(notificationData)
+                .then(function() {
+                    console.log('Notification sent to user:', notificationData);
+                    // Refresh the reports list
+                    fetchReports();
+                })
+                .catch(function(error) {
+                    console.error('Error sending notification:', error.message);
+                    // Refresh the reports list
+                    fetchReports();
+                });
+            }).catch(function(error) {
+                console.error('Error fetching report data:', error.message);
+                // Refresh the reports list
+                fetchReports();
+            });
+        }).catch(function(error) {
+            console.error('Error deleting post:', error.message);
+            // Refresh the reports list
+            fetchReports();
+        });
     }
 
     // Function to set the authorUID when "Suspend Author" button is clicked

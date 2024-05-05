@@ -682,66 +682,84 @@ function fetchRecentDiscussions() {
 
     // Function to handle reporting a post
     function reportPost(postKey) {
-      // Get the current user
-      var currentUser = firebase.auth().currentUser;
+        // Get the current user
+        var currentUser = firebase.auth().currentUser;
 
-      // Check if the user is logged in
-      if (currentUser) {
-        // Show the report modal
-        $('#reportModal').modal('show');
+        // Check if the user is logged in
+        if (currentUser) {
+            // Show the report modal
+            $('#reportModal').modal('show');
 
-        // Get a reference to the reports node in Firebase
-        var reportsRef = database.ref('reports');
+            // Get a reference to the reports node in Firebase
+            var reportsRef = database.ref('reports');
+            var adminNotificationsRef = database.ref('adminNotifications');
 
-        // Fetch the authorUID of the reported post
-        database.ref('discussions/' + postKey + '/authorUID').once('value').then(function(snapshot) {
-          var authorUID = snapshot.val();
+            // Fetch the authorUID of the reported post
+            database.ref('discussions/' + postKey + '/authorUID').once('value').then(function(snapshot) {
+                var authorUID = snapshot.val();
 
-          // Handle form submission inside the report modal
-          document.getElementById('reportForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+                // Handle form submission inside the report modal
+                document.getElementById('reportForm').addEventListener('submit', function(event) {
+                    event.preventDefault(); // Prevent default form submission
 
-            // Get the reason(s) for the report
-            var reasons = [];
-            document.querySelectorAll('#reportForm input[type="checkbox"]:checked').forEach(function(checkbox) {
-              reasons.push(checkbox.value);
-            });
+                    // Get the reason(s) for the report
+                    var reasons = [];
+                    document.querySelectorAll('#reportForm input[type="checkbox"]:checked').forEach(function(checkbox) {
+                        reasons.push(checkbox.value);
+                    });
 
-            // Additional reasons if any
-            var otherReasons = document.getElementById('otherReasons').value.trim();
-            if (otherReasons !== '') {
-              reasons.push(otherReasons);
-            }
+                    // Additional reasons if any
+                    var otherReasons = document.getElementById('otherReasons').value.trim();
+                    if (otherReasons !== '') {
+                        reasons.push(otherReasons);
+                    }
 
-            // Create a report object
-            var reportData = {
-              postKey: postKey,
-              authorUID: authorUID,
-              reportedBy: currentUser.uid,
-              reasons: reasons
-            };
+                    // Create a report object
+                    var reportData = {
+                        postKey: postKey,
+                        authorUID: authorUID,
+                        reportedBy: currentUser.uid,
+                        reasons: reasons
+                    };
 
-            // Push the report data to Firebase
-            reportsRef.push(reportData)
-              .then(function() {
-                console.log('Report submitted:', reportData);
-                // Close the report modal after submission
-                $('#reportModal').modal('hide');
-              })
-              .catch(function(error) {
-                console.error('Error submitting report:', error.message);
+                    // Push the report data to Firebase
+                    reportsRef.push(reportData)
+                    .then(function() {
+                        console.log('Report submitted:', reportData);
+                        // Close the report modal after submission
+                        $('#reportModal').modal('hide');
+
+                        // Add data to adminNotifications node
+                        var adminNotificationData = {
+                            isRead: false,
+                            message: "A user reported a post in community forum. Check forum reports page.",
+                            submittedAt: new Date().toISOString(),
+                            type: "report"
+                        };
+
+                        // Push data to adminNotifications node
+                        adminNotificationsRef.push(adminNotificationData)
+                        .then(function() {
+                            console.log('Admin notification added:', adminNotificationData);
+                        })
+                        .catch(function(error) {
+                            console.error('Error adding admin notification:', error.message);
+                        });
+                    })
+                    .catch(function(error) {
+                        console.error('Error submitting report:', error.message);
+                        // Handle error
+                    });
+                });
+            }).catch(function(error) {
+                console.error('Error fetching authorUID:', error.message);
                 // Handle error
-              });
-          });
-        }).catch(function(error) {
-          console.error('Error fetching authorUID:', error.message);
-          // Handle error
-        });
-      } else {
-        // If the user is not logged in, redirect to the login page or show a message
-        console.log('User not logged in');
-        // You can redirect or display a message to prompt the user to log in
-      }
+            });
+        } else {
+            // If the user is not logged in, redirect to the login page or show a message
+            console.log('User not logged in');
+            // You can redirect or display a message to prompt the user to log in
+        }
     }
 
   </script>

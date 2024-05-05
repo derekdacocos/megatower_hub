@@ -208,6 +208,8 @@
                             })
                             .then(() => {
                                 console.log('Payment removed from database.');
+                                // Notify the user about the confirmation
+                                notifyUserAboutConfirmation(paymentData.userId, paymentData.timestamp);
                                 // Refresh payment list
                                 fetchPayments();
                             })
@@ -219,6 +221,32 @@
                         console.error('Error fetching payment data:', error);
                     });
             }
+        }
+
+        // Function to notify the user about the confirmation
+        function notifyUserAboutConfirmation(userId, paymentTimestamp) {
+            // Convert paymentTimestamp to a Date object
+            const paymentDate = new Date(paymentTimestamp);
+            // Format paymentDate as a readable date string
+            const paymentDateString = paymentDate.toLocaleString(); // You can adjust the locale and formatting options as needed
+            // Get the current timestamp in milliseconds
+            const confirmationTimestamp = Date.now();
+            // Construct the notification message
+            const notificationMessage = `The proof of payment you submitted on ${paymentDateString} has been confirmed.`;
+            // Prepare notification data
+            const notificationData = {
+                dateTime: confirmationTimestamp,
+                isRead: false,
+                notification: notificationMessage
+            };
+            // Push notification to the user's node
+            database.ref('users/' + userId + '/notifications').push(notificationData)
+                .then(() => {
+                    console.log('Notification sent to the user.');
+                })
+                .catch((error) => {
+                    console.error('Error sending notification to the user:', error);
+                });
         }
 
         // Function to fetch and display confirmed payments in a modal
