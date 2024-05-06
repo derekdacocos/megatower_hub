@@ -53,7 +53,7 @@ var firebaseConfig = {
 
         // Ensure you are using the correct property names as stored in your Firebase database
         notificationElement.innerHTML = `
-            <h6 class="text-warning">${notification.title || 'Notification'}</h6>
+            <h6 class="text-warning"><i class="fas fa-bell"></i> ${notification.title || 'Notification'}</h6>
             <p class="mb-1">${notification.notification || 'No message'}</p>
             <small class="text-muted">${dateTime}</small> <!-- Display time -->
         `;

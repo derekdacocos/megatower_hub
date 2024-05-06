@@ -21,10 +21,6 @@
                     <input type="text" class="form-control" id="fullName" required>
                 </div>
                 <div class="mb-3">
-                    <label for="dob" class="form-label">Date of Birth</label>
-                    <input type="date" class="form-control" id="dob" required>
-                </div>
-                <div class="mb-3">
                     <label for="phoneNumber" class="form-label">Phone Number</label>
                     <input type="tel" class="form-control" id="phoneNumber" required>
                 </div>
@@ -64,7 +60,6 @@
                     e.preventDefault();
 
                     const fullName = document.getElementById('fullName').value;
-                    const dob = document.getElementById('dob').value;
                     const phoneNumber = document.getElementById('phoneNumber').value;
                     const unitNumber = document.getElementById('unitNumber').value;
 
@@ -79,7 +74,6 @@
 
                     userRef.update({
                         fullName: fullName,
-                        dateOfBirth: dob,
                         phoneNumber: phoneNumber,
                         unitNumber: unitNumber,
                         lastLogin: firebase.database.ServerValue.TIMESTAMP
