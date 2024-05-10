@@ -114,12 +114,11 @@
                     <th>Full Name</th>
                     <th>Email</th>
                     <th>Phone Number</th>
-                    <th>Date of Birth</th>
                     <th>Role</th>
                     <th>Last Login</th>
                     <th>Unit Number</th>
                     <th>Payment Date</th>
-                    <th>Actions</th> <!-- New column for edit and delete buttons -->
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="userTableBody"></tbody>
@@ -227,22 +226,31 @@
                         users.push({ userId, ...user });
                     });
 
-                    // Sort users based on lastLogin timestamp in descending order
-                    users.sort((a, b) => b.lastLogin - a.lastLogin);
+                    // Sort users based on fullName, with fullName presence prioritized
+                    users.sort((a, b) => {
+                        if (a.fullName && !b.fullName) return -1;
+                        if (!a.fullName && b.fullName) return 1;
+                        if (a.fullName && b.fullName) {
+                            return a.fullName.localeCompare(b.fullName);
+                        }
+                        return 0;
+                    });
 
                     // Render users in the table
                     users.forEach((user) => {
                         const tableRow = document.createElement('tr');
                         tableRow.innerHTML = `
-                            <td>${user.fullName}</td>
-                            <td>${user.email}</td>
-                            <td>${user.phoneNumber}</td>
-                            <td>${user.dateOfBirth}</td>
-                            <td>${user.role}</td>
-                            <td>${new Date(user.lastLogin).toLocaleString()}</td>
-                            <td>${user.unitNumber}</td>
-                            <td>${user.paymentDate || ''}</td>
-                            <td><button class="btn btn-primary btn-sm" onclick="editUser('${user.userId}')">Edit</button> <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userId}')">Delete</button></td>
+                            <td>${user.fullName || 'Unregistered'}</td>
+                            <td>${user.email || 'Unregistered'}</td>
+                            <td>${user.phoneNumber || 'Unregistered'}</td>
+                            <td>${user.role || 'Unregistered'}</td>
+                            <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Unregistered'}</td>
+                            <td>${user.unitNumber || 'Unregistered'}</td>
+                            <td>${user.paymentDate || 'Unregistered'}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="editUser('${user.userId}')">Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userId}')">Delete</button>
+                            </td>
                         `;
                         tableRow.dataset.userId = user.userId;
                         userTableBody.appendChild(tableRow);
