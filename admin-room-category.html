@@ -612,7 +612,7 @@
             });
         });
 
-        <!-- Display added rooms data in the table -->
+        // Display added rooms data in the table
         database.ref('rooms').on('value', function(snapshot) {
             addedRoomsTableBody.innerHTML = '';
             let count = 1;
@@ -643,7 +643,9 @@
                         <button type="button" class="btn btn-primary btn-sm" onclick="toggleAmenities('${key}')">Amenities</button>
                         <div id="amenities${key}" style="display: none;"></div>
                     </td>
-                    <td>Status: ${availability}</td>
+                    <td>
+                        <span class="badge bg-${availability === 'available' ? 'success' : 'danger'}">${availability}</span>
+                    </td>
                     <td>
                         <div style="margin-bottom: 5px;">
                             <button type="button" class="btn btn-primary btn-sm" onclick="editRoom('${key}', '${room}', '${category}', '${capacity}', '${floor}', '${type}', '${price}', '${availability}')">Edit</button>
@@ -782,7 +784,6 @@
         });
 
     </script>
-
     <script>
         // Function to handle logout
         function logout() {
