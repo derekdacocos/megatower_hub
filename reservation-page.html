@@ -621,6 +621,8 @@ function submitBookingWithProof() {
     var checkInDate = document.getElementById('checkInDate').value;
     var checkOutDate = document.getElementById('checkOutDate').value;
     var selectedType = document.getElementById('typeDropdown').value;
+    var adultsCount = document.getElementById('adultsCount').value;
+    var childrenCount = document.getElementById('childrenCount').value;
     var proofOfPaymentFile = document.getElementById('proofOfPayment').files[0];
 
     // Upload proof of payment to Firebase Storage
@@ -644,7 +646,9 @@ function submitBookingWithProof() {
                 checkOutDate: checkOutDate,
                 proofOfPaymentURL: downloadURL,
                 status: 'pending',
-                submittedAt: firebase.database.ServerValue.TIMESTAMP
+                submittedAt: firebase.database.ServerValue.TIMESTAMP,
+                adultsCount: adultsCount,
+                childrenCount: childrenCount
             };
 
             // Handle rental type separately
