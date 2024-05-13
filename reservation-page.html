@@ -118,6 +118,15 @@ drift.load('kin4c3m7twpw');
                             <option value="rental">Rental</option>
                         </select>
                     </div>
+                    <!-- Short/Long Term Dropdown (hidden by default) -->
+                    <div class="col-lg-2 mb-3" id="rentalTermField" style="display: none;">
+                        <label class="form-label" style="font-weight: 500;">Rental Term</label>
+                        <select class="form-select" aria-label="Rental Term" id="rentalTermDropdown">
+                            <option selected>Choose...</option>
+                            <option value="short_term">Short Term</option>
+                            <option value="long_term">Long Term</option>
+                        </select>
+                    </div>
                     <!-- Check-in Date Field -->
                     <div class="col-lg-2 mb-3" id="checkInField" style="display: none;">
                         <label class="form-label" style="font-weight: 500;">Check-in</label>
@@ -489,9 +498,16 @@ document.getElementById('availabilityForm').addEventListener('submit', function(
     var selectedAmenities = Array.from(document.querySelectorAll('#amenitiesModal input[type="checkbox"]:checked')).map(function(checkbox) {
         return checkbox.value;
     });
-    var selectedType = document.getElementById('typeDropdown').value; // Get the selected type
+    var selectedType = document.getElementById('typeDropdown').value;
+    var selectedRentalTerm = document.getElementById('rentalTermDropdown') ? document.getElementById('rentalTermDropdown').value : null;
     var adultsCount = document.getElementById('adultsCount').value;
     var childrenCount = document.getElementById('childrenCount').value;
+
+    // Handle rental term data
+    if (selectedType === 'rental' && !selectedRentalTerm) {
+        alert('Please select a rental term.');
+        return;
+    }
     
     // Calculate the total number of guests
     var guestsCount = parseInt(adultsCount) + parseInt(childrenCount);
@@ -597,7 +613,6 @@ document.getElementById('bookingForm').addEventListener('submit', function(event
     });
 });
 
-// Function to submit booking with proof of payment
 function submitBookingWithProof() {
     // Get form data
     var fullName = document.getElementById('fullName').value;
@@ -605,6 +620,7 @@ function submitBookingWithProof() {
     var roomId = document.getElementById('roomId').value;
     var checkInDate = document.getElementById('checkInDate').value;
     var checkOutDate = document.getElementById('checkOutDate').value;
+    var selectedType = document.getElementById('typeDropdown').value;
     var proofOfPaymentFile = document.getElementById('proofOfPayment').files[0];
 
     // Upload proof of payment to Firebase Storage
@@ -620,18 +636,30 @@ function submitBookingWithProof() {
     }, function() {
         // Handle successful upload
         uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-            // Save booking details along with proof of payment URL to Firebase Realtime Database
-            var newReservationRef = firebase.database().ref('reservations').push();
-            newReservationRef.set({
+            var reservationData = {
                 roomId: roomId,
                 fullName: fullName,
                 email: email,
                 checkInDate: checkInDate,
                 checkOutDate: checkOutDate,
-                proofOfPaymentURL: downloadURL, // Save proof of payment URL
+                proofOfPaymentURL: downloadURL,
                 status: 'pending',
-                submittedAt: firebase.database.ServerValue.TIMESTAMP // Add submittedAt field
-            }).then(() => {
+                submittedAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Handle rental type separately
+            if (selectedType === 'rental') {
+                var selectedRentalTerm = document.getElementById('rentalTermDropdown').value;
+                reservationData.type = selectedType;
+                reservationData.rentalTerm = selectedRentalTerm;
+            } else {
+                // For other types (Transient, Purchase)
+                reservationData.type = selectedType;
+            }
+
+            // Submit booking to Firebase Realtime Database
+            var newReservationRef = firebase.database().ref('reservations').push();
+            newReservationRef.set(reservationData).then(() => {
                 alert('Your booking is submitted and pending confirmation.');
                 $('#bookingModal').modal('hide');
             }).catch((error) => {
@@ -640,7 +668,6 @@ function submitBookingWithProof() {
         });
     });
 }
-
 
 // Initialize Swiper
 var swiper = new Swiper('.swiper-container', {
@@ -681,15 +708,21 @@ $(document).ready(function(){
 <script>
     document.getElementById('typeDropdown').addEventListener('change', function() {
         var selectedType = this.value;
-        var checkInField = document.getElementById('checkInField');
-        var checkOutField = document.getElementById('checkOutField');
-    
-        if (selectedType === 'transient') {
-            checkInField.style.display = 'block';
-            checkOutField.style.display = 'block';
+
+        // Show/hide rental term dropdown based on selection
+        if (selectedType === 'rental') {
+            document.getElementById('rentalTermField').style.display = 'block';
         } else {
-            checkInField.style.display = 'none';
-            checkOutField.style.display = 'none';
+            document.getElementById('rentalTermField').style.display = 'none';
+        }
+
+        // Show/hide check-in and check-out fields based on selection
+        if (selectedType === 'transient') {
+            document.getElementById('checkInField').style.display = 'block';
+            document.getElementById('checkOutField').style.display = 'block';
+        } else {
+            document.getElementById('checkInField').style.display = 'none';
+            document.getElementById('checkOutField').style.display = 'none';
         }
     });
     
@@ -700,7 +733,6 @@ $(document).ready(function(){
     
         if (selectedType === 'transient') {
             // Perform form submission
-            // For demonstration, just showing a modal
             $('#confirmationModal').modal('show');
             // Reset form fields
             document.getElementById('availabilityForm').reset();
