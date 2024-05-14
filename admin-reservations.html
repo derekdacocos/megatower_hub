@@ -104,10 +104,8 @@
             <thead>
                 <tr>
                     <th>Full Name</th>
-                    <th>Room ID</th>
                     <th>Status</th>
-                    <th>Check-In Date</th>
-                    <th>Check-Out Date</th>
+                    <th>Booking Type</th>
                     <th>Email</th>
                     <th>Submitted At</th>
                     <th>Payment</th>
@@ -221,23 +219,57 @@ function displayReservations() {
                 // Format submittedAt into a readable format
                 const submittedAtDate = new Date(reservation.submittedAt).toLocaleString();
 
-                // Replace empty dates with 'N/A'
-                const checkInDate = reservation.checkInDate ? reservation.checkInDate : 'N/A';
-                const checkOutDate = reservation.checkOutDate ? reservation.checkOutDate : 'N/A';
-
                 // Fetch room data based on room UID
                 const roomId = reservation.roomId;
                 database.ref('rooms').child(roomId).once('value')
                     .then((roomSnapshot) => {
                         const roomData = roomSnapshot.val();
                         const roomValue = roomData.room; // Assuming 'room' is the property to display
+
+                        // Construct type information
+                        let typeInfo = '';
+                        let capitalizedType = reservation.type.charAt(0).toUpperCase() + reservation.type.slice(1); // Capitalize the type
+                        if (capitalizedType === 'Transient') {
+                            typeInfo = `
+                                <p style="margin-bottom: 5px;"><b>Type:</b> ${capitalizedType}</p>
+                                <p><b>Room ID:</b> ${roomValue}</p>
+                                <p style="margin-bottom: 5px;"><b>Check In:</b> ${reservation.checkInDate}</p>
+                                <p style="margin-bottom: 5px;"><b>Check Out:</b> ${reservation.checkOutDate}</p>
+                            `;
+                        } else if (capitalizedType === 'Rental') {
+                            let termInfo = '';
+                            if (reservation.rentalTerm === 'short_term') {
+                                termInfo = 'Short Term Rental';
+                            } else if (reservation.rentalTerm === 'long_term') {
+                                termInfo = 'Long Term Rental';
+                            } else {
+                                termInfo = reservation.rentalTerm;
+                            }
+                            typeInfo = `
+                                <p style="margin-bottom: 5px;"><b>Type:</b> ${capitalizedType}</p>
+                                <p><b>Room ID:</b> ${roomValue}</p>
+                                <p style="margin-bottom: 5px;"><b>Term:</b> ${termInfo}</p>
+                            `;
+                        } else {
+                            typeInfo = `
+                            <p style="margin-bottom: 5px;"><b>Type:</b> ${capitalizedType}</p>
+                                <p><b>Room ID:</b> ${roomValue}</p>
+                            `;
+                        }
+
+                        // Add guests count, adults count, and children count
+                        if (!isNaN(reservation.adultsCount) && !isNaN(reservation.childrenCount)) {
+                            const guestsCount = parseInt(reservation.adultsCount) + parseInt(reservation.childrenCount);
+                            typeInfo += `<p style="margin-bottom: 5px;"><b>Guests:</b> ${guestsCount}</p>`;
+                            typeInfo += `<p style="margin-bottom: 5px;">&nbsp;&nbsp;&nbsp;&nbsp;<span style="margin-left: 10px;"><b>Adults:</b></span> ${reservation.adultsCount}</p>`;
+                            typeInfo += `<p style="margin-bottom: 5px;">&nbsp;&nbsp;&nbsp;&nbsp;<span style="margin-left: 10px;"><b>Children:</b></span> ${reservation.childrenCount}</p>`;
+                        }
+
                         const tableRow = document.createElement('tr');
                         tableRow.innerHTML = `
                             <td>${reservation.fullName}</td>
-                            <td>${roomValue}</td>
                             <td><span class="badge ${statusColorClass} rounded-pill">${reservation.status}</span></td>
-                            <td>${checkInDate}</td>
-                            <td>${checkOutDate}</td>
+                            <td>${typeInfo}</td> <!-- Display type information -->
                             <td>${reservation.email}</td>
                             <td>${submittedAtDate}</td> <!-- Display readable submittedAt date -->
                             <td>${reservation.proofOfPaymentURL ? `<a href="${reservation.proofOfPaymentURL}" target="_blank">View Proof</a>` : 'Not Available'}</td>
