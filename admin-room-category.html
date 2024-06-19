@@ -191,6 +191,10 @@
                                 </div>
                             </div>
                             <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
                                 <label for="image" class="form-label">Image</label>
                                 <input type="file" class="form-control" id="image" accept="image/*" required>
                             </div>
@@ -544,73 +548,77 @@
 
 
         // Function to add a room
-        roomForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+document.getElementById('roomForm').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-            // Get form values (room data)
-            const room = document.getElementById('room').value;
-            const category = document.getElementById('categorySelect').value;
-            const capacity = document.getElementById('capacity').value;
-            const floor = document.getElementById('floor').value;
-            const type = document.getElementById('type').value;
-            const price = document.getElementById('price').value;
-            const availability = document.getElementById('availability').value;
-            const image = document.getElementById('image').files[0];
-            const name = room; // Removed concatenation with 'type'
+    // Get form values (room data)
+    const room = document.getElementById('room').value;
+    const category = document.getElementById('categorySelect').value;
+    const capacity = document.getElementById('capacity').value;
+    const floor = document.getElementById('floor').value;
+    const type = document.getElementById('type').value;
+    const price = document.getElementById('price').value;
+    const availability = document.getElementById('availability').value;
+    const description = document.getElementById('description').value;
+    const image = document.getElementById('image').files[0];
+    const name = room; // Removed concatenation with 'type'
 
-            // Get selected amenities
-            const selectedAmenities = [];
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(checkbox) {
-                selectedAmenities.push(checkbox.value);
-            });
+    // Get selected amenities
+    const selectedAmenities = [];
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(checkbox) {
+        selectedAmenities.push(checkbox.value);
+    });
 
-            // Define the saveAmenities function here
-            function saveAmenities() {
-                // Your saveAmenities function implementation here
-                console.log("Adding amenities...");
-                // You can access selectedAmenities here
-                console.log("Selected amenities:", selectedAmenities);
-            }
+    // Define the saveAmenities function here
+    function saveAmenities() {
+        // Your saveAmenities function implementation here
+        console.log("Adding amenities...");
+        // You can access selectedAmenities here
+        console.log("Selected amenities:", selectedAmenities);
+    }
 
-            // Upload image to Firebase Storage
-            const storageRef = storage.ref('room_images/' + image.name);
-            storageRef.put(image)
-                .then(snapshot => snapshot.ref.getDownloadURL())
-                .then(downloadURL => {
-                    // Add room data to Firebase Realtime Database
-                    const roomData = {
-                        room: room,
-                        category: category,
-                        capacity: capacity,
-                        floor: floor,
-                        type: type,
-                        price: price,
-                        availability: availability,
-                        name: name,
-                        image: downloadURL,
-                        amenities: selectedAmenities // Add selected amenities to room data
-                    };
-                    database.ref('rooms').push(roomData);
-                })
-                .catch(error => {
-                    console.error('Error uploading image: ', error);
-                });
-
-            roomForm.reset();
+    // Upload image to Firebase Storage
+    const storageRef = storage.ref('room_images/' + image.name);
+    storageRef.put(image)
+        .then(snapshot => snapshot.ref.getDownloadURL())
+        .then(downloadURL => {
+            // Add room data to Firebase Realtime Database
+            const roomData = {
+                room: room,
+                category: category,
+                capacity: capacity,
+                floor: floor,
+                type: type,
+                price: price,
+                availability: availability,
+                description: description, // Add description to room data
+                name: name,
+                image: downloadURL,
+                amenities: selectedAmenities // Add selected amenities to room data
+            };
+            database.ref('rooms').push(roomData);
+        })
+        .catch(error => {
+            console.error('Error uploading image: ', error);
         });
-        // Populate category select options
-        database.ref('room_category').on('value', function(snapshot) {
-            const categorySelect = document.getElementById('categorySelect');
-            categorySelect.innerHTML = '';
-            snapshot.forEach(function(childSnapshot) {
-                const data = childSnapshot.val();
-                const category = data.category;
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categorySelect.appendChild(option);
-            });
-        });
+
+    roomForm.reset();
+});
+
+// Populate category select options
+database.ref('room_category').on('value', function(snapshot) {
+    const categorySelect = document.getElementById('categorySelect');
+    categorySelect.innerHTML = '';
+    snapshot.forEach(function(childSnapshot) {
+        const data = childSnapshot.val();
+        const category = data.category;
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+});
+
 
         // Display added rooms data in the table
         database.ref('rooms').on('value', function(snapshot) {
