@@ -326,12 +326,12 @@
                                 // Add margin between buttons
                                 buttonWrapper.appendChild(document.createElement('br'));
 
-                                // Button to apply penalty
                                 const penaltyButton = document.createElement('button');
+                                penaltyButton.id = `penaltyButton${sortedRequest.id}`; // Assign a unique ID for each button
                                 penaltyButton.className = 'btn btn-warning btn-sm rounded-3';
                                 penaltyButton.innerText = 'Penalty';
                                 penaltyButton.addEventListener('click', () => {
-                                    // Prompt the admin for the number of days
+                                    // Prompt for number of days when applying penalty
                                     const penaltyDays = prompt("Enter the number of days for the penalty:");
                                     if (penaltyDays === null || penaltyDays === "") {
                                         return; // Exit if cancelled or no input
@@ -396,37 +396,107 @@
             $('#remarksModal').modal('hide');
         }
 
-        // Function to apply a penalty to the user for 7 days for misusing the emergency request feature
+        // Function to apply or revoke penalty
         function applyPenalty(requestId, penaltyDays) {
-            // Display confirmation dialog
-            const confirmed = confirm("Are you sure you want to apply a penalty to this user?");
-            if (!confirmed) {
-                return; // Exit the function if the admin cancels
-            }
-
             const requestRef = firebase.database().ref(`maintenanceRequests/${requestId}`);
             requestRef.once('value').then((snapshot) => {
                 const request = snapshot.val();
                 const userID = request.userID;
 
-                // Calculate the penalty expiration date (current date + penaltyDays)
-                const penaltyExpiration = new Date();
-                penaltyExpiration.setDate(penaltyExpiration.getDate() + penaltyDays);
+                // Check if user has an existing penalty
+                const userRef = firebase.database().ref(`users/${userID}`);
+                userRef.once('value').then((userSnapshot) => {
+                    const user = userSnapshot.val();
+                    if (user && user.penaltyUntil && !isNaN(user.penaltyUntil)) {
+                        // User has an existing penalty, prompt to revoke
+                        const revokeConfirmed = confirm("This user already has a penalty. Do you want to revoke it?");
+                        if (revokeConfirmed) {
+                            // Revoke penalty
+                            userRef.update({
+                                penaltyUntil: null
+                            });
 
-                // Apply the penalty to the user
+                            // Update UI to reflect revoked penalty
+                            updatePenaltyButton(requestId, false);
+                        }
+                    } else {
+                        // Calculate the penalty expiration date (current date + penaltyDays)
+                        const penaltyExpiration = new Date();
+                        penaltyExpiration.setDate(penaltyExpiration.getDate() + penaltyDays);
+
+                        // Apply the penalty to the user
+                        userRef.update({
+                            penaltyUntil: penaltyExpiration.getTime()
+                        });
+
+                        // Send a notification to the user
+                        const confirmationMessage = `A penalty has been applied to your account for misusing the emergency maintenance request feature. You will not be able to submit emergency maintenance requests until ${penaltyExpiration.toLocaleString()}.`;
+                        sendNotificationToUser(userID, confirmationMessage);
+
+                        // Update UI to reflect applied penalty
+                        updatePenaltyButton(requestId, true);
+                    }
+                });
+            });
+        }
+
+        // Function to update the penalty button text and behavior
+        function updatePenaltyButton(requestId, isPenaltyApplied) {
+            const button = document.getElementById(`penaltyButton${requestId}`);
+            if (button) {
+                if (isPenaltyApplied) {
+                    // Change button to Revoke
+                    button.innerText = 'Revoke';
+                    button.classList.remove('btn-warning');
+                    button.classList.add('btn-danger');
+                    button.removeEventListener('click', applyPenalty); // Remove applyPenalty listener
+                    button.addEventListener('click', () => {
+                        // Confirm before revoking
+                        const revokeConfirmed = confirm("Are you sure you want to revoke the penalty?");
+                        if (revokeConfirmed) {
+                            revokePenalty(requestId);
+                        }
+                    });
+                } else {
+                    // Change button back to Penalty
+                    button.innerText = 'Penalty';
+                    button.classList.remove('btn-danger');
+                    button.classList.add('btn-warning');
+                    button.removeEventListener('click', revokePenalty); // Remove revokePenalty listener
+                    button.addEventListener('click', () => {
+                        // Prompt for number of days when applying penalty
+                        const penaltyDays = prompt("Enter the number of days for the penalty:");
+                        if (penaltyDays === null || penaltyDays === "") {
+                            return; // Exit if cancelled or no input
+                        }
+                        applyPenalty(requestId, parseInt(penaltyDays, 10));
+                    });
+                }
+            }
+        }
+
+        // Function to revoke the penalty
+        function revokePenalty(requestId) {
+            const requestRef = firebase.database().ref(`maintenanceRequests/${requestId}`);
+            requestRef.once('value').then((snapshot) => {
+                const request = snapshot.val();
+                const userID = request.userID;
+
+                // Revoke the penalty from the user
                 const userRef = firebase.database().ref(`users/${userID}`);
                 userRef.update({
-                    penaltyUntil: penaltyExpiration.getTime()
+                    penaltyUntil: null
                 });
 
                 // Send a notification to the user
-                const confirmationMessage = `A penalty has been applied to your account for misusing the emergency maintenance request feature. You will not be able to submit emergency maintenance requests until ${penaltyExpiration.toLocaleString()}.`;
+                const confirmationMessage = `The penalty applied to your account has been revoked.`;
                 sendNotificationToUser(userID, confirmationMessage);
 
-                // Optionally, you can also display the confirmation in the console
-                console.log(adminConfirmation);
+                // Update UI to reflect revoked penalty
+                updatePenaltyButton(requestId, false);
             });
         }
+
     </script>
 
     <script>
