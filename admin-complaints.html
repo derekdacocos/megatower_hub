@@ -146,39 +146,49 @@
                     const complaint = childSnapshot.val();
                     const complaintKey = childSnapshot.key;
 
-                    const name = complaint.name || "Anonymous";
-                    const description = complaint.description || "Not Available";
-                    const submittedAt = new Date(complaint.submittedAt).toLocaleString();
-                    const resolved = complaint.resolved || false;
+                    // Fetch user details to get fullName
+                    database.ref(`users/${complaint.userID}`).once('value')
+                        .then(userSnapshot => {
+                            const userData = userSnapshot.val();
+                            const fullName = userData.fullName || "Anonymous"; // Default to "Anonymous" if fullName not found
 
-                    complaintsArray.push({
-                        key: complaintKey,
-                        name: name,
-                        description: description,
-                        submittedAt: submittedAt,
-                        resolved: resolved
-                    });
-                });
+                            const description = complaint.description || "Not Available";
+                            const submittedAt = new Date(complaint.submittedAt).toLocaleString();
+                            const resolved = complaint.resolved || false;
 
-                // Sort complaints by submittedAt in descending order
-                complaintsArray.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+                            complaintsArray.push({
+                                key: complaintKey,
+                                fullName: fullName,
+                                description: description,
+                                submittedAt: submittedAt,
+                                resolved: resolved
+                            });
 
-                // Populate the table with sorted complaints
-                complaintsArray.forEach(complaint => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${count++}</td>
-                        <td>${complaint.name}</td>
-                        <td>${complaint.description}</td>
-                        <td>${complaint.submittedAt}</td>
-                        <td>${complaint.resolved ? 'Yes' : 'No'}</td>
-                        <td>
-                        <button class="btn btn-success btn-action" onclick="toggleResolvedStatus('${complaint.key}', ${complaint.resolved})">
-                            ${complaint.resolved ? 'Mark Unresolved' : 'Set as Resolved'}
-                        </button>
-                    </td>
-                    `;
-                    complaintsTableBody.appendChild(row);
+                            // Sort complaints by submittedAt in descending order
+                            complaintsArray.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+                            // Populate the table with sorted complaints
+                            complaintsTableBody.innerHTML = ''; // Clear existing rows
+                            complaintsArray.forEach(complaint => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${count++}</td>
+                                    <td>${complaint.fullName}</td>
+                                    <td>${complaint.description}</td>
+                                    <td>${complaint.submittedAt}</td>
+                                    <td>${complaint.resolved ? 'Yes' : 'No'}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-action" onclick="toggleResolvedStatus('${complaint.key}', ${complaint.resolved})">
+                                            ${complaint.resolved ? 'Mark Unresolved' : 'Set as Resolved'}
+                                        </button>
+                                    </td>
+                                `;
+                                complaintsTableBody.appendChild(row);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching user data:', error);
+                        });
                 });
             });
         }

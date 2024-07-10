@@ -136,10 +136,6 @@
           <h2>Complaint Form</h2>
           <form id="complaintForm">
             <div class="form-group">
-              <label for="name">Name:</label>
-              <input type="text" class="form-control" id="name" required>
-            </div>            
-            <div class="form-group">
               <label for="description">Description:</label>
               <textarea class="form-control mb-3" id="description" rows="4" required></textarea>
             </div>            
@@ -196,44 +192,53 @@
         return;
       }
 
-      const name = document.getElementById('name').value;
       const description = document.getElementById('description').value; // Changed from 'complaintMessage' to 'description'
 
       // Validate form fields
-      if (name.trim() === '' || description.trim() === '') {
+      if (description.trim() === '') {
         alert('Please fill out all required fields.');
-        return; // Prevent further execution
+        return; // Prevent further execution if validation fails
       }
 
-      // Get the current date and time in milliseconds
+      // Get current timestamp
       const submittedAt = Date.now();
 
-      // Push data to Firebase Realtime Database under complaints node
-      database.ref('complaints').push({
-        userID: userID,
-        name: name,
-        description: description, // Changed from 'complaintMessage' to 'description'
-        submittedAt: submittedAt,
-        resolved: false // Initially, the complaint is not resolved
-      })
-      .then(() => {
-        // Clear the form after submission
-        document.getElementById('complaintForm').reset();
+      // Fetch the fullName of the user from the users node
+      database.ref('users/' + userID).once('value')
+        .then(snapshot => {
+          const userData = snapshot.val();
+          const fullName = userData.fullName || 'Unknown User';
 
-        // Push data to Firebase Realtime Database under adminNotifications node
-        database.ref('adminNotifications').push({
-          type: 'Complaint',
-          message: `${name} submitted a complaint.`,
-          submittedAt: submittedAt,
-          isRead: false // Initially, the notification is unread
+          // Push data to Firebase Realtime Database under complaints node
+          database.ref('complaints').push({
+            userID: userID,
+            description: description, // Changed from 'complaintMessage' to 'description'
+            submittedAt: submittedAt,
+            resolved: false // Initially, the complaint is not resolved
+          })
+          .then(() => {
+            // Clear the form after submission
+            document.getElementById('complaintForm').reset();
+
+            // Push data to Firebase Realtime Database under adminNotifications node
+            database.ref('adminNotifications').push({
+              type: 'Complaint',
+              message: `${fullName} submitted a complaint.`,
+              submittedAt: submittedAt,
+              isRead: false // Initially, the notification is unread
+            });
+            
+            alert("Complaint submitted successfully!");
+          })
+          .catch((error) => {
+            console.error(error.message);
+            alert("Error submitting complaint. Please try again.");
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching user data:", error);
+          alert("Error fetching user data. Please try again.");
         });
-        
-        alert("Complaint submitted successfully!");
-      })
-      .catch((error) => {
-        console.error(error.message);
-        alert("Error submitting complaint. Please try again.");
-      });
     }
 
     // Check if the user is authenticated on page load
@@ -268,55 +273,43 @@
       }
     });
 
-   // Fetch and display notifications for the authenticated user
-  function displayNotificationsForUser(userID) {
-    const notificationsBox = document.getElementById('feedbackBox');
-    
-    // Clear existing content
-    notificationsBox.innerHTML = "";
-
-    // Reference to the 'complaintNotifs' node under the user's ID
-    const userNotificationsRef = database.ref('users/' + userID + '/complaintNotifs');
-
-    // Listen for real-time updates
-    userNotificationsRef.orderByChild('dateTime').on('value', snapshot => {
-      const notifications = [];
-      snapshot.forEach(childSnapshot => {
-        const notification = childSnapshot.val();
-        notifications.push(notification);
-      });
-
-      // Sort notifications by dateTime in descending order (most recent first)
-      notifications.sort((a, b) => b.dateTime - a.dateTime);
-
+    // Fetch and display notifications for the authenticated user
+    function displayNotificationsForUser(userID) {
+      const notificationsBox = document.getElementById('feedbackBox');
+      
       // Clear existing content
       notificationsBox.innerHTML = "";
 
-      // Create HTML elements for each notification
-      notifications.forEach(notification => {
-        const notificationDiv = document.createElement('div');
-        notificationDiv.innerHTML = `
-            <p>${notification.message}</p>
-            <small>${new Date(notification.dateTime).toLocaleString()}</small><br>
-            <hr>
-        `;
-        notificationsBox.appendChild(notificationDiv);
-      });
-    });
-  }
+      // Reference to the 'complaintNotifs' node under the user's ID
+      const userNotificationsRef = database.ref('users/' + userID + '/complaintNotifs');
 
-    function validateForm() {
-      const name = document.getElementById('name').value;
-      const complaintMessage = document.getElementById('complaintMessage').value;
-      
-      if (name.trim() === '' || complaintMessage.trim() === '') {
-        alert('Please fill out all required fields.');
-        return false; // Prevent form submission
-      }
-      
-      // If validation passes, allow form submission
-      return true;
+      // Listen for real-time updates
+      userNotificationsRef.orderByChild('dateTime').on('value', snapshot => {
+        const notifications = [];
+        snapshot.forEach(childSnapshot => {
+          const notification = childSnapshot.val();
+          notifications.push(notification);
+        });
+
+        // Sort notifications by dateTime in descending order (most recent first)
+        notifications.sort((a, b) => b.dateTime - a.dateTime);
+
+        // Clear existing content
+        notificationsBox.innerHTML = "";
+
+        // Create HTML elements for each notification
+        notifications.forEach(notification => {
+          const notificationDiv = document.createElement('div');
+          notificationDiv.innerHTML = `
+              <p>${notification.message}</p>
+              <small>${new Date(notification.dateTime).toLocaleString()}</small><br>
+              <hr>
+          `;
+          notificationsBox.appendChild(notificationDiv);
+        });
+      });
     }
+
   </script>
 
   <script>
