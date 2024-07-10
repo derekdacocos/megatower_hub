@@ -174,10 +174,6 @@
                     <label for="phoneNumberInput" class="form-label">Phone Number</label>
                     <input type="text" class="form-control" id="phoneNumberInput">
                 </div>
-                <div class="mb-3">
-                    <label for="unitNumberInput" class="form-label">Unit Number</label>
-                    <input type="text" class="form-control" id="unitNumberInput">
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -249,15 +245,12 @@
         function enableProfileEditing() {
             const fullNameSpan = document.getElementById('fullName');
             const phoneNumberSpan = document.getElementById('phoneNumber');
-            const unitNumberSpan = document.getElementById('unitNumber');
 
             const fullNameInput = document.getElementById('fullNameInput');
             const phoneNumberInput = document.getElementById('phoneNumberInput');
-            const unitNumberInput = document.getElementById('unitNumberInput');
 
             fullNameInput.value = fullNameSpan.textContent;
             phoneNumberInput.value = phoneNumberSpan.textContent;
-            unitNumberInput.value = unitNumberSpan.textContent;
 
             $('#profileUpdateModal').modal('show');
         }
@@ -270,12 +263,10 @@
 
                 const fullName = document.getElementById('fullNameInput').value;
                 const phoneNumber = document.getElementById('phoneNumberInput').value;
-                const unitNumber = document.getElementById('unitNumberInput').value;
 
                 userProfileRef.update({
                     fullName: fullName,
                     phoneNumber: phoneNumber,
-                    unitNumber: unitNumber
                 }).then(() => {
                     alert('Profile updated successfully!');
                     // Refresh the page to display updated information
