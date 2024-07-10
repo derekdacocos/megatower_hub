@@ -331,7 +331,12 @@
                                 penaltyButton.className = 'btn btn-warning btn-sm rounded-3';
                                 penaltyButton.innerText = 'Penalty';
                                 penaltyButton.addEventListener('click', () => {
-                                    applyPenalty(sortedRequest.id);
+                                    // Prompt the admin for the number of days
+                                    const penaltyDays = prompt("Enter the number of days for the penalty:");
+                                    if (penaltyDays === null || penaltyDays === "") {
+                                        return; // Exit if cancelled or no input
+                                    }
+                                    applyPenalty(sortedRequest.id, parseInt(penaltyDays, 10));
                                 });
                                 buttonWrapper.appendChild(penaltyButton);
 
@@ -392,7 +397,7 @@
         }
 
         // Function to apply a penalty to the user for 7 days for misusing the emergency request feature
-        function applyPenalty(requestId) {
+        function applyPenalty(requestId, penaltyDays) {
             // Display confirmation dialog
             const confirmed = confirm("Are you sure you want to apply a penalty to this user?");
             if (!confirmed) {
@@ -404,9 +409,9 @@
                 const request = snapshot.val();
                 const userID = request.userID;
 
-                // Calculate the penalty expiration date (current date + 7 days)
+                // Calculate the penalty expiration date (current date + penaltyDays)
                 const penaltyExpiration = new Date();
-                penaltyExpiration.setDate(penaltyExpiration.getDate() + 7);
+                penaltyExpiration.setDate(penaltyExpiration.getDate() + penaltyDays);
 
                 // Apply the penalty to the user
                 const userRef = firebase.database().ref(`users/${userID}`);
