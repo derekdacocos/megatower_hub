@@ -396,6 +396,10 @@
                             </select>
                         </div>
                         <div class="mb-3">
+                            <label for="editRoomDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editRoomDescription" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
                             <button type="button" class="btn btn-info" onclick="prepareAndShowEditAmenitiesModal(); $('#editRoomModal').modal('hide');">Edit Amenities</button>
                         </div>
                         <input type="hidden" id="editRoomId">
@@ -732,6 +736,7 @@ database.ref('room_category').on('value', function(snapshot) {
             const type = document.getElementById('editRoomType').value;
             const price = document.getElementById('editRoomPrice').value;
             const availability = document.getElementById('editRoomAvailability').value;
+            const description = document.getElementById('editRoomDescription').value; // Add this line
 
             // Update room details in Firebase Realtime Database
             database.ref('rooms').child(id).update({
@@ -741,7 +746,8 @@ database.ref('room_category').on('value', function(snapshot) {
                 floor: floor,
                 type: type,
                 price: price,
-                availability: availability
+                availability: availability,
+                description: description // Add this line
             }).then(() => {
                 // Close the modal after saving changes
                 $('#editRoomModal').modal('hide');
