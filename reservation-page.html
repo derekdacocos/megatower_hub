@@ -490,6 +490,18 @@ function formatPrice(price) {
     return '₱' + formattedPrice;
 }
 
+// Function to truncate description
+function truncateDescription(description, maxLength) {
+    if (!description) {
+        return ''; // Return empty string if description is undefined or null
+    }
+    if (description.length > maxLength) {
+        return description.substring(0, maxLength) + '...';
+    } else {
+        return description;
+    }
+}
+
 document.getElementById('availabilityForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the form from submitting in the traditional way
 
@@ -508,7 +520,7 @@ document.getElementById('availabilityForm').addEventListener('submit', function(
         alert('Please select a rental term.');
         return;
     }
-    
+
     // Calculate the total number of guests
     var guestsCount = parseInt(adultsCount) + parseInt(childrenCount);
 
@@ -519,16 +531,15 @@ document.getElementById('availabilityForm').addEventListener('submit', function(
         Object.keys(rooms).forEach(function(roomId) {
             var room = rooms[roomId];
             if (room.availability === 'available' && selectedAmenities.every(amenity => room.amenities.includes(amenity))) {
-                // Check if the room type matches the selected type
                 if (selectedType === 'Choose...' || room.type === selectedType) {
-                    // Assuming the room is available if there are no bookedDates overlapping the requested period
                     var isOverlapping = Object.keys(room.bookedDates || {}).some(function(date) {
                         var bookedDate = new Date(date);
                         return bookedDate >= checkInDate && bookedDate <= checkOutDate;
                     });
 
                     if (!isOverlapping && (parseInt(adultsCount) + parseInt(childrenCount)) <= room.capacity) {
-                        // Inside the JavaScript where you generate the room cards
+                        var truncatedDescription = truncateDescription(room.description, 100); // Adjust maxLength as needed
+
                         availableRoomHtml += `
                             <div class="col-lg-4 col-md-6 my-3">
                                 <div class="card h-100 border-0 shadow">
@@ -537,7 +548,11 @@ document.getElementById('availabilityForm').addEventListener('submit', function(
                                         <div>
                                             <h5 class="card-title">${room.category}</h5>
                                             <h6 class="mb-4">Room: ${room.room}</h6>
-                                            <h6 class="mb-4">Description: ${room.description}</h6>
+                                            <div class="description mb-4">
+                                                <h6 class="mb-1">Description:</h6>
+                                                <p class="description-text">${truncatedDescription}</p>
+                                                ${room.description && room.description.length > 100 ? '<button class="btn btn-link see-more" onclick="toggleDescription(this)" data-full-description="' + encodeURIComponent(room.description) + '">See More</button>' : ''}
+                                            </div>
                                             <h6 class="mb-4">Price: ${formatPrice(room.price)}</h6> <!-- Format the price here -->
                                             <div class="amenities mb-4">
                                                 <h6 class="mb-1">Amenities</h6>
@@ -563,11 +578,22 @@ document.getElementById('availabilityForm').addEventListener('submit', function(
         }
 
         document.getElementById('availableRooms').innerHTML = availableRoomHtml;
-
-        // Show the "Available Rooms" label after submitting the form
         document.getElementById('availableRoomsLabel').style.display = 'block';
     });
 });
+
+function toggleDescription(button) {
+    var descriptionText = button.previousElementSibling;
+    var fullDescription = decodeURIComponent(button.getAttribute('data-full-description'));
+    if (button.textContent === 'See More') {
+        descriptionText.textContent = fullDescription;
+        button.textContent = 'See Less';
+    } else {
+        descriptionText.textContent = truncateDescription(fullDescription, 100); // Adjust maxLength as needed
+        button.textContent = 'See More';
+    }
+}
+
 
 function openBookingModal(roomId) {
     // Set the room ID in the hidden input of the booking form
