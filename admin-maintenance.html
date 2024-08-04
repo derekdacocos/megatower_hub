@@ -99,6 +99,7 @@
     <!-- Content -->
     <div class="container mt-5">
         <h2 class="mb-4">Maintenance Queue</h2>
+        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#maintenanceArchivesModal">Maintenance Archives</button>
         <div class="row">
             <div class="col-md-8">
                 <table class="table">
@@ -123,6 +124,37 @@
                 <div id="confirmationBox" class="p-3" style="border: 1px solid #ced4da; border-radius: 5px; height: 300px; overflow-y: auto;">
                     <h4 class="mb-3">Confirmation Box</h4>
                     <ul id="confirmationMessages" class="list-group"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Archives Modal -->
+    <div class="modal fade" id="maintenanceArchivesModal" tabindex="-1" aria-labelledby="maintenanceArchivesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="maintenanceArchivesModalLabel">Maintenance Archives</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Description</th>
+                                <th scope="col">Schedule</th>
+                                <th scope="col">Submitted At</th>
+                                <th scope="col">Assigned To</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenanceArchivesTableBody">
+                            <!-- Archived maintenance requests will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -496,6 +528,38 @@
                 updatePenaltyButton(requestId, false);
             });
         }
+        
+        // Function to fetch and display finished maintenance
+        function displayFinishedMaintenance() {
+            const finishedMaintenanceRef = firebase.database().ref('finishedMaintenance');
+
+            finishedMaintenanceRef.on('value', (snapshot) => {
+                const maintenanceArchivesTableBody = document.getElementById('maintenanceArchivesTableBody');
+                maintenanceArchivesTableBody.innerHTML = ''; // Clear existing data
+
+                const finishedRequests = snapshot.val();
+                if (finishedRequests) {
+                    // Convert the object of requests into an array
+                    const finishedRequestArray = Object.keys(finishedRequests).map((key) => ({
+                        id: key,
+                        ...finishedRequests[key],
+                    }));
+
+                    finishedRequestArray.forEach((finishedRequest) => {
+                        const row = maintenanceArchivesTableBody.insertRow();
+                        row.innerHTML = `<td>${finishedRequest.description}</td>
+                                        <td>${finishedRequest.isEmergency ? '<b>URGENT</b>' : (finishedRequest.scheduleDate && finishedRequest.scheduleTime ? finishedRequest.scheduleDate + ' ' + finishedRequest.scheduleTime : 'Not provided')}</td>
+                                        <td>${formatTimestamp(finishedRequest.submittedAt)}</td>
+                                        <td>${finishedRequest.assignedTo || 'Not assigned'}</td>
+                                        <td>Completed</td>`;
+                    });
+                }
+            });
+        }
+
+// Call the function when the modal is opened
+$('#maintenanceArchivesModal').on('show.bs.modal', displayFinishedMaintenance);
+
 
     </script>
 
